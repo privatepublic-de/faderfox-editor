@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updateView() {
         DOM.empty(ctrlcontainer);
-        for (i=0;i<24;i++) {
+        for (let i=0;i<24;i++) {
             DOM.addHTML(ctrlcontainer, 'beforeend', controlhtml);
         }
         let index = 0;
