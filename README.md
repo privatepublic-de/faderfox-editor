@@ -1,7 +1,7 @@
 # Faderfox Controller Editor (Web-MIDI)
 This project offers browser-based editors for MIDI controllers by [faderfox.de](http://faderfox.de).
 
-TO use this editor you need a Web-MIDI-enabled webbrowser. Currently only Google Chrome (since Version 49 with sysex-support) and [Chromium](https://www.chromium.org/Home) support Web-MIDI.
+To use this editor you need a Web-MIDI-enabled webbrowser. Currently only Google Chrome (since Version 49 with sysex-support) and [Chromium](https://www.chromium.org/Home) support Web-MIDI.
 
 ## PC4 editor
 
