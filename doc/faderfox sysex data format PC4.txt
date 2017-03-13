@@ -1,0 +1,92 @@
+FADERFOX SYSEX DATA FORMAT PC4
+
+
+data of one setup:
+
+4D		pot 1
+2x		type 
+1x		channel 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+4D		pot 1
+2x		CC# high nibble (max 7 !)
+1x		CC# low nibble
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+
+4D		pot 2
+2x		type 
+1x		channel 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+4D		pot 2
+2x		CC# high nibble (max 7 !)
+1x		CC# low nibble
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+
+4D		pot 3
+2x		type 
+1x		channel 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+4D		pot 3
+2x		CC# high nibble (max 7 !)
+1x		CC# low nibble
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+
+.
+.
+.
+.
+.
+
+4D		pot 24
+2x		type 
+1x		channel 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+4D		pot 24
+2x		CC# high nibble (max 7 !)
+1x		CC# low nibble
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+
+
+
+next setup memory (all 16 setup memories follow in ascending order)
+
+
+
+!!!
+30 times value 00 between the commands are important for successful flash process
+
+
+types:
+B	control change
+C	program change
+E	pitch bend
+(all other values will be converted to B)
+
+
+channels:
+0	channel 1
+1	channel 2
+.
+.
+.
+F	channel 16
+
+
+CC#:
+00 to 7F (0 to 127)
+not used for types C and E (each value possible)

@@ -1,0 +1,60 @@
+FADERFOX SYSEX FORMAT GENERAL
+
+
+system commands (sysex start/stop) have 1 byte (high nibble = F).
+all other commands have 3 bytes :
+1st byte = command byte (high nibble = 4)
+2nd byte = data MSB in low nibble (high nibble = 2)
+3rd byte = data LSB in low nibble (high nibble = 1)
+
+
+1st nibble of 1st byte = command/data type
+0	empty (no command/data)
+F	system command (sysex start/stop)
+4	command
+2	data MSB
+1	data LSB
+
+2nd nibble = command/data
+
+
+commands:
+
+CMD_EMPTY		00
+CMD_DOWNLOAD_START	41		// data: device ID (see below)
+CMD_DOWNLOAD_TYPE	42		// data: 01 = app; 02 = one setup; 03 = all setups
+CMD_APP_ID_H		43		// data: firmware-version
+CMD_APP_ID_L		44		// data: firmware-sub-version
+
+CMD_PAGE_CRC_H		4B		// checksum high byte
+CMD_PAGE_CRC_L		4C		// checksum low byte	
+CMD_PAGE_DATA		4D		// data
+
+CMD_DOWNLOAD_STOP	4F		// data: device ID (see below)
+
+CMD_SYSEX_START		F0
+CMD_SYSEX_STOP		F7
+
+
+
+
+DEVICE_ID's
+01		// ID for DJ44
+02		// ID for PC4
+03		// ID for SC4
+04		// ID for MB1
+05		// ID for Versus
+06		// ID for UC4
+07		// ID for UC44
+08		// ID for PC44
+
+
+CRC calculation:
+adds all data bytes in a word register (16bit)
+only data from data commands (4D) !
+for instance add hex 35 for command 4D 23 15 
+
+
+!!!
+each sysex string started with F0 00 00 00 (sysex start, 3 x 00 for inventor ID)
+and end with 4B 2x 1x 4C 2x 1x 4F 2x 1x F7 (4B = CRC high, 4C = CRC low, 4F = download stop, F7 = sysex stop)
