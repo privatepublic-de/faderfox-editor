@@ -107,18 +107,18 @@ document.addEventListener("DOMContentLoaded", function() {
     function sysexHandler(data) {
         try {
             let newdata = sysex.parseSysexData(data);
-            Message.show(SPC4.title_data_received, SPC4.msg_apply, {
+            MBox.show(SPC4.title_data_received, SPC4.msg_apply, {
                 confirmCallback: function() {
-                    Message.hide();
+                    MBox.hide();
                     datastore = newdata;
                     selectedPreset = 0;
                     updateView();
-                    Message.show(SPC4.title_data_received, SPC4.msg_data_applied, {hideAfter:5000});
+                    MBox.show(SPC4.title_data_received, SPC4.msg_data_applied, {hideAfter:5000});
                 }
             });
         }
         catch(e) {
-            Message.show(SPC4.title_data_received, STR.apply(SPC4.$msg_invalid_data ,e.message), {hideAfter:10000, type:'error'});
+            MBox.show(SPC4.title_data_received, STR.apply(SPC4.$msg_invalid_data ,e.message), {hideAfter:10000, type:'error'});
         }
     }
 
@@ -126,29 +126,29 @@ document.addEventListener("DOMContentLoaded", function() {
     var midi = new MIDI("Faderfox PC4", sysexHandler);
     DOM.on('#btntransfer', 'click', function() {
         if (midi.hasOutput()) {
-            Message.show(SPC4.title_send, SPC4.msg_send, {
+            MBox.show(SPC4.title_send, SPC4.msg_send, {
                 buttonLabel: "Send",
                 confirmCallback: function() {
-                    Message.hide();
+                    MBox.hide();
                     let data = sysex.generateSysexData(datastore);
                     midi.sendSysex(data);
                 }
             });
         }
         else {
-            Message.show(STR.midictrl.title_error, STR.midictrl.nooutputs, {type:'error'});
+            MBox.show(STR.midictrl.title_error, STR.midictrl.nooutputs, {type:'error'});
         }
     });
     DOM.on('#btnreceive', 'click', function() {
         if (midi.hasInput()) {
-            Message.show(SPC4.title_receive, SPC4.msg_receive);
+            MBox.show(SPC4.title_receive, SPC4.msg_receive);
         }
         else {
-            Message.show(STR.midictrl.title_error, STR.midictrl.noinputs, {type:'error'});
+            MBox.show(STR.midictrl.title_error, STR.midictrl.noinputs, {type:'error'});
         }
     });
     DOM.on('#btnallchannels', 'click', function() {
-        Message.show(SPC4.title_all_pots, SPC4.msg_all_pots+'<br/><br/><div class="field"><label>Channel:</label>\
+        MBox.show(SPC4.title_all_pots, SPC4.msg_all_pots+'<br/><br/><div class="field"><label>Channel:</label>\
                 <input name="channel" type="text" size="3" value="" placeholder="#" /></div>', {
             buttonLabel: 'Set channels',
             confirmCallback: function() {
@@ -159,12 +159,12 @@ document.addEventListener("DOMContentLoaded", function() {
                         el.dispatchEvent(new Event('change'));
                     });
                 }
-                Message.hide();
+                MBox.hide();
             }
         });
     });
     DOM.on('#btnfilesave', 'click', function() {
-        Message.show(SPC4.title_save, SPC4.msg_save+'<br/><br/><div class="field"><label>Filename:</label><input name="filename" type="text" size="12" value="" placeholder="filename" /><b>.syx</b></div>', 
+        MBox.show(SPC4.title_save, SPC4.msg_save+'<br/><br/><div class="field"><label>Filename:</label><input name="filename" type="text" size="12" value="" placeholder="filename" /><b>.syx</b></div>', 
         {
             buttonLabel: 'Save File',
             confirmCallback: function() {
@@ -173,12 +173,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     let data = sysex.generateSysexData(datastore);
                     download(data, filename+".syx", "application/octet-stream" );                    
                 }
-                Message.hide();
+                MBox.hide();
             }
         });
     });
     DOM.on('#btnfileload', 'click', function() {
-        Message.show(SPC4.title_load, SPC4.msg_load+'<br/<br/><input type="file" name="file" />', {
+        MBox.show(SPC4.title_load, SPC4.msg_load+'<br/<br/><input type="file" name="file" />', {
             attachHandlers: function(boxelement) {
                 DOM.attachInside(boxelement, 'input[type=file]', 'change', function(evt) {
                     sysex.readFile(evt.target, function(data) {
@@ -186,8 +186,8 @@ document.addEventListener("DOMContentLoaded", function() {
                             datastore = data;
                             selectedPreset = 0;
                             updateView();
-                            Message.hide();
-                            Message.show(SPC4.title_load, SPC4.msg_loaded, {hideAfter:5000});
+                            MBox.hide();
+                            MBox.show(SPC4.title_load, SPC4.msg_loaded, {hideAfter:5000});
                         }
                     });
                 }); 
@@ -196,22 +196,21 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     DOM.on('#btncopy', 'click', function() {
         clipboard = datastore[selectedPreset];
-        Message.show(SPC4.title_copypaste, STR.apply(SPC4.$msg_copy, selectedPreset+1), { hideAfter: 5000});
+        MBox.show(SPC4.title_copypaste, STR.apply(SPC4.$msg_copy, selectedPreset+1), { hideAfter: 5000});
     });
     DOM.on('#btnpaste', 'click', function() {
         if (clipboard) {
-            Message.show(SPC4.title_copypaste, STR.apply(SPC4.$msg_paste, selectedPreset+1), { 
+            MBox.show(SPC4.title_copypaste, STR.apply(SPC4.$msg_paste, selectedPreset+1), { 
                 confirmCallback: function() {
                     datastore[selectedPreset] = clipboard;
                     updateView();
-                    Message.hide();
-                    Message.show(SPC4.title_copypaste, SPC4.msg_pasted, { hideAfter: 5000});
+                    MBox.hide();
+                    MBox.show(SPC4.title_copypaste, SPC4.msg_pasted, { hideAfter: 5000});
                 }
             });
         }
         else {
-            Message.show(SPC4.title_copypaste, SPC4.msg_clipboard_empty, { hideAfter: 5000});
+            MBox.show(SPC4.title_copypaste, SPC4.msg_clipboard_empty, { hideAfter: 5000});
         }
     });
-
 });
