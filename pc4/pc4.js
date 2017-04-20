@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (clipboard) {
             MBox.show(SPC4.title_copypaste, STR.apply(SPC4.$msg_paste, selectedPreset+1), { 
                 confirmCallback: function() {
-                    datastore[selectedPreset] = clipboard;
+                    datastore[selectedPreset] = JSON.parse(JSON.stringify(clipboard)); // clone via json
                     updateView();
                     MBox.hide();
                     MBox.show(SPC4.title_copypaste, SPC4.msg_pasted, { hideAfter: 5000});
