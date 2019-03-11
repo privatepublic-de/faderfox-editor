@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../lib/base.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="../lib/strings.js"></script>
+    <script src="strings-ec4.js"></script>
+    <script src="../lib/download.js"></script>
+    <script src="../lib/base.js"></script>
+    <script src="ec4.js"></script>
+</head>
+<body>
+
+    <h1>Faderfox EC4 Editor</h1>
+    <div id="midisettings" title="Please select the MIDI interface your EC4 is connected to for input and output.">
+        <div class="field">
+            <label for="midiInDeviceId">MIDI Input:</label>
+            <select id="midiInDeviceId"><option>(No devices)</option></select>
+        </div>
+        <div class="field" style="margin-left:.5em;">
+            <label for="midiOutDeviceId">MIDI Output:</label>
+            <select id="midiOutDeviceId"><option>(No devices)</option></select>
+        </div>
+        <div id="tb">
+            <button type="button" id="btnreceive">Receive from EC4</button>
+            <button type="button" id="btntransfer">Send to EC4</button>
+            <button type="button" id="btnfileload" style="margin-left:2em">Load file</button>
+            <button type="button" id="btnfilesave">Save file</button>
+        </div>
+    </div>
+    <div class="content">
+        <main>
+            <div id="preset">
+                <p>Select setup and group or edit their name.</p>
+            </div>
+            <div class="oled"
+                ><span class="a">Ctrl:</span><select class="b" data-watch="select-encoder">
+                    <option>EC01</option><option>EC02</option><option>EC03</option><option>EC04</option>
+                    <option>EC05</option><option>EC06</option><option>EC07</option><option>EC08</option>
+                    <option>EC09</option><option>EC10</option><option>EC11</option><option>EC12</option>
+                    <option>EC13</option><option>EC14</option><option>EC15</option><option>EC16</option>
+                </select><span class="c" data-action="edit-chan">Chan :</span><input data-watch="chan" data-action="edit-chan" class="d" type="text" value="000"
+                /><span class="a" data-action="edit-disp">Disp:</span><select data-watch="disp" data-action="edit-disp" class="b">
+                    <option>off</option>
+                    <option>127</option>
+                    <option>100</option>
+                    <option>1000</option>
+                    <option> ±63</option>
+                    <option> ±50</option>
+                    <option>±500</option>
+                    <option>ONOF</option>
+                </select><span class="c" data-action="edit-numb">Numb :</span><input data-watch="numb" data-action="edit-numb" class="d" type="text" value="000"
+                /><span class="a" data-action="edit-type">Type:</span><select data-watch="type" data-action="edit-type" class="b">
+                    <option>CCR1</option>
+                    <option>CCR2</option>
+                    <option>CCab</option>
+                    <option>PrgC</option>
+                    <option>CCAh</option>
+                    <option>PBnd</option>
+                    <option>AftT</option>
+                    <option>Note</option>
+                </select><span class="c" data-action="edit-lowr">Lower:</span><input data-watch="lowr" data-action="edit-lowr" class="d" type="text" value="000"
+                /><span class="a" data-action="edit-mode">Mode:</span><select data-watch="mode" data-action="edit-mode" class="b">
+                    <option>Acc0</option>
+                    <option>Acc1</option>
+                    <option>Acc2</option>
+                    <option>Acc3</option>
+                </select><span class="c" data-action="edit-uppr">Upper:</span><input data-watch="uppr" data-action="edit-uppr" class="d" type="text" value="127"
+            /></div>
+            <div id="ctrlcontainer">
+            </div>
+        </main>
+        <div id="tbbottom">
+            <button type="button" id="btnallchannels">Set all channels</button>
+            <button type="button" id="btncopy">Copy</button>
+            <button type="button" id="btnpaste">Paste</button>
+        </div>
+    </div>
+    <div class="credits">
+        Web-MIDI Editor for the <a href="http://faderfox.de/pc4.html">faderfox PC4-Pot controller</a>.
+        Developed by Peter Witzel (<a href="http://www.privatepublic.de">privatepublic.de</a>) in co-operation with Faderfox.
+        Source code available on <a href="https://github.com/privatepublic-de/faderfox-editor">github</a>.
+    </div>
+
+</body>
+</html>

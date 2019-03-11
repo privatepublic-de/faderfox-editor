@@ -104,9 +104,47 @@ document.addEventListener("DOMContentLoaded", function() {
         updateView();
     });
 
+
+    function interpret(data) {
+        let currentCtrl = {};
+        let ctrls = [];
+        let dataHandler = function(chunk) {
+            if (typeof currentCtrl.type==="undefined") {
+                let typev = chunk.raw[0] & 0xf;
+                let channel = chunk.raw[1] & 0xf;
+                let type;
+                switch (typev) {
+                    case 0xc:
+                        type = "pgm";
+                        break;
+                    case 0xe:
+                        type = "pb";
+                        break;
+                    case 0xb:
+                    default:
+                        type = "cc";
+                        break;
+                }
+                currentCtrl.type = type;
+                currentCtrl.channel = channel+1;
+            }
+            else {
+                currentCtrl.ccno = chunk.val;
+                ctrls.push(currentCtrl);
+                currentCtrl = {};
+            }
+        };
+        sysex.parseSysexData(data, dataHandler);
+        let newdata = [];
+        for (let i=0;i<16;i++) {
+            newdata.push(ctrls.slice(i*24,i*24+24));
+        }
+        return newdata;
+    }
+
     function sysexHandler(data) {
         try {
-            let newdata = sysex.parseSysexData(data);
+            let newdata = interpret(data);
             MBox.show(SPC4.title_data_received, SPC4.msg_apply, {
                 confirmCallback: function() {
                     MBox.hide();
@@ -183,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 DOM.attachInside(boxelement, 'input[type=file]', 'change', function(evt) {
                     sysex.readFile(evt.target, function(data) {
                         if (data) {
-                            datastore = data;
+                            datastore = interpret(data);
                             selectedPreset = 0;
                             updateView();
                             MBox.hide();

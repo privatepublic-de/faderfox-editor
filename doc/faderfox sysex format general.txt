@@ -8,7 +8,7 @@ all other commands have 3 bytes :
 3rd byte = data LSB in low nibble (high nibble = 1)
 
 
-1st nibble of 1st byte = command/data type
+1st nibble = command/data type
 0	empty (no command/data)
 F	system command (sysex start/stop)
 4	command
@@ -16,6 +16,41 @@ F	system command (sysex start/stop)
 1	data LSB
 
 2nd nibble = command/data
+
+
+all data send as pages of max 64 data bytes
+page format (total of max 234 sysex bytes):
+[
+header:
+49		memory address high
+2x		high nibble
+1x		low nibble
+4A		memory address low
+2x		high nibble
+1x		low nibble
+
+max 64 data commands (each with 3 bytes):
+4D		data command
+2x		high nibble
+1x		low nibble
+.
+.
+.
+.
+
+footer:
+4B		CRC high
+2x		CRC high nibble
+1x		CRC low nibble
+4C		CRC low
+2x		CRC high nibble
+1x		CRC low nibble
+
+!!! 30 times value 00 at the end of each page. it is important for successful flash process !!! :
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00
+]
 
 
 commands:
@@ -26,6 +61,8 @@ CMD_DOWNLOAD_TYPE	42		// data: 01 = app; 02 = one setup; 03 = all setups
 CMD_APP_ID_H		43		// data: firmware-version
 CMD_APP_ID_L		44		// data: firmware-sub-version
 
+CMD_PAGE_NUM_H		49		// memory address high
+CMD_PAGE_NUM_L		4A		// memory address low
 CMD_PAGE_CRC_H		4B		// checksum high byte
 CMD_PAGE_CRC_L		4C		// checksum low byte	
 CMD_PAGE_DATA		4D		// data
@@ -47,6 +84,9 @@ DEVICE_ID's
 06		// ID for UC4
 07		// ID for UC44
 08		// ID for PC44
+09		// ID for MX12
+10		// ID for PC12
+11		// ID for EC4
 
 
 CRC calculation:

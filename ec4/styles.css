@@ -1,0 +1,378 @@
+
+/* @font-face kit by Fonts2u (https://fonts2u.com) */ @font-face {font-family:"5x8 LCD HD44780U A02 Regular";src:url("5x8_lcd_hd44780u_a02.eot?") format("eot"),url("5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02") format("svg"),url("5x8_lcd_hd44780u_a02.woff") format("woff"),url("5x8_lcd_hd44780u_a02.ttf") format("truetype");font-weight:normal;font-style:normal;}
+
+
+.content {
+    position: relative;
+}
+
+.oled {
+    position: absolute;
+    top: 102px;
+    left: 50%;
+    margin-left: -150px;
+    width: 300px;
+    height: 130px;
+    box-shadow: 0 0 10px #222;
+    color: #FEFF5F;
+    background: linear-gradient( 8deg, #000, #222, #333 );
+    font-family:"5x8 LCD HD44780U A02 Regular";
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 28px;
+    box-sizing: border-box;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    padding: 5px 5px 5px 9px;
+}
+
+.oled .selected {
+    background: #FEFF5F;
+    color: #000;
+}
+
+.oled input, .oled select {
+    background: transparent;
+    color: #FEFF5F;
+    font-family:"5x8 LCD HD44780U A02 Regular";
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+    border: none;
+    box-sizing: border-box;
+    display: inline-block;
+    outline: none;
+}
+.oled select option {
+    background-color: #000;
+}
+.oled input {
+    text-align: right;
+}
+.oled span {
+    display: inline-block;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+.oled .a { width: 25%; }
+.oled .b { width: 26%; }
+.oled .c { width: 30%; margin-left: 1%; padding-left: 3%; border-left: 1px solid #FEFF5F}
+.oled .d { width: 15%; }
+
+*[data-action] {
+    cursor: pointer;
+}
+
+main {
+    box-sizing: border-box;
+    margin: 0 auto;
+    width: 500px;
+    height: 818px;
+    background: url("ec4 dummy.jpg") no-repeat;
+    background-size: 100% 100%;
+    position: relative;
+    /* border: 1px solid #666;
+    border-top: none; */
+}
+#ctrlcontainer {
+    position: absolute;
+    top: 265px;
+    bottom: 60px;
+    left: 22px;
+    right: 28px;
+}
+main section {
+    box-sizing: border-box;
+    float: left;
+    width: 25%;
+    height: 24%;
+    position: relative;
+}
+
+.enc {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #666;
+    /* border-left: none;
+    border-right: none; */
+    /* background: rgba(0,0,0,.5); */
+}
+
+.enc.selected {
+    background-color: rgba(255, 255, 0, .3);
+}
+
+.enc .knob {
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    top: 45%;
+    bottom: 10%;
+    border-radius: 50%;
+    /* border: 2px solid #333; */
+    background-color: #000;
+    box-shadow: 0 0 15px #555;
+}
+
+.enc .n {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 15%;
+    margin: 0 5px;
+    text-align: center;
+}
+
+.enc .v {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 52%;
+    text-align: center;
+    /*background: #000;*/
+    margin: 0 5px;
+}
+
+.enc .n input {
+    color: #000;
+    background: #FEFF5F;
+    font-family:"5x8 LCD HD44780U A02 Regular";
+    font-size: 16px;
+    padding: 0;
+    border: none;
+    width: 4em;
+    text-align: center;
+}
+
+.enc .v input {
+    width: 30%;
+    text-align: right;
+    padding: 0 5px;
+    background: #eee;
+    font-size: 14px;
+    border: none;
+}
+
+.enc .v label {
+    background: #000;
+    color: #ddd;
+    font-size: .85em;
+    margin-bottom: 4px;
+    display: block;
+    text-transform: uppercase;
+}
+
+.enc select {
+    width: 100%;
+}
+
+.enc .mode, .enc .type, .enc .disp, .enc .val {
+    display: none;
+}
+
+.mode .enc .mode,  .type .enc .type, .disp .enc .disp, .val .enc .val {
+    display: block;
+}
+
+
+.params {
+    background-color: #eee;
+    color: #000;
+    border: 1px solid #666;
+    border-top: none;
+    font-size: .7em;
+    padding: 4px;
+}
+
+.params label {
+    width: 60%;
+    display: inline-block;
+}
+.params input {
+    width: 40%;
+    padding: 0;
+    margin: 0;
+    text-align: right;
+    border: none;
+    font-size: 1.3em;
+}
+input[data-type="ccno"] {
+    border-top: 1px solid #bde;
+}
+
+
+
+#tb {
+    text-align: center;
+    border-top: 1px solid #aaa;
+    margin-top: .5em;
+    padding-top: .5em;
+}
+#tbbottom {
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+}
+
+#midisettings {
+    margin: 10px auto;
+    padding: 10px 5px 10px 5px;
+    width: 490px;
+    text-align: center;
+    color: #fff;
+    background: #777 linear-gradient(#777, #555);
+    font-size: .8em;
+    border-radius: 6px;
+}
+#midisettings.unsupported {
+    background: #b66;
+}
+
+#midisettings select {
+    max-width: 140px;
+}
+
+.field {
+    display: inline-block;
+}
+
+ul.select {
+    display: block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.msgbox h2::after,
+.select::after {
+    content:"";
+    display:table;
+    clear:both;
+}
+.select li {
+    display: block;
+    cursor: pointer;
+    background-color: #000;
+}
+
+.select li.selected,
+.select li:hover {
+    background-color: #ccc;
+    color: #000;
+}
+
+#preset {
+    position: absolute;
+    top: 20px;
+    left: -150px;
+    width: 150px;
+}
+
+#preset ul {
+    position: relative;
+    font-family:"5x8 LCD HD44780U A02 Regular";
+    font-size: 16px;
+    display: block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#browser input {
+    background: transparent;
+    color: #FEFF5F;
+    font-family:"5x8 LCD HD44780U A02 Regular";
+    font-size: 16px;
+    padding: 0;
+    border: none;
+    width: 4em;
+    cursor: pointer;
+}
+
+#preset #browser {
+    border: 2px solid #eee;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+#preset #browser li {
+    cursor: pointer;
+    padding: 4px;
+    border-bottom: 1px solid black;
+    color: #FEFF5F;
+}
+
+#preset ul#browser ul {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 50%;
+    background: #666;
+    border-left: 2px solid #666;
+}
+
+#preset ul#browser > li {
+    width: 50%;
+}
+
+
+#preset ul#browser .selected ul {
+    display: block;
+}
+
+#preset #browser li.selected {
+    background-color: #c00!important;
+}
+
+#preset #browser ul li,
+#preset #browser li:hover {
+    background-color: #444;
+}
+
+.ctrl ul.select {
+    width: 100%;
+}
+
+.ctrl li {
+    box-sizing: border-box;
+    border: 1px solid #666;
+    border-bottom: none;
+    float: left;
+    text-align: center;
+    font-size: .8em;
+    padding: 2px;
+}
+
+
+.ctrl li {
+    width: 33.334%;
+    font-size: .7em;
+}
+
+.cc .ctrl li.cc,
+.cc .params {
+    background-color: #bde;
+    color: black;
+}
+
+.pb .ctrl li.pb,
+.pb .params {
+    background-color: #fb9;
+    color: black;
+}
+.pgm .ctrl li.pgm,
+.pgm .params {
+    background-color: #beb;
+    color: black;
+}
+.params .cc {
+    display: none;
+}
+
+.cc .params .cc {
+    display: block;
+}

@@ -1,0 +1,89 @@
+body {
+    background: #000;
+    color: #ddd;
+    font-family: Arial,sans-serif;
+    font-size: 100%;
+}
+h1 {
+    text-align: center;
+    font-size: 1.2em;
+}
+ .msgbox {
+    display: none;
+    box-sizing: border-box;
+    position: fixed;
+    width: 450px;
+    height: 200px;
+    left: 50%;
+    top: 50%;
+    margin-top: -100px;
+    margin-left: -225px;
+    background: #eee linear-gradient(#eee, #ddd);
+    color: #000;
+    border: 6px solid #000;
+    box-shadow: 0 0 8px #000;
+    padding: 10px;
+    overflow: auto;
+    font-size: .8em;
+}
+.msgbox.error {
+    border-color:#f33;
+    background: #ffe8d8 linear-gradient(#fff, #ffe8d8);
+}
+#mbox.msgbox.processing,
+#mboxtemp.msgbox.processing {
+    background-image: url('../img/wait.gif');
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.msgbox h2 {
+    margin: 0 0 .5em 0;
+    font-size: 1.1em;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #666;
+}
+.msgbox .ok {
+    margin-right: 1em;
+    font-weight: bold;
+    height: 2em;
+    padding: 0 2em;
+}
+.msgbox div.msg {
+    line-height: 1.6em;
+    margin: .5em 0 0 0;
+}
+.msgbox ul {
+    margin: .5em 0 0 0;
+}
+.msgbox p {
+    margin: .5em 0 0 0;
+}
+.msgbox button.close {
+    border: none;
+}
+#mboxtemp {
+    background: #F0FBD7 linear-gradient(#fff, #F0FBD7);
+}
+#mboxtemp button,
+#mbox button.close {
+    float: right;
+}
+.msgbox .buttons {
+    display: none;
+    margin-top: 1em;
+}
+#mbox.confirm .buttons {
+    display: block;
+}
+
+.credits {
+    text-align: center;
+    width: 500px;
+    margin: 2em auto 0 auto;
+    font-size: .75em;
+    color: #888;
+    font-style: italic;
+}
+.credits a {
+    color: #69c;
+}
