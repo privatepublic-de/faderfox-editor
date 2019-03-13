@@ -1,5 +1,110 @@
 "use strict";
 
+let allData = new Uint8Array(50240);
+const dataOffset = 0x1BC0;
+const addrSetupNames = dataOffset - dataOffset;
+const addrGroupNames = 0x1C00 - dataOffset;
+const addrPresets = 0x2000 - dataOffset;
+
+
+const P = { // P is short for Parameter
+    type: 'type', channel: 'channel', number: 'number',
+    number_h: 'number_h', lower: 'lower', upper: 'upper', 
+    mode: 'mode', scale: 'scale', name: 'name', 
+
+    $type: { pos: 0, mask: 0xf0 },
+    $channel: { pos: 0, mask: 0x0f },
+    $number: { pos: 16, mask: 0xff },
+    $number_h: { pos: 32, mask: 0xff },
+    $lower: { pos: 48, mask: 0xff },
+    $upper: { pos: 64, mask: 0xff },
+    $mode: { pos: 80, mask: 0xf0 },
+    $scale: { pos: 80, mask: 0x0f },
+    $name: { pos: 128 },
+
+    get: function(setup, group, encoder, type) {
+        const spec = P['$'+type];
+        if (!spec) {
+            console.log('Unknown parameter type '+type);
+            return;
+        }
+        let addr = addrPresets + (setup*16 + group)*192 + spec.pos;
+        if (type === P.name) {
+            addr += encoder*4;
+            return String.fromCharCode(allData[addr+0], allData[addr+1], allData[addr+2], allData[addr+3]);
+        } else {
+            addr += encoder;
+            if (spec.mask!=0xff) {
+                let val = allData[addr] & spec.mask;
+                if (spec.mask>0x0f) {
+                    val = val>>4;
+                }
+                if (type === P.channel) val++;
+                return val;
+            } else {
+                return allData[addr];
+            }
+        }
+    },
+    set: function(setup, group, encoder, type, value) {
+        const spec = P['$'+type];
+        if (!spec) {
+            console.log('Unknown parameter type: '+type);
+            return;
+        }
+        let addr = addrPresets + (setup*16 + group)*192 + spec.pos;
+        if (type === P.name) {
+            addr += encoder*4;
+            while (value.length<4) { value += ' '; }
+            for (let i=0; i<4; i++) {
+                allData[addr+i] = value.charCodeAt(i);
+            }
+        } else {
+            addr += encoder;
+            value = parseInt(value);
+            if (type === P.channel) value--;
+            if (spec.mask!=0xff) {
+                if (spec.mask>0x0f) {
+                        value = (value & 0x0f)<<4;
+                        allData[addr] = (allData[addr] & 0x0f) | value;
+                } else {
+                    allData[addr] = (allData[addr] & 0xf0) | value;
+                }
+            } else {
+                value = value & spec.mask;
+                allData[addr] = value;
+            }
+        }
+    }
+};
+
+
+(function initialiseValues() {
+    allData.fill(0);
+    for (let setup=0; setup<16; setup++) {
+        const name = `SE${(setup<9?'0':'')+(setup+1)}`;
+        for (let i=0;i<4;i++) {
+            allData[addrSetupNames+setup*4+i] = name.charCodeAt(i);
+        }
+        for (let group=0; group<16; group++) {
+            const name = `GR${(group<9?'0':'')+(group+1)}`;
+            for (let i=0;i<4;i++) {
+                allData[addrGroupNames+setup*16+group*4+i] = name.charCodeAt(i);
+            }
+            for (let encoder=0; encoder<16; encoder++) {
+                const name = `EC${(encoder<9?'0':'')+(encoder+1)}`;
+                P.set(setup, group, encoder, P.name, name);
+                P.set(setup, group, encoder, P.channel, group + 1);
+                P.set(setup, group, encoder, P.scale, 1);
+                P.set(setup, group, encoder, P.type, 2);
+                P.set(setup, group, encoder, P.mode, 3);
+                P.set(setup, group, encoder, P.upper, 127);
+            }
+        }
+    }
+    // console.log(allData.length, new TextDecoder("utf-8").decode(allData));
+})();
+
 class Selection {
 
     constructor(updatecallback) {
@@ -48,144 +153,19 @@ class Selection {
 
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const sel = new Selection(selection => {
-        console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
-        // sync values
-        DOM.removeClass('#ctrlcontainer .enc', 'selected');
-        DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, 'selected');
-    });
-    let sysex = new Sysex('EC4');
-    let allData = new Uint8Array(50240);
-    const dataOffset = 0x1BC0;
-    const startSetupNames = dataOffset - dataOffset;
-    const startGroupNames = 0x1C00 - dataOffset;
-    const startPresets = 0x2000 - dataOffset;
-    const nameChars = new RegExp('[A-Za-z0-9.\\-/ ]');
+const REnameChars = new RegExp('[A-Za-z0-9.\\-/ ]');
+const REnumberChars = new RegExp('[0-9]');
 
-    function createNameInput(id, value) {
-        let inp = document.createElement('input');
-        inp.setAttribute('id',id);
-        inp.setAttribute('type','text');
-        inp.setAttribute('data-watch', 'name');
-        inp.setAttribute('maxlength',4);
-        inp.setAttribute('value',value || '');
-        return inp;
-    }
-    let sulist = document.createElement('ul')
-    sulist.setAttribute('id', 'browser');
-    for (let su=0;su<16;su++) {
-        let li = document.createElement('li');
-        li.setAttribute('data-action', 'select-setup');
-        li.setAttribute('data-number', su);
-        if (su===0) {
-            li.classList.add('selected');
-        }
-        let grlist = document.createElement('ul');
-        for (let gr=0;gr<16;gr++) {
-            let grli = document.createElement('li');
-            grli.setAttribute('data-action', 'select-group');
-            grli.setAttribute('data-number', gr);
-            if (gr===0) {
-                grli.classList.add('selected');
-            }
-            grli.appendChild(createNameInput(`s${su}g${gr}`,'GR'+(gr<9?'0':'')+(gr+1)));
-            grlist.appendChild(grli);
-        }
-        li.appendChild(createNameInput(`s${su}`, 'SE'+(su<9?'0':'')+(su+1)));
-        li.appendChild(grlist);
-        sulist.appendChild(li);
-    }
-    DOM.element('#preset').prepend(sulist);
+class InputHandler {
 
-    // build encoders
-    for (let i=0; i<16; i++) {
-        const twodig = (i<9?'0':'') + (i+1);
-        let html = `<section><div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc"><div class="knob"></div><div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" /></div><div class="v"><div class="val"><label></label><input data-watch="numb" id="enc_value${i}" type="text" value="0" /></div><div class="disp"><label></label><select data-watch="disp"><option>display off</option><option>0...127</option><option>0...100</option><option>0...1000</option><option>-63...+63</option><option>-50...+50</option><option>-500...+500</option><option>ON / OFF</option></select></div><div class="type"><label></label><select data-watch="type"><option>CC relative 1</option><option>CC relative 2</option><option>CC absolute</option><option>Program change</option><option>CC absolute 14bit</option><option>Pitch bend</option><option>Aftertouch</option><option>Note</option></select></div><div class="mode"><label></label><select data-watch="mode"><option>no acceleration</option><option>low acceleration</option><option>mid acceleration</option><option>max acceleration</option></select></div></div></div></section>`;
-        DOM.addHTML('#ctrlcontainer', 'beforeend', html);
+    constructor(selection) {
+        this.selection = selection;
     }
 
-    function selectEncoder(e) {
-        let selectedId = -1;
-        switch (e.type) {
-            case 'click':
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-                    return;
-                }
-                let el = e.target;
-                while (!el.getAttribute('data-enc')) {
-                    el = el.parentElement;
-                }
-                selectedId = el.getAttribute('data-enc');
-            break;
-            case 'change':
-                selectedId = e.target.selectedIndex;
-            break;
-        }
-        if (selectedId>-1) {
-            sel.encoder = selectedId;
-        }
-    }
-
-    const editLabel = {
-        'edit-disp': 'Display',
-        'edit-type': 'Type',
-        'edit-mode': 'Mode',
-        'edit-chan': 'Channel',
-        'edit-numb': 'CC-Number',
-        'edit-lowr': 'Lower',
-        'edit-uppr': 'Upper'
-    };
-
-    function actionHandler(e) {
-        const action = e.currentTarget.getAttribute('data-action');
-        console.log(`Action ${action}`);
-        if (action.indexOf('edit-') === 0) {
-            DOM.all('#ctrlcontainer .enc label', e=>{
-                e.innerText = editLabel[action];
-            });
-        }
-        switch (action) {
-            case 'select-setup':
-            case 'select-group':
-                DOM.removeClass(e.currentTarget.parentElement.childNodes, 'selected');
-                DOM.addClass(e.currentTarget, 'selected');
-                let number = e.currentTarget.getAttribute('data-number');
-                if (action === 'select-setup') {
-                    sel.setup = number;
-                } else {
-                    sel.group = number;
-                }
-                break;
-            case 'select-encoder':
-                selectEncoder(e);
-                break;
-            case 'edit-disp':
-                DOM.element('#ctrlcontainer').className = 'disp';
-                break;
-            case 'edit-type':
-                DOM.element('#ctrlcontainer').className = 'type';
-                break;                
-            case 'edit-mode':
-                DOM.element('#ctrlcontainer').className = 'mode';
-                break;
-            case 'edit-chan':
-            case 'edit-numb':
-            case 'edit-lowr':
-            case 'edit-uppr':
-                DOM.element('#ctrlcontainer').className = 'val';
-                break;
-        }
-    }
-
-    DOM.all('*[data-action]', e=> {
-        e.addEventListener('click', actionHandler);
-    });
-
-    function checkKey(e) {
+    checkNameKey(e, element, what) {
         let allowed = true;
         if (e.key.length===1) {
-            if (!nameChars.test(e.key)) {
+            if (!REnameChars.test(e.key)) {
                 allowed = false;
             }
         }
@@ -194,28 +174,196 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         return allowed;
     }
-    function watchHandler(e) {
-        const what = e.currentTarget.getAttribute('data-watch') || e.target.getAttribute('data-watch');
-        console.log(`Watch ${what}`);
+
+    checkNumberKey(e, element, what) {
+        let allowed = true;
+        if (e.key.length===1) {
+            if (!REnumberChars.test(e.key)) {
+                allowed = false;
+            }
+        }
+        if (!allowed) {
+            e.preventDefault();
+        }
+        return allowed;
+    }
+
+    checkValue(element, what) {
+        let value = element.value;
         switch (what) {
-            case 'name':
-                return checkKey(e);
-            break;
-            case 'select-encoder':
-                selectEncoder(e);
-            break;
+            case 'channel':
+                if (value<1) value = 1;
+                else if (value>16) value = 16;
+                break;
+            case 'number':
+            case 'lower':
+            case 'upper':
+                if (value<0) value = 0;
+                else if (value>127) value = 127;
+                break;
+        }
+        element.value = value;
+    }
+
+    distributeValue(element, what) {
+        const encid = this.findReferencedEncoder(element);
+        DOM.all(`.watchparams *[data-watch=${what}]`, el => {
+            let eid = this.findReferencedEncoder(el);
+            if (eid === encid) {
+                el.value = element.value;
+                if (typeof element.selectedIndex!=='undefined') {
+                    el.selectedIndex = element.selectedIndex;
+                }
+            }
+        });
+        let storeVal = (typeof element.selectedIndex!=='undefined')?element.selectedIndex:element.value;
+        P.set(this.selection.setup, this.selection.group, encid, what, storeVal);
+        if (what===P.type && encid===this.selection.encoder) {
+            DOM.element('#oled').setAttribute('data-type', storeVal);
         }
     }
 
-    DOM.all('*[data-watch]', e=> {
-        switch (e.tagName) {
-            case 'SELECT': 
-                e.addEventListener('change', watchHandler);
+    findReferencedEncoder(element) {
+        let encoderId = null;
+        while(element && !(encoderId = element.getAttribute('data-enc'))) {
+            element = element.parentElement;
+        }
+        if (encoderId) {
+            return parseInt(encoderId);
+        } else { 
+            return this.selection.encoder;
+        }
+    }
+
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const sel = new Selection(selection => {
+        console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
+        // sync values
+        DOM.removeClass('#ctrlcontainer .enc', 'selected');
+        DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, 'selected');
+        syncValues();
+    });
+    const inputhandler = new InputHandler(sel);
+    const sysex = new Sysex('EC4');
+
+    buildUI();
+
+    function syncValues() {
+        DOM.removeClass('#browser li', 'selected');
+        DOM.addClass(`#browser > li:nth-child(${sel.setup+1})`, 'selected');
+        DOM.addClass(`#browser > li:nth-child(${sel.setup+1}) li:nth-child(${sel.group+1})`, 'selected');
+
+        DOM.all('.watchparams *[data-watch]', el=>{
+            const what = el.getAttribute('data-watch');
+            const encoderId = inputhandler.findReferencedEncoder(el);
+            const value = P.get(sel.setup, sel.group, encoderId, what);
+            if (typeof value === 'undefined') {
+                return;
+            }
+            // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
+            if (typeof el.selectedIndex !== 'undefined') {
+                el.selectedIndex = value;
+            }
+            else {
+                if (typeof el.value !== 'undefined') {
+                    el.value = value;
+                }
+            }
+        });
+        DOM.element('#oled').setAttribute('data-type', P.get(sel.setup, sel.group, sel.encoder, P.type));
+    }
+
+    syncValues();
+
+    function selectEncoder(e) {
+        let selectedId = -1;
+        switch (e.type) {
+            case 'click':
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                    return;
+                }
+                selectedId = inputhandler.findReferencedEncoder(e.target);
             break;
-            case 'INPUT':
-                e.addEventListener('keydown', watchHandler);
+            case 'change':
+                selectedId = e.target.selectedIndex;
             break;
         }
+        console.log(`selectedId ${selectedId}`);
+        if (selectedId>-1) {
+            sel.encoder = selectedId;
+            DOM.element('#oled *[data-watch=select-encoder]').selectedIndex = selectedId;
+        }
+    }
+
+    function actionHandler(e) {
+        const action = e.currentTarget.getAttribute('data-action');
+        console.log(`Action ${action}`);
+        if (action.indexOf('edit-') === 0) {
+            const name = action.split('-')[1];
+            DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
+            const eled = DOM.element(`#oled *[data-watch=${name}]`);
+            if (eled.tagName === 'INPUT') eled.select();
+            eled.focus();
+        }
+        switch (action) {
+            case 'select-setup':
+            case 'select-group':
+                let number = e.currentTarget.getAttribute('data-number');
+                if (action === 'select-setup') {
+                    sel.setup = number;
+                    sel.group = 0;
+                } else {
+                    sel.group = number;
+                }
+                e.stopPropagation();
+                break;
+            case 'select-encoder':
+                selectEncoder(e);
+                break;
+        }
+    }
+
+    DOM.all('*[data-action]', e=> {
+        e.addEventListener('click', actionHandler);
+    });
+
+    function watchHandler(event) {
+        const what = event.currentTarget.getAttribute('data-watch') || event.target.getAttribute('data-watch');
+        let encoderId = null;
+        encoderId = inputhandler.findReferencedEncoder(event.target) || sel.encoder;
+        console.log(`Watch ${what} on ${event.target} ${encoderId}`);
+        switch (what) {
+            case P.name:
+                return inputhandler.checkNameKey(event, event.target, what);
+            case 'select-encoder':
+                selectEncoder(event);
+                return;
+            // case P.type:
+            //     DOM.element('#oled').setAttribute('data-type', P.get(sel.setup, sel.group, sel.encoder, P.type));
+            //     break;
+        }
+        if (event.target.tagName==='INPUT') {
+            return inputhandler.checkNumberKey(event, event.target, what);
+        }
+    }
+
+    DOM.all('*[data-watch]', element => {
+        const what = element.getAttribute('data-watch');
+        switch (element.tagName) {
+            case 'SELECT': 
+                element.addEventListener('change', (ev)=>{watchHandler(ev); inputhandler.distributeValue(event.target, what)});
+            break;
+            case 'INPUT':
+                element.addEventListener('keydown', watchHandler);
+                element.addEventListener('keyup', ()=>{inputhandler.distributeValue(event.target, what);})
+            break;
+        }
+        element.addEventListener('blur', ev => { 
+            inputhandler.checkValue(element, what); 
+            inputhandler.distributeValue(element, what);
+        });
     });
 
     DOM.on('#btnfileload', 'click', function() {
@@ -228,11 +376,15 @@ document.addEventListener("DOMContentLoaded", function() {
                             sysex.parseSysexData(data, chunk => {}, (addr, pagedata)=>{
                                 allData.set(pagedata, addr - dataOffset);
                             });
+                            // allData.forEach((v, i)=>{
+                            //     if (v<32 || v>122) allData[i] = '.'.charCodeAt(0);
+                            // });
+                            // console.log(allData.length, new TextDecoder("utf-8").decode(allData));
                             for (let i=0; i<16; i++) {
-                                let name = allData.subarray(startSetupNames + i*4, startSetupNames + i*4+4);
+                                let name = allData.subarray(addrSetupNames + i*4, addrSetupNames + i*4+4);
                                 DOM.element(`#s${i}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
                                 for (let j=0; j<16; j++) {
-                                    let name = allData.subarray(startGroupNames + i*64 + j*4, startGroupNames + i*64 + j*4 + 4);
+                                    let name = allData.subarray(addrGroupNames + i*64 + j*4, addrGroupNames + i*64 + j*4 + 4);
                                     DOM.element(`#s${i}g${j}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
                                 }
                             }
@@ -248,3 +400,92 @@ document.addEventListener("DOMContentLoaded", function() {
     sel.setAll(0, 0, 0);
 
 });
+
+function buildUI() {
+    function createNameInput(id, type, value) {
+        let element = document.createElement('input');
+        element.setAttribute('id',id);
+        element.setAttribute('type','text');
+        element.setAttribute('data-watch', 'name-'+type);
+        element.setAttribute('maxlength',4);
+        element.setAttribute('value',value || '');
+        return element;
+    }
+    let setupList = document.createElement('ul')
+    setupList.setAttribute('id', 'browser');
+    for (let setupNumber=0;setupNumber<16;setupNumber++) {
+        let setupItem = document.createElement('li');
+        setupItem.setAttribute('data-action', 'select-setup');
+        setupItem.setAttribute('data-number', setupNumber);
+        if (setupNumber===0) {
+            setupItem.classList.add('selected');
+        }
+        let groupList = document.createElement('ul');
+        groupList.className = 'group';
+        for (let groupNumber=0;groupNumber<16;groupNumber++) {
+            let groupItem = document.createElement('li');
+            groupItem.setAttribute('data-action', 'select-group');
+            groupItem.setAttribute('data-number', groupNumber);
+            if (groupNumber===0) {
+                groupItem.classList.add('selected');
+            }
+            groupItem.appendChild(createNameInput(`s${setupNumber}g${groupNumber}`, 'group', 'GR'+(groupNumber<9?'0':'')+(groupNumber+1)));
+            groupList.appendChild(groupItem);
+        }
+        setupItem.appendChild(createNameInput(`s${setupNumber}`, 'setup', 'SE'+(setupNumber<9?'0':'')+(setupNumber+1)));
+        setupItem.appendChild(groupList);
+        setupList.appendChild(setupItem);
+    }
+    DOM.element('#preset').prepend(setupList);
+
+    // build encoders
+    let encBase = `
+        <div class="number"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" /></div>
+        <div class="channel"><label>Channel</label><input data-watch="channel" maxlength="2" type="text" value="0" /></div>
+        <div class="lower"><label>Lower</label><input data-watch="lower" maxlength="3" type="text" value="0" /></div>
+        <div class="upper"><label>Upper</label><input data-watch="upper" maxlength="3" type="text" value="0" /></div>
+        <div class="scale"><label>Display</label>
+            <select data-watch="scale">
+                <option>display off</option>
+                <option>0...127</option>
+                <option>0...100</option>
+                <option>0...1000</option>
+                <option>-63...+63</option>
+                <option>-50...+50</option>
+                <option>-500...+500</option>
+                <option>ON / OFF</option>
+            </select>
+        </div>
+        <div class="type"><label>Type</label>
+            <select data-watch="type">
+                <option>CC relative 1</option>
+                <option>CC relative 2</option>
+                <option>CC absolute</option>
+                <option>Program change</option>
+                <option>CC absolute 14bit</option>
+                <option>Pitch bend</option>
+                <option>Aftertouch</option>
+                <option>Note</option>
+            </select>
+        </div>
+        <div class="mode"><label>Mode</label>
+            <select data-watch="mode">
+                <option>no acceleration</option>
+                <option>low acceleration</option>
+                <option>mid acceleration</option>
+                <option>max acceleration</option>
+            </select>
+        </div>`;
+    for (let i=0; i<16; i++) {
+        const twodig = (i<9?'0':'') + (i+1);
+        let html = `
+            <section>
+                <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc">
+                    <div class="knob"></div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" /></div>
+                    <div class="v">${encBase}</div>
+                </div>
+            </section>`;
+        DOM.addHTML('#ctrlcontainer', 'beforeend', html);
+    }
+}

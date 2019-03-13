@@ -6,7 +6,7 @@
     position: relative;
 }
 
-.oled {
+#oled {
     position: absolute;
     top: 102px;
     left: 50%;
@@ -26,12 +26,12 @@
     padding: 5px 5px 5px 9px;
 }
 
-.oled .selected {
+#oled .selected {
     background: #FEFF5F;
     color: #000;
 }
 
-.oled input, .oled select {
+#oled input, #oled select {
     background: transparent;
     color: #FEFF5F;
     font-family:"5x8 LCD HD44780U A02 Regular";
@@ -44,21 +44,37 @@
     display: inline-block;
     outline: none;
 }
-.oled select option {
+#oled select option {
     background-color: #000;
 }
-.oled input {
+#oled select:focus {
+    outline: 2px solid Highlight;
+}
+#oled input {
     text-align: right;
 }
-.oled span {
+#oled span {
     display: inline-block;
     white-space: nowrap;
     box-sizing: border-box;
 }
-.oled .a { width: 25%; }
-.oled .b { width: 26%; }
-.oled .c { width: 30%; margin-left: 1%; padding-left: 3%; border-left: 1px solid #FEFF5F}
-.oled .d { width: 15%; }
+#oled .a { width: 25%; }
+#oled .b { width: 26%; }
+#oled .c { width: 30%; margin-left: 1%; padding-left: 3%; border-left: 1px solid #FEFF5F}
+#oled .d { width: 15%; }
+
+#oled[data-type="0"] .lower,
+#oled[data-type="0"] .upper,
+#oled[data-type="1"] .lower,
+#oled[data-type="1"] .upper,
+#oled[data-type="3"] .number,
+#oled[data-type="5"] .number,
+#oled[data-type="6"] .number,
+#oled[data-type="7"] .lower,
+#oled[data-type="7"] .upper,
+#oled[data-type="7"] .mode
+    { visibility: hidden;}
+
 
 *[data-action] {
     cursor: pointer;
@@ -102,6 +118,7 @@ main section {
 
 .enc.selected {
     background-color: rgba(255, 255, 0, .3);
+    outline: 4px solid #FEFF5F;
 }
 
 .enc .knob {
@@ -136,8 +153,8 @@ main section {
 }
 
 .enc .n input {
-    color: #000;
-    background: #FEFF5F;
+    color:  #FEFF5F;
+    background: #525322;
     font-family:"5x8 LCD HD44780U A02 Regular";
     font-size: 16px;
     padding: 0;
@@ -147,11 +164,11 @@ main section {
 }
 
 .enc .v input {
-    width: 30%;
+    width: 50%;
     text-align: right;
     padding: 0 5px;
-    background: #eee;
-    font-size: 14px;
+    background: #ddd;;
+    font-size: 16px;
     border: none;
 }
 
@@ -168,14 +185,35 @@ main section {
     width: 100%;
 }
 
-.enc .mode, .enc .type, .enc .disp, .enc .val {
+.enc .mode, 
+.enc .type, 
+.enc .scale,
+.enc .channel,
+.enc .number, 
+.enc .lower, 
+.enc .upper {
     display: none;
 }
 
-.mode .enc .mode,  .type .enc .type, .disp .enc .disp, .val .enc .val {
+
+*[data-mode=mode] .enc .mode, 
+*[data-mode=type] .enc .type, 
+*[data-mode=scale] .enc .scale,
+*[data-mode=channel] .enc .channel,
+*[data-mode=number] .enc .number, 
+*[data-mode=lower] .enc .lower, 
+*[data-mode=upper] .enc .upper {
     display: block;
 }
-
+/* .mode .enc .mode, 
+.type .enc .type, 
+.scale .enc .scale,
+.channel .enc .channel,
+.number .enc .number, 
+.lower .enc .lower, 
+.upper .enc .upper {
+    display: block;
+} */
 
 .params {
     background-color: #eee;

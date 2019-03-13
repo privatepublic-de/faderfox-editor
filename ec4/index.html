@@ -33,14 +33,14 @@
             <div id="preset">
                 <p>Select setup and group or edit their name.</p>
             </div>
-            <div class="oled"
+            <div id="oled" class="watchparams"
                 ><span class="a">Ctrl:</span><select class="b" data-watch="select-encoder">
                     <option>EC01</option><option>EC02</option><option>EC03</option><option>EC04</option>
                     <option>EC05</option><option>EC06</option><option>EC07</option><option>EC08</option>
                     <option>EC09</option><option>EC10</option><option>EC11</option><option>EC12</option>
                     <option>EC13</option><option>EC14</option><option>EC15</option><option>EC16</option>
-                </select><span class="c" data-action="edit-chan">Chan :</span><input data-watch="chan" data-action="edit-chan" class="d" type="text" value="000"
-                /><span class="a" data-action="edit-disp">Disp:</span><select data-watch="disp" data-action="edit-disp" class="b">
+                </select><span class="c" data-action="edit-channel">Chan :</span><input data-watch="channel" data-action="edit-channel" class="d" type="text" maxlength="2" value=""
+                /><span class="a" data-action="edit-scale">Disp:</span><select data-watch="scale" data-action="edit-scale" class="b">
                     <option>off</option>
                     <option>127</option>
                     <option>100</option>
@@ -49,7 +49,7 @@
                     <option> ±50</option>
                     <option>±500</option>
                     <option>ONOF</option>
-                </select><span class="c" data-action="edit-numb">Numb :</span><input data-watch="numb" data-action="edit-numb" class="d" type="text" value="000"
+                </select><span class="c number" data-action="edit-number">Numb :</span><input data-watch="number" data-action="edit-number" class="d number" type="text" maxlength="3" value=""
                 /><span class="a" data-action="edit-type">Type:</span><select data-watch="type" data-action="edit-type" class="b">
                     <option>CCR1</option>
                     <option>CCR2</option>
@@ -59,15 +59,15 @@
                     <option>PBnd</option>
                     <option>AftT</option>
                     <option>Note</option>
-                </select><span class="c" data-action="edit-lowr">Lower:</span><input data-watch="lowr" data-action="edit-lowr" class="d" type="text" value="000"
-                /><span class="a" data-action="edit-mode">Mode:</span><select data-watch="mode" data-action="edit-mode" class="b">
+                </select><span class="c lower" data-action="edit-lower">Lower:</span><input data-watch="lower" data-action="edit-lower" class="d lower" type="text" maxlength="3" value=""
+                /><span class="a mode" data-action="edit-mode">Mode:</span><select data-watch="mode" data-action="edit-mode" class="b mode">
                     <option>Acc0</option>
                     <option>Acc1</option>
                     <option>Acc2</option>
                     <option>Acc3</option>
-                </select><span class="c" data-action="edit-uppr">Upper:</span><input data-watch="uppr" data-action="edit-uppr" class="d" type="text" value="127"
+                </select><span class="c upper" data-action="edit-upper">Upper:</span><input data-watch="upper" data-action="edit-upper" class="d upper" type="text" maxlength="3" value=""
             /></div>
-            <div id="ctrlcontainer">
+            <div id="ctrlcontainer" class="watchparams">
             </div>
         </main>
         <div id="tbbottom">
