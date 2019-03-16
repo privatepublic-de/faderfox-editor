@@ -1,18 +1,23 @@
 let SEC4 = {
     title_data_received: "Data received",
     title_send: "Send data to EC4",
-    msg_send: "Set your EC4 to system mode (press left+right button, yellow LED must be on).\
-                Then press <i>Send</i> button below to start transfer. Red LED shows data transfer.",
+    msg_send: "To send the current editor settings to your EC4 device:\
+                <ul><li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>\
+                <li>Select &quot;Receive&quot; menu; the display shows &quot;Work in progress&quot;</li>\
+                <li>Then press the <i>Send</i> button below to start transfer</li>\
+                <li>You can monitor the transfer progress on the EC4's display.</li>\
+                </ul>",
 
     msg_apply: "Received setup data from EC4. Apply to editor?",
     msg_data_applied: "Setups from EC4 applied to editor!",
     $msg_invalid_data: "Received invalid sysex data. {}",
 
-    title_receive: "Receive from PC4", 
-    msg_receive: "Send your current PC4 settings to this editor:\
-            <ul><li>Enter system mode (yellow LED must be on)</li>\
-            <li>Hold down left shift button and turn pot 24 to right position until yellow LED blinks</li>\
-            <li>Release shift key to start data transfer.<br/>Red LED shows data transfer.</li></ul>\
+    title_receive: "Receive from EC4", 
+    msg_receive: "To receive the settings from your EC4 device:\
+            <ul><li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>\
+            <li>Select &quot;Send&quot; menu</li>\
+            <li>Select &quot;Send all setups&quot; and hold the pressed knob until transfer starts</li>\
+            <li>You can monitor the transfer progress on the EC4's display.</li>\</ul>\
             <p>A message will appear here, after the data has been received.</p>",
 
     title_save: "Save as sysex file", 

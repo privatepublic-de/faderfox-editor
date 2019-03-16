@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faderfox EC4 Editor</title>
+    <meta name="description" content="Web-MIDI Editor to configure the Faderfox EC4 controller.">
     <link rel="stylesheet" href="../lib/base.css">
     <link rel="stylesheet" href="styles.css">
     <script src="../lib/strings.js"></script>
@@ -8,6 +12,7 @@
     <script src="../lib/download.js"></script>
     <script src="../lib/base.js"></script>
     <script src="ec4.js"></script>
+    <script>if (location.protocol!=='https:' && location.protocol!=='file:') {location.href = 'https:' + window.location.href.substring(window.location.protocol.length);}</script>
 </head>
 <body>
 
@@ -31,16 +36,16 @@
     <div class="content">
         <main>
             <div id="preset">
-                <p>Select setup and group or edit their name.</p>
+                <p>Select setup, group and edit name.</p>
             </div>
             <div id="oled" class="watchparams"
-                ><span class="a">Ctrl:</span><select class="b" data-watch="select-encoder">
-                    <option>EC01</option><option>EC02</option><option>EC03</option><option>EC04</option>
-                    <option>EC05</option><option>EC06</option><option>EC07</option><option>EC08</option>
-                    <option>EC09</option><option>EC10</option><option>EC11</option><option>EC12</option>
-                    <option>EC13</option><option>EC14</option><option>EC15</option><option>EC16</option>
-                </select><span class="c" data-action="edit-channel">Chan :</span><input data-watch="channel" data-action="edit-channel" class="d" type="text" maxlength="2" value=""
-                /><span class="a" data-action="edit-scale">Disp:</span><select data-watch="scale" data-action="edit-scale" class="b">
+                ><span class="a" data-action="edit-nothing">Ctrl:</span><select class="b" data-watch="select-encoder">
+                    <option>01</option><option>02</option><option>03</option><option>04</option>
+                    <option>05</option><option>06</option><option>07</option><option>08</option>
+                    <option>09</option><option>10</option><option>11</option><option>12</option>
+                    <option>13</option><option>14</option><option>15</option><option>16</option>
+                </select><span class="c channel" data-action="edit-channel">Chan :</span><input data-watch="channel" data-action="edit-channel" class="d" type="text" maxlength="2" value=""
+                /><span class="a scale" data-action="edit-scale">Disp:</span><select data-watch="scale" data-action="edit-scale" class="b">
                     <option>off</option>
                     <option>127</option>
                     <option>100</option>
@@ -49,8 +54,10 @@
                     <option> ±50</option>
                     <option>±500</option>
                     <option>ONOF</option>
-                </select><span class="c number" data-action="edit-number">Numb :</span><input data-watch="number" data-action="edit-number" class="d number" type="text" maxlength="3" value=""
-                /><span class="a" data-action="edit-type">Type:</span><select data-watch="type" data-action="edit-type" class="b">
+                </select><span class="c number number_l" data-action="edit-number">Numb :</span><input data-watch="number" data-action="edit-number" class="d number number_l" type="text" maxlength="3" value=""
+                /><span class="c number number_h" data-action="edit-number">N:</span><input data-watch="number" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value=""
+                /><input data-watch="number_h" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value=""
+                /><span class="a type" data-action="edit-type">Type:</span><select data-watch="type" data-action="edit-type" class="b">
                     <option>CCR1</option>
                     <option>CCR2</option>
                     <option>CCab</option>
@@ -59,6 +66,7 @@
                     <option>PBnd</option>
                     <option>AftT</option>
                     <option>Note</option>
+                    <option>NRPM</option>
                 </select><span class="c lower" data-action="edit-lower">Lower:</span><input data-watch="lower" data-action="edit-lower" class="d lower" type="text" maxlength="3" value=""
                 /><span class="a mode" data-action="edit-mode">Mode:</span><select data-watch="mode" data-action="edit-mode" class="b mode">
                     <option>Acc0</option>
@@ -71,13 +79,13 @@
             </div>
         </main>
         <div id="tbbottom">
-            <button type="button" id="btnallchannels">Set all channels</button>
-            <button type="button" id="btncopy">Copy</button>
+            <button type="button" id="btncopysetup">Copy Setup</button>
+            <button type="button" id="btncopygroup">Copy Group</button>
             <button type="button" id="btnpaste">Paste</button>
         </div>
     </div>
     <div class="credits">
-        Web-MIDI Editor for the <a href="http://faderfox.de/pc4.html">faderfox PC4-Pot controller</a>.
+        Web-MIDI Editor for the <a href="http://faderfox.de/ec4.html">faderfox EC4-Pot controller</a>.
         Developed by Peter Witzel (<a href="http://www.privatepublic.de">privatepublic.de</a>) in co-operation with Faderfox.
         Source code available on <a href="https://github.com/privatepublic-de/faderfox-editor">github</a>.
     </div>

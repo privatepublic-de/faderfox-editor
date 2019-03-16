@@ -6,20 +6,68 @@ const addrSetupNames = dataOffset - dataOffset;
 const addrGroupNames = 0x1C00 - dataOffset;
 const addrPresets = 0x2000 - dataOffset;
 
+class Selection {
+
+    constructor(updatecallback) {
+        this.s = 0;
+        this.g = 0;
+        this.e = 0;
+        this.updatecallback = updatecallback;
+    }
+
+    setAll(setup, group, encoder) {
+        this.s = setup;
+        this.g = group;
+        this.e = encoder;
+        this.updatecallback(this);
+    }
+
+    get setup() {
+        return this.s;
+    }
+
+    set setup(n) {
+        const v = parseInt(n);
+        if (v!==this.s) {
+            this.s = v;
+            this.updatecallback(this);
+        }
+    }
+
+    get group() {
+        return this.g;
+    }
+
+    set group(n) {
+        this.g = parseInt(n);
+        this.updatecallback(this);
+    }
+
+    get encoder() {
+        return this.e;
+    }
+
+    set encoder(n) {
+        this.e = parseInt(n);
+        this.updatecallback(this);
+    }
+
+}
+
 
 const P = { // P is short for Parameter
     type: 'type', channel: 'channel', number: 'number',
     number_h: 'number_h', lower: 'lower', upper: 'upper', 
     mode: 'mode', scale: 'scale', name: 'name', 
 
-    $type: { pos: 0, mask: 0xf0 },
+    $type: { pos: 0, mask: 0xf0, min: 0, max: 8, default: 2 },
     $channel: { pos: 0, mask: 0x0f },
     $number: { pos: 16, mask: 0xff },
     $number_h: { pos: 32, mask: 0xff },
     $lower: { pos: 48, mask: 0xff },
     $upper: { pos: 64, mask: 0xff },
-    $mode: { pos: 80, mask: 0xf0 },
-    $scale: { pos: 80, mask: 0x0f },
+    $mode: { pos: 80, mask: 0xf0, min: 0, max: 3, default: 3 },
+    $scale: { pos: 80, mask: 0x0f, min: 0, max: 7, default: 1 },
     $name: { pos: 128 },
 
     get: function(setup, group, encoder, type) {
@@ -38,6 +86,11 @@ const P = { // P is short for Parameter
                 let val = allData[addr] & spec.mask;
                 if (spec.mask>0x0f) {
                     val = val>>4;
+                }
+                if (spec.hasOwnProperty('min')) {
+                    if (val<spec.min || val>spec.max) {
+                        val = spec.default;
+                    }
                 }
                 if (type === P.channel) val++;
                 return val;
@@ -105,53 +158,6 @@ const P = { // P is short for Parameter
     // console.log(allData.length, new TextDecoder("utf-8").decode(allData));
 })();
 
-class Selection {
-
-    constructor(updatecallback) {
-        this.s = 0;
-        this.g = 0;
-        this.e = 0;
-        this.updatecallback = updatecallback;
-    }
-
-    setAll(setup, group, encoder) {
-        this.s = setup;
-        this.g = group;
-        this.e = encoder;
-        this.updatecallback(this);
-    }
-
-    get setup() {
-        return this.s;
-    }
-
-    set setup(n) {
-        const v = parseInt(n);
-        if (v!==this.s) {
-            this.s = v;
-            this.updatecallback(this);
-        }
-    }
-
-    get group() {
-        return this.g;
-    }
-
-    set group(n) {
-        this.g = parseInt(n);
-        this.updatecallback(this);
-    }
-
-    get encoder() {
-        return this.e;
-    }
-
-    set encoder(n) {
-        this.e = parseInt(n);
-        this.updatecallback(this);
-    }
-
-}
 
 const REnameChars = new RegExp('[A-Za-z0-9.\\-/ ]');
 const REnumberChars = new RegExp('[0-9]');
@@ -196,6 +202,7 @@ class InputHandler {
                 else if (value>16) value = 16;
                 break;
             case 'number':
+            case 'number_h':
             case 'lower':
             case 'upper':
                 if (value<0) value = 0;
@@ -218,8 +225,15 @@ class InputHandler {
         });
         let storeVal = (typeof element.selectedIndex!=='undefined')?element.selectedIndex:element.value;
         P.set(this.selection.setup, this.selection.group, encid, what, storeVal);
-        if (what===P.type && encid===this.selection.encoder) {
-            DOM.element('#oled').setAttribute('data-type', storeVal);
+        if (what===P.type) {
+            if (encid===this.selection.encoder) {
+                DOM.element('#oled').setAttribute('data-type', storeVal);
+            }
+            DOM.all('#ctrlcontainer .enc', (el=>{
+                const eid = this.findReferencedEncoder(el);
+                const type = P.get(this.selection.setup, this.selection.group, eid, P.type);
+                el.setAttribute('data-type', type);
+            }));
         }
     }
 
@@ -273,6 +287,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
         DOM.element('#oled').setAttribute('data-type', P.get(sel.setup, sel.group, sel.encoder, P.type));
+        DOM.all('#ctrlcontainer .enc', (el=>{
+            const eid = inputhandler.findReferencedEncoder(el);
+            const type = P.get(sel.setup, sel.group, eid, P.type);
+            el.setAttribute('data-type', type);
+        }));
     }
 
     syncValues();
@@ -303,9 +322,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (action.indexOf('edit-') === 0) {
             const name = action.split('-')[1];
             DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
+            DOM.element('#oled').setAttribute('data-mode', name);
             const eled = DOM.element(`#oled *[data-watch=${name}]`);
-            if (eled.tagName === 'INPUT') eled.select();
-            eled.focus();
+            if (eled) {
+                if (eled.tagName === 'INPUT') eled.select();
+                eled.focus();
+            }
         }
         switch (action) {
             case 'select-setup':
@@ -340,9 +362,6 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'select-encoder':
                 selectEncoder(event);
                 return;
-            // case P.type:
-            //     DOM.element('#oled').setAttribute('data-type', P.get(sel.setup, sel.group, sel.encoder, P.type));
-            //     break;
         }
         if (event.target.tagName==='INPUT') {
             return inputhandler.checkNumberKey(event, event.target, what);
@@ -366,28 +385,111 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    function generateSysexData() {
+        const deviceparts = sysex.hilo(sysex.deviceId);
+        let dataout = [0xf0, 0x00, 0x00, 0x00, 0x41, deviceparts[0], deviceparts[1], 0x42, 0x20, 0x13, 0x43, 0x20, 0x10, 0x44, 0x20, 0x12];
+        const pages = allData.length / 64;
+        for (let page=0; page<pages; page++) {
+            const pos = page*64;
+            const addr = pos + dataOffset;
+            dataout.push(0x49, ...sysex.hilo(addr>>8));
+            dataout.push(0x4a, ...sysex.hilo(addr & 0xff));
+            let crc = 0;
+            for (let i=0; i<64; i++) {
+                dataout.push(0x4d, ...sysex.hilo(allData[pos+i]));
+                crc += allData[pos+i];
+            }
+            crc = crc&0xffff;
+            dataout.push(0x4b, ...sysex.hilo((crc&0xff00)>>8)); // CRC high
+            dataout.push(0x4c, ...sysex.hilo((crc&0x00ff))); // CRC low
+            dataout.push(...Sysex._padding);
+        }
+        dataout.push(0x4f); // download stop
+        dataout.push(...deviceparts);
+        dataout.push(0xf7);
+        return new Uint8Array(dataout);
+    }
+
+
+    function interpretSysExData(data) {
+        allData.fill(0);
+        sysex.parseSysexData(data, chunk => {}, (addr, pagedata)=>{
+            allData.set(pagedata, addr - dataOffset);
+        });
+        for (let i=0; i<16; i++) {
+            let name = allData.subarray(addrSetupNames + i*4, addrSetupNames + i*4+4);
+            DOM.element(`#s${i}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
+            for (let j=0; j<16; j++) {
+                let name = allData.subarray(addrGroupNames + i*64 + j*4, addrGroupNames + i*64 + j*4 + 4);
+                DOM.element(`#s${i}g${j}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
+            }
+        }
+        syncValues();
+    }
+
+    function sysexHandler(data) {
+        try {
+            MBox.show(SEC4.title_data_received, SEC4.msg_apply, {
+                confirmCallback: function() {
+                    MBox.hide();
+                    interpretSysExData(data);
+                    MBox.show(SEC4.title_data_received, SEC4.msg_data_applied, {hideAfter:5000});
+                }
+            });
+        }
+        catch(e) {
+            MBox.show(SEC4.title_data_received, STR.apply(SEC4.$msg_invalid_data ,e.message), {hideAfter:10000, type:'error'});
+        }
+    }
+
+    const midi = new MIDI("Faderfox EC4", sysexHandler);
+
+    DOM.on('#btntransfer', 'click', function() {
+        if (midi.hasOutput()) {
+            MBox.show(SEC4.title_send, SEC4.msg_send, {
+                buttonLabel: "Send",
+                confirmCallback: function() {
+                    MBox.hide();
+                    let data = generateSysexData();
+                    midi.sendSysex(data, 25000);
+                }
+            });
+        }
+        else {
+            MBox.show(STR.midictrl.title_error, STR.midictrl.nooutputs, {type:'error'});
+        }
+    });
+    DOM.on('#btnreceive', 'click', function() {
+        if (midi.hasInput()) {
+            MBox.show(SEC4.title_receive, SEC4.msg_receive);
+        }
+        else {
+            MBox.show(STR.midictrl.title_error, STR.midictrl.noinputs, {type:'error'});
+        }
+    });
+
+    DOM.on('#btnfilesave', 'click', function() {
+        MBox.show(SEC4.title_save, SEC4.msg_save+'<br/><br/><div class="field"><label>Filename:</label><input name="filename" type="text" size="12" value="" placeholder="filename" /><b>.syx</b></div>', 
+        {
+            buttonLabel: 'Save File',
+            confirmCallback: function() {
+                let filename = DOM.element('#mbox input[name=filename]').value;
+                if (filename && filename!=="") {
+                    download(generateSysexData(), filename+".syx", "application/octet-stream" ); 
+                }
+                MBox.hide();
+            }
+        });
+        
+    });
+
     DOM.on('#btnfileload', 'click', function() {
-        MBox.show(SEC4.title_load, SEC4.msg_load+'<br/<br/><input type="file" name="file" />', {
+        MBox.show(SEC4.title_load, SEC4.msg_load+'<br/><br/><input type="file" name="file" />', {
             attachHandlers: function(boxelement) {
                 DOM.attachInside(boxelement, 'input[type=file]', 'change', function(evt) {
                     sysex.readFile(evt.target, function(data) {
                         if (data) {
-                            allData.fill(0);
-                            sysex.parseSysexData(data, chunk => {}, (addr, pagedata)=>{
-                                allData.set(pagedata, addr - dataOffset);
-                            });
-                            // allData.forEach((v, i)=>{
-                            //     if (v<32 || v>122) allData[i] = '.'.charCodeAt(0);
-                            // });
-                            // console.log(allData.length, new TextDecoder("utf-8").decode(allData));
-                            for (let i=0; i<16; i++) {
-                                let name = allData.subarray(addrSetupNames + i*4, addrSetupNames + i*4+4);
-                                DOM.element(`#s${i}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
-                                for (let j=0; j<16; j++) {
-                                    let name = allData.subarray(addrGroupNames + i*64 + j*4, addrGroupNames + i*64 + j*4 + 4);
-                                    DOM.element(`#s${i}g${j}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
-                                }
-                            }
+                            interpretSysExData(data);
                             MBox.hide();
                             MBox.show(SEC4.title_load, SEC4.msg_loaded, {hideAfter:5000});
                         }
@@ -396,6 +498,8 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+
+    DOM.on('#btncopysetup,#btncopygroup,#btnpaste', 'click', function() { alert('Not implemented yet... :-(');})
 
     sel.setAll(0, 0, 0);
 
@@ -440,7 +544,13 @@ function buildUI() {
 
     // build encoders
     let encBase = `
-        <div class="number"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" /></div>
+        <div class="number">
+            <div class="standard"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" /></div>
+            <div class="hi-lo"><label># Hi/Low</label>
+                <input data-watch="number" maxlength="3" type="text" value="0" />
+                <input data-watch="number_h" maxlength="3" type="text" value="0" />
+            </div>
+        </div>
         <div class="channel"><label>Channel</label><input data-watch="channel" maxlength="2" type="text" value="0" /></div>
         <div class="lower"><label>Lower</label><input data-watch="lower" maxlength="3" type="text" value="0" /></div>
         <div class="upper"><label>Upper</label><input data-watch="upper" maxlength="3" type="text" value="0" /></div>
@@ -462,10 +572,11 @@ function buildUI() {
                 <option>CC relative 2</option>
                 <option>CC absolute</option>
                 <option>Program change</option>
-                <option>CC absolute 14bit</option>
+                <option>CC 14bit absolute</option>
                 <option>Pitch bend</option>
                 <option>Aftertouch</option>
                 <option>Note</option>
+                <option>NRPM</option>
             </select>
         </div>
         <div class="mode"><label>Mode</label>

@@ -64,44 +64,6 @@ input[data-type="ccno"] {
     border-top: 1px solid #bde;
 }
 
-
-
-#tb {
-    text-align: center;
-    border-top: 1px solid #aaa;
-    margin-top: .5em;
-    padding-top: .5em;
-}
-#tbbottom {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 24px;
-}
-
-#midisettings {
-    margin: 10px auto;
-    padding: 10px 5px 10px 5px;
-    width: 490px;
-    text-align: center;
-    color: #fff;
-    background: #777 linear-gradient(#777, #555);
-    font-size: .8em;
-    border-radius: 6px;
-}
-#midisettings.unsupported {
-    background: #b66;
-}
-
-#midisettings select {
-    max-width: 140px;
-}
-
-.field {
-    display: inline-block;
-}
-
 ul.select {
     display: block;
     list-style: none;

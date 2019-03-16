@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
     DOM.on('#btnfileload', 'click', function() {
-        MBox.show(SPC4.title_load, SPC4.msg_load+'<br/<br/><input type="file" name="file" />', {
+        MBox.show(SPC4.title_load, SPC4.msg_load+'<br/><br/><input type="file" name="file" />', {
             attachHandlers: function(boxelement) {
                 DOM.attachInside(boxelement, 'input[type=file]', 'change', function(evt) {
                     sysex.readFile(evt.target, function(data) {

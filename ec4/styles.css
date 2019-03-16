@@ -43,6 +43,7 @@
     box-sizing: border-box;
     display: inline-block;
     outline: none;
+    box-shadow: inset 2px 2px 2px #000;
 }
 #oled select option {
     background-color: #000;
@@ -62,6 +63,9 @@
 #oled .b { width: 26%; }
 #oled .c { width: 30%; margin-left: 1%; padding-left: 3%; border-left: 1px solid #FEFF5F}
 #oled .d { width: 15%; }
+#oled .c.number_h { width: 13%; }
+#oled .d.number_h { width: 15%; }
+#oled .d.number_h + .d.number_h { border-left: 1px solid #FEFF5F; margin-left: 2%; padding-left: 1%; }
 
 #oled[data-type="0"] .lower,
 #oled[data-type="0"] .upper,
@@ -75,6 +79,24 @@
 #oled[data-type="7"] .mode
     { visibility: hidden;}
 
+
+#oled[data-mode="channel"] span.channel,
+#oled[data-mode="number"] span.number,
+#oled[data-mode="type"] span.type,
+#oled[data-mode="scale"] span.scale,
+#oled[data-mode="mode"] span.mode,
+#oled[data-mode="upper"] span.upper,    
+#oled[data-mode="lower"] span.lower {
+    text-decoration: underline;
+}
+
+#oled .number_h,
+#oled[data-type="8"] .number_l {
+    display: none;
+}
+#oled[data-type="8"] .number_h {
+    display: inline-block;
+}
 
 *[data-action] {
     cursor: pointer;
@@ -110,7 +132,7 @@ main section {
     position: relative;
     width: 100%;
     height: 100%;
-    border: 1px solid #666;
+    border: 1px solid #333;
     /* border-left: none;
     border-right: none; */
     /* background: rgba(0,0,0,.5); */
@@ -118,19 +140,21 @@ main section {
 
 .enc.selected {
     background-color: rgba(255, 255, 0, .3);
-    outline: 4px solid #FEFF5F;
+    /*outline: 4px solid #FEFF5F;*/
 }
 
 .enc .knob {
     position: absolute;
-    left: 25%;
-    right: 25%;
-    top: 45%;
-    bottom: 10%;
+    left: 50%;
+    top: 65%;
+    width: 64px;
+    height: 64px;
+    margin-left: -32px;
+    margin-top: -32px;
     border-radius: 50%;
-    /* border: 2px solid #333; */
-    background-color: #000;
-    box-shadow: 0 0 15px #555;
+    background-color: #222;
+    box-shadow: 0 0 15px #777;
+    border: 2px solid #000;
 }
 
 .enc .n {
@@ -146,7 +170,7 @@ main section {
     position: absolute;
     right: 0;
     left: 0;
-    top: 52%;
+    top: 51%;
     text-align: center;
     /*background: #000;*/
     margin: 0 5px;
@@ -158,23 +182,26 @@ main section {
     font-family:"5x8 LCD HD44780U A02 Regular";
     font-size: 16px;
     padding: 0;
+    box-shadow: inset 1px 1px 2px #000;
     border: none;
     width: 4em;
     text-align: center;
 }
 
 .enc .v input {
-    width: 50%;
+    width: 40%;
     text-align: right;
     padding: 0 5px;
-    background: #ddd;;
-    font-size: 16px;
+    color: #FEFF5F;
+    background: #444;
+    font-size: 18px;
+    box-shadow: inset 2px 2px 2px #000;
     border: none;
 }
 
 .enc .v label {
-    background: #000;
-    color: #ddd;
+    /* background: #000; */
+    color: #bbb;
     font-size: .85em;
     margin-bottom: 4px;
     display: block;
@@ -183,6 +210,12 @@ main section {
 
 .enc select {
     width: 100%;
+    color: #FEFF5F;
+    background: #444;;
+    font-size: 16px;
+    box-shadow: inset 2px 2px 2px #000;
+    border: none;
+    border-radius: 0;
 }
 
 .enc .mode, 
@@ -205,101 +238,20 @@ main section {
 *[data-mode=upper] .enc .upper {
     display: block;
 }
-/* .mode .enc .mode, 
-.type .enc .type, 
-.scale .enc .scale,
-.channel .enc .channel,
-.number .enc .number, 
-.lower .enc .lower, 
-.upper .enc .upper {
-    display: block;
-} */
 
-.params {
-    background-color: #eee;
-    color: #000;
-    border: 1px solid #666;
-    border-top: none;
-    font-size: .7em;
-    padding: 4px;
+.enc[data-type="8"] .standard {
+    display: none;
+}
+.enc[data-type="8"] .hi-lo {
+    display: block;
+}
+.enc .hi-lo {
+    display: none;
 }
 
-.params label {
-    width: 60%;
+.enc .hi-lo input {
+    width: 30%;
     display: inline-block;
-}
-.params input {
-    width: 40%;
-    padding: 0;
-    margin: 0;
-    text-align: right;
-    border: none;
-    font-size: 1.3em;
-}
-input[data-type="ccno"] {
-    border-top: 1px solid #bde;
-}
-
-
-
-#tb {
-    text-align: center;
-    border-top: 1px solid #aaa;
-    margin-top: .5em;
-    padding-top: .5em;
-}
-#tbbottom {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 24px;
-}
-
-#midisettings {
-    margin: 10px auto;
-    padding: 10px 5px 10px 5px;
-    width: 490px;
-    text-align: center;
-    color: #fff;
-    background: #777 linear-gradient(#777, #555);
-    font-size: .8em;
-    border-radius: 6px;
-}
-#midisettings.unsupported {
-    background: #b66;
-}
-
-#midisettings select {
-    max-width: 140px;
-}
-
-.field {
-    display: inline-block;
-}
-
-ul.select {
-    display: block;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.msgbox h2::after,
-.select::after {
-    content:"";
-    display:table;
-    clear:both;
-}
-.select li {
-    display: block;
-    cursor: pointer;
-    background-color: #000;
-}
-
-.select li.selected,
-.select li:hover {
-    background-color: #ccc;
-    color: #000;
 }
 
 #preset {
@@ -328,6 +280,7 @@ ul.select {
     border: none;
     width: 4em;
     cursor: pointer;
+    outline: none;
 }
 
 #preset #browser {
@@ -365,52 +318,16 @@ ul.select {
 #preset #browser li.selected {
     background-color: #c00!important;
 }
+#preset #browser li li.selected::after {
+    content: '▶';
+    font-family: Arial,sans-serif;
+    color: #fff;
+    position: absolute;
+    right: -12px;
+}
 
 #preset #browser ul li,
 #preset #browser li:hover {
     background-color: #444;
 }
 
-.ctrl ul.select {
-    width: 100%;
-}
-
-.ctrl li {
-    box-sizing: border-box;
-    border: 1px solid #666;
-    border-bottom: none;
-    float: left;
-    text-align: center;
-    font-size: .8em;
-    padding: 2px;
-}
-
-
-.ctrl li {
-    width: 33.334%;
-    font-size: .7em;
-}
-
-.cc .ctrl li.cc,
-.cc .params {
-    background-color: #bde;
-    color: black;
-}
-
-.pb .ctrl li.pb,
-.pb .params {
-    background-color: #fb9;
-    color: black;
-}
-.pgm .ctrl li.pgm,
-.pgm .params {
-    background-color: #beb;
-    color: black;
-}
-.params .cc {
-    display: none;
-}
-
-.cc .params .cc {
-    display: block;
-}
