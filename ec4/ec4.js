@@ -358,6 +358,8 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log(`Watch ${what} on ${event.target} ${encoderId}`);
         switch (what) {
             case P.name:
+            case 'name-setup':
+            case 'name-group':
                 return inputhandler.checkNameKey(event, event.target, what);
             case 'select-encoder':
                 selectEncoder(event);
