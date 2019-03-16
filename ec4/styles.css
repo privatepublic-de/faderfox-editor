@@ -256,9 +256,18 @@ main section {
 
 #preset {
     position: absolute;
-    top: 20px;
+    top: 6px;
     left: -150px;
     width: 150px;
+}
+
+#preset .header span {
+    display: inline-block;
+    width: 50%;
+    box-sizing: border-box;
+}
+#preset .header span:first-child {
+    padding-left: 5px;
 }
 
 #preset ul {

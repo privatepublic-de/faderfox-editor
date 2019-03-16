@@ -565,7 +565,7 @@ function buildUI() {
         setupItem.appendChild(groupList);
         setupList.appendChild(setupItem);
     }
-    DOM.element('#preset').prepend(setupList);
+    DOM.element('#setupsandgroups').prepend(setupList);
 
     // build encoders
     let encBase = `
