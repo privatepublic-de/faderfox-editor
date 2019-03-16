@@ -361,12 +361,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     sel.group = number;
                 }
-                e.stopPropagation();
                 break;
             case 'select-encoder':
                 selectEncoder(e);
                 break;
         }
+        e.stopPropagation();
     }
 
     DOM.all('*[data-action]', e=> {
@@ -536,7 +536,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    DOM.on('#btncopysetup,#btncopygroup,#btnpaste', 'click', function() { alert('Not implemented yet... :-(');})
+    DOM.on('#btncopysetup,#btncopygroup,#btnpastesetup,#btnpastegroup', 'click', function() { alert('Not implemented yet... :-(');})
 
     sel.setAll(0, 0, 0);
 
