@@ -128,6 +128,20 @@ const P = { // P is short for Parameter
                 allData[addr] = value;
             }
         }
+    },
+    setSetupName: function(setupNumber, name) {
+        while (name.length<4) { name += ' '; }
+        const addr = addrSetupNames + setupNumber*4;
+        for (let i=0; i<4; i++) {
+            allData[addr+i] = name.charCodeAt(i);
+        }
+    },
+    setGroupName: function(setupNumber, groupNumber, name) {
+        while (name.length<4) { name += ' '; }
+        const addr = addrGroupNames + setupNumber*64 + groupNumber*4;
+        for (let i=0; i<4; i++) {
+            allData[addr+i] = name.charCodeAt(i);
+        }
     }
 };
 
@@ -213,27 +227,35 @@ class InputHandler {
     }
 
     distributeValue(element, what) {
-        const encid = this.findReferencedEncoder(element);
-        DOM.all(`.watchparams *[data-watch=${what}]`, el => {
-            let eid = this.findReferencedEncoder(el);
-            if (eid === encid) {
-                el.value = element.value;
-                if (typeof element.selectedIndex!=='undefined') {
-                    el.selectedIndex = element.selectedIndex;
+        if (what === 'name-setup') {
+            const setupNumber = element.getAttribute('data-number');
+            P.setSetupName(setupNumber, element.value);
+        } else if (what === 'name-group') {
+            const numbers = element.getAttribute('data-number').split(',');
+            P.setGroupName(numbers[0], numbers[1], element.value);
+        } else {
+            const encid = this.findReferencedEncoder(element);
+            DOM.all(`.watchparams *[data-watch=${what}]`, el => {
+                let eid = this.findReferencedEncoder(el);
+                if (eid === encid) {
+                    el.value = element.value;
+                    if (typeof element.selectedIndex!=='undefined') {
+                        el.selectedIndex = element.selectedIndex;
+                    }
                 }
+            });
+            let storeVal = (typeof element.selectedIndex!=='undefined')?element.selectedIndex:element.value;
+            P.set(this.selection.setup, this.selection.group, encid, what, storeVal);
+            if (what===P.type) {
+                if (encid===this.selection.encoder) {
+                    DOM.element('#oled').setAttribute('data-type', storeVal);
+                }
+                DOM.all('#ctrlcontainer .enc', (el=>{
+                    const eid = this.findReferencedEncoder(el);
+                    const type = P.get(this.selection.setup, this.selection.group, eid, P.type);
+                    el.setAttribute('data-type', type);
+                }));
             }
-        });
-        let storeVal = (typeof element.selectedIndex!=='undefined')?element.selectedIndex:element.value;
-        P.set(this.selection.setup, this.selection.group, encid, what, storeVal);
-        if (what===P.type) {
-            if (encid===this.selection.encoder) {
-                DOM.element('#oled').setAttribute('data-type', storeVal);
-            }
-            DOM.all('#ctrlcontainer .enc', (el=>{
-                const eid = this.findReferencedEncoder(el);
-                const type = P.get(this.selection.setup, this.selection.group, eid, P.type);
-                el.setAttribute('data-type', type);
-            }));
         }
     }
 
@@ -508,11 +530,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function buildUI() {
-    function createNameInput(id, type, value) {
+    function createNameInput(id, type, number, value) {
         let element = document.createElement('input');
         element.setAttribute('id',id);
         element.setAttribute('type','text');
         element.setAttribute('data-watch', 'name-'+type);
+        element.setAttribute('data-number', number);
         element.setAttribute('maxlength',4);
         element.setAttribute('value',value || '');
         return element;
@@ -535,10 +558,10 @@ function buildUI() {
             if (groupNumber===0) {
                 groupItem.classList.add('selected');
             }
-            groupItem.appendChild(createNameInput(`s${setupNumber}g${groupNumber}`, 'group', 'GR'+(groupNumber<9?'0':'')+(groupNumber+1)));
+            groupItem.appendChild(createNameInput(`s${setupNumber}g${groupNumber}`, 'group', `${setupNumber},${groupNumber}`, 'GR'+(groupNumber<9?'0':'')+(groupNumber+1)));
             groupList.appendChild(groupItem);
         }
-        setupItem.appendChild(createNameInput(`s${setupNumber}`, 'setup', 'SE'+(setupNumber<9?'0':'')+(setupNumber+1)));
+        setupItem.appendChild(createNameInput(`s${setupNumber}`, 'setup', setupNumber, 'SE'+(setupNumber<9?'0':'')+(setupNumber+1)));
         setupItem.appendChild(groupList);
         setupList.appendChild(setupItem);
     }
