@@ -17,7 +17,7 @@ let SEC4 = {
             <ul><li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>\
             <li>Select &quot;Send&quot; menu</li>\
             <li>Select &quot;Send all setups&quot; and hold the pressed knob until transfer starts</li>\
-            <li>You can monitor the transfer progress on the EC4's display.</li>\</ul>\
+            <li>You can monitor the transfer progress on the EC4's display.</li></ul>\
             <p>A message will appear here, after the data has been received.</p>",
 
     title_save: "Save as sysex file", 

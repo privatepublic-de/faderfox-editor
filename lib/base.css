@@ -13,10 +13,10 @@ h1 {
     box-sizing: border-box;
     position: fixed;
     width: 450px;
-    height: 200px;
+    height: auto;
     left: 50%;
-    top: 50%;
-    margin-top: -100px;
+    top: 20%;
+    /* margin-top: -100px; */
     margin-left: -225px;
     background: #eee linear-gradient(#eee, #ddd);
     color: #000;
@@ -35,6 +35,7 @@ h1 {
     background-image: url('../img/wait.gif');
     background-repeat: no-repeat;
     background-position: center center;
+    min-height: 200px;
 }
 .msgbox h2 {
     margin: 0 0 .5em 0;
