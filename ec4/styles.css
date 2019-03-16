@@ -58,7 +58,6 @@
     display: inline-block;
     white-space: nowrap;
     box-sizing: border-box;
-    border-bottom: 1px solid transparent;
 }
 #oled .a { width: 25%; }
 #oled .b { width: 26%; }
@@ -88,7 +87,7 @@
 #oled[data-mode="mode"] span.mode,
 #oled[data-mode="upper"] span.upper,    
 #oled[data-mode="lower"] span.lower {
-    border-bottom: 1px solid;
+    background-color: #660;
 }
 
 #oled .number_h,
@@ -120,7 +119,7 @@ main {
     bottom: 60px;
     left: 22px;
     right: 28px;
-}
+}   
 main section {
     box-sizing: border-box;
     float: left;
