@@ -216,6 +216,9 @@ class InputHandler {
                 else if (value>16) value = 16;
                 break;
             case 'number':
+                if (DOM.parentsUpAttribute(element, 'data-type')==4 && value>31) {
+                    value = 31;
+                }
             case 'number_h':
             case 'lower':
             case 'upper':
@@ -260,10 +263,7 @@ class InputHandler {
     }
 
     findReferencedEncoder(element) {
-        let encoderId = null;
-        while(element && !(encoderId = element.getAttribute('data-enc'))) {
-            element = element.parentElement;
-        }
+        let encoderId = DOM.parentsUpAttribute(element, 'data-enc');
         if (encoderId) {
             return parseInt(encoderId);
         } else { 
@@ -386,6 +386,19 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'select-encoder':
                 selectEncoder(event);
                 return;
+            case 'number':
+            case 'number_h':
+            case 'lower':
+            case 'upper':
+            case 'channel':
+                if (event.key==='ArrowUp' || event.key==='ArrowDown') {
+                    const add = (event.key==='ArrowUp')?1:-1;
+                    event.target.value = parseInt(event.target.value) + add;
+                    inputhandler.checkValue(event.target, what);
+                    inputhandler.distributeValue(event.target, what);
+                    return;
+                }
+                break;
         }
         if (event.target.tagName==='INPUT') {
             return inputhandler.checkNumberKey(event, event.target, what);
@@ -568,58 +581,58 @@ function buildUI() {
     DOM.element('#setupsandgroups').prepend(setupList);
 
     // build encoders
-    let encBase = `
-        <div class="number">
-            <div class="standard"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" /></div>
-            <div class="hi-lo"><label># Hi/Low</label>
-                <input data-watch="number" maxlength="3" type="text" value="0" />
-                <input data-watch="number_h" maxlength="3" type="text" value="0" />
-            </div>
-        </div>
-        <div class="channel"><label>Channel</label><input data-watch="channel" maxlength="2" type="text" value="0" /></div>
-        <div class="lower"><label>Lower</label><input data-watch="lower" maxlength="3" type="text" value="0" /></div>
-        <div class="upper"><label>Upper</label><input data-watch="upper" maxlength="3" type="text" value="0" /></div>
-        <div class="scale"><label>Display</label>
-            <select data-watch="scale">
-                <option>display off</option>
-                <option>0...127</option>
-                <option>0...100</option>
-                <option>0...1000</option>
-                <option>-63...+63</option>
-                <option>-50...+50</option>
-                <option>-500...+500</option>
-                <option>ON / OFF</option>
-            </select>
-        </div>
-        <div class="type"><label>Type</label>
-            <select data-watch="type">
-                <option>CC relative 1</option>
-                <option>CC relative 2</option>
-                <option>CC absolute</option>
-                <option>Program change</option>
-                <option>CC 14bit absolute</option>
-                <option>Pitch bend</option>
-                <option>Aftertouch</option>
-                <option>Note</option>
-                <option>NRPM</option>
-            </select>
-        </div>
-        <div class="mode"><label>Mode</label>
-            <select data-watch="mode">
-                <option>no acceleration</option>
-                <option>low acceleration</option>
-                <option>mid acceleration</option>
-                <option>max acceleration</option>
-            </select>
-        </div>`;
     for (let i=0; i<16; i++) {
         const twodig = (i<9?'0':'') + (i+1);
         let html = `
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc">
                     <div class="knob"></div>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" /></div>
-                    <div class="v">${encBase}</div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" tabindex="${200+i}"/></div>
+                    <div class="v">
+                        <div class="number">
+                            <div class="standard"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216+i}"/></div>
+                            <div class="hi-lo"><label># Hi/Low</label>
+                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216+i}" />
+                                <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216+i}" />
+                            </div>
+                        </div>
+                        <div class="channel"><label>Channel</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216+i}" /></div>
+                        <div class="lower"><label>Lower</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${216+i}" /></div>
+                        <div class="upper"><label>Upper</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${216+i}" /></div>
+                        <div class="scale"><label>Display</label>
+                            <select data-watch="scale" tabindex="${216+i}">
+                                <option>display off</option>
+                                <option>0...127</option>
+                                <option>0...100</option>
+                                <option>0...1000</option>
+                                <option>-63...+63</option>
+                                <option>-50...+50</option>
+                                <option>-500...+500</option>
+                                <option>ON / OFF</option>
+                            </select>
+                        </div>
+                        <div class="type"><label>Type</label>
+                            <select data-watch="type" tabindex="${216+i}">
+                                <option>CC relative 1</option>
+                                <option>CC relative 2</option>
+                                <option>CC absolute</option>
+                                <option>Program change</option>
+                                <option>CC 14bit absolute</option>
+                                <option>Pitch bend</option>
+                                <option>Aftertouch</option>
+                                <option>Note</option>
+                                <option>NRPM</option>
+                            </select>
+                        </div>
+                        <div class="mode"><label>Mode</label>
+                            <select data-watch="mode" tabindex="${216+i}">
+                                <option>no acceleration</option>
+                                <option>low acceleration</option>
+                                <option>mid acceleration</option>
+                                <option>max acceleration</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </section>`;
         DOM.addHTML('#ctrlcontainer', 'beforeend', html);
