@@ -53,6 +53,7 @@
 }
 #oled input {
     text-align: right;
+    padding: 2px 0;
 }
 #oled span {
     display: inline-block;
@@ -96,6 +97,29 @@
 }
 #oled[data-type="8"] .number_h {
     display: inline-block;
+}
+
+#toallenc {
+    position: absolute;
+    bottom: -16px;
+    width: 60%;
+    left: 50%;
+    margin-left: -30%;
+    text-align: center;
+    background: #000;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 4px;
+    font-size: 10px;
+    font-weight: normal;
+    color: #ddd;
+    line-height: 1em;
+    font-family: Verdana, sans-serif;
+    cursor: pointer;
+    display: none;
+}
+#toallenc:hover {
+    background-color: #770;
 }
 
 *[data-action]:not(main) {

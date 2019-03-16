@@ -58,7 +58,13 @@ class Selection {
 const P = { // P is short for Parameter
     type: 'type', channel: 'channel', number: 'number',
     number_h: 'number_h', lower: 'lower', upper: 'upper', 
-    mode: 'mode', scale: 'scale', name: 'name', 
+    mode: 'mode', scale: 'scale', name: 'name',
+
+    labels: {
+        type: 'Type', channel: 'Channel', number: 'Number',
+        number_h: 'Number', lower: 'Lower', upper: 'Upper',
+        mode: 'Mode', scale: 'Display'
+    },
 
     $type: { pos: 0, mask: 0xf0, min: 0, max: 8, default: 2 },
     $channel: { pos: 0, mask: 0x0f },
@@ -345,6 +351,12 @@ document.addEventListener("DOMContentLoaded", function() {
             const name = action.split('-')[1];
             DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
             DOM.element('#oled').setAttribute('data-mode', name);
+            if (P.labels[name]) {
+                DOM.element('#toallenc span').innerText = P.labels[name];
+                DOM.show('#toallenc');
+            } else {
+                DOM.hide('#toallenc');
+            }
             const eled = DOM.element(`#oled *[data-watch=${name}]`);
             if (eled) {
                 if (eled.tagName === 'INPUT') eled.select();
@@ -364,6 +376,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             case 'select-encoder':
                 selectEncoder(e);
+                break;
+            case 'copy2all':
+                const what = DOM.parentsUpAttribute(e.target, 'data-mode');
+                const type = DOM.parentsUpAttribute(e.target, 'data-type');
+                const value = P.get(sel.setup, sel.group, sel.encoder, what);
+                const number_h = P.get(sel.setup, sel.group, sel.encoder, P.number_h);
+                for (let i=0; i<16; i++) {
+                    P.set(sel.setup, sel.group, i, what, value);
+                    if (what===P.number && type==='8') {
+                        P.set(sel.setup, sel.group, i, P.number_h, number_h);
+                    }
+                }
+                syncValues();
                 break;
         }
         e.stopPropagation();
