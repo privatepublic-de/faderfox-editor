@@ -181,19 +181,19 @@ main section {
     background: #525322;
     font-family:"5x8 LCD HD44780U A02 Regular";
     font-size: 16px;
-    padding: 0;
+    padding: 0 5px;
     box-shadow: inset 1px 1px 2px #000;
     border: none;
-    width: 4em;
-    text-align: center;
+    width: 3em;
+    text-align: left;
 }
 
 .enc .v input {
     width: 40%;
     text-align: right;
-    padding: 0 5px;
-    color: #FEFF5F;
-    background: #444;
+    padding: 2px 5px 0 5px;
+    color: #000;
+    background: #ccc;
     font-size: 18px;
     box-shadow: inset 2px 2px 2px #000;
     border: none;
@@ -210,8 +210,8 @@ main section {
 
 .enc select {
     width: 100%;
-    color: #FEFF5F;
-    background: #444;;
+    color: #000;
+    background: #ccc;;
     font-size: 16px;
     box-shadow: inset 2px 2px 2px #000;
     border: none;
