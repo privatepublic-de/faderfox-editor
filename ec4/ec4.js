@@ -1,10 +1,17 @@
 "use strict";
 
 let allData = new Uint8Array(50240);
+const lengthGroup = 192;
+const lengthSetup = lengthGroup*16;
 const dataOffset = 0x1BC0;
 const addrSetupNames = dataOffset - dataOffset;
 const addrGroupNames = 0x1C00 - dataOffset;
 const addrPresets = 0x2000 - dataOffset;
+let clipboardDataGroup;
+const clipboardDataSetup = {
+    groupNames: undefined,
+    setupData: undefined
+};
 
 class Selection {
 
@@ -82,7 +89,7 @@ const P = { // P is short for Parameter
             console.log('Unknown parameter type '+type);
             return;
         }
-        let addr = addrPresets + (setup*16 + group)*192 + spec.pos;
+        let addr = addrPresets + (setup*16 + group)*lengthGroup + spec.pos;
         if (type === P.name) {
             addr += encoder*4;
             return String.fromCharCode(allData[addr+0], allData[addr+1], allData[addr+2], allData[addr+3]);
@@ -111,7 +118,7 @@ const P = { // P is short for Parameter
             console.log('Unknown parameter type: '+type);
             return;
         }
-        let addr = addrPresets + (setup*16 + group)*192 + spec.pos;
+        let addr = addrPresets + (setup*16 + group)*lengthGroup + spec.pos;
         if (type === P.name) {
             addr += encoder*4;
             while (value.length<4) { value += ' '; }
@@ -148,6 +155,16 @@ const P = { // P is short for Parameter
         for (let i=0; i<4; i++) {
             allData[addr+i] = name.charCodeAt(i);
         }
+    },
+    getGroupName: function(setupNumber, groupNumber) {
+        const addr = addrGroupNames + setupNumber*64 + groupNumber*4;
+        const name = allData.subarray(addr, addr + 4);
+        return String.fromCharCode(name[0], name[1], name[2], name[3]);
+    },
+    getSetupName: function(setupNumber) {
+        const addr = addrSetupNames + setupNumber*4;
+        const name = allData.subarray(addr, addr + 4);
+        return String.fromCharCode(name[0], name[1], name[2], name[3]);
     }
 };
 
@@ -156,14 +173,10 @@ const P = { // P is short for Parameter
     allData.fill(0);
     for (let setup=0; setup<16; setup++) {
         const name = `SE${(setup<9?'0':'')+(setup+1)}`;
-        for (let i=0;i<4;i++) {
-            allData[addrSetupNames+setup*4+i] = name.charCodeAt(i);
-        }
+        P.setSetupName(setup, name);
         for (let group=0; group<16; group++) {
             const name = `GR${(group<9?'0':'')+(group+1)}`;
-            for (let i=0;i<4;i++) {
-                allData[addrGroupNames+setup*16+group*4+i] = name.charCodeAt(i);
-            }
+            P.setGroupName(setup, group, name);
             for (let encoder=0; encoder<16; encoder++) {
                 const name = `EC${(encoder<9?'0':'')+(encoder+1)}`;
                 P.set(setup, group, encoder, P.name, name);
@@ -180,6 +193,7 @@ const P = { // P is short for Parameter
 
 
 const REnameChars = new RegExp('[A-Za-z0-9.\\-/ ]');
+const REnotNameChars = new RegExp('[^A-Za-z0-9.\\-/ ]');
 const REnumberChars = new RegExp('[0-9]');
 
 class InputHandler {
@@ -320,6 +334,18 @@ document.addEventListener("DOMContentLoaded", function() {
             const type = P.get(sel.setup, sel.group, eid, P.type);
             el.setAttribute('data-type', type);
         }));
+        for (let i=0; i<16; i++) {
+            const setupAddr = addrSetupNames + i*4;
+            const nameChars = allData.subarray(setupAddr, setupAddr + 4);
+            const setupName = String.fromCharCode(nameChars[0], nameChars[1], nameChars[2], nameChars[3]).replace(REnotNameChars,' ');
+            DOM.element(`#s${i}`).value = setupName;
+            for (let j=0; j<16; j++) {
+                const groupAddr = addrGroupNames + i*64 + j*4;
+                const nameChars = allData.subarray(groupAddr, groupAddr + 4);
+                const groupName = String.fromCharCode(nameChars[0], nameChars[1], nameChars[2], nameChars[3]).replace(REnotNameChars,' ');
+                DOM.element(`#s${i}g${j}`).value = groupName;
+            }
+        }
     }
 
     syncValues();
@@ -478,14 +504,6 @@ document.addEventListener("DOMContentLoaded", function() {
         sysex.parseSysexData(data, chunk => {}, (addr, pagedata)=>{
             allData.set(pagedata, addr - dataOffset);
         });
-        for (let i=0; i<16; i++) {
-            let name = allData.subarray(addrSetupNames + i*4, addrSetupNames + i*4+4);
-            DOM.element(`#s${i}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
-            for (let j=0; j<16; j++) {
-                let name = allData.subarray(addrGroupNames + i*64 + j*4, addrGroupNames + i*64 + j*4 + 4);
-                DOM.element(`#s${i}g${j}`).value = String.fromCharCode(name[0], name[1], name[2], name[3]);
-            }
-        }
         syncValues();
     }
 
@@ -561,7 +579,71 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    DOM.on('#btncopysetup,#btncopygroup,#btnpastesetup,#btnpastegroup', 'click', function() { alert('Not implemented yet... :-(');})
+    function copyToClipboard(what) {
+        if (what==='group') {
+            const addr = addrPresets + (sel.setup*16 + sel.group)*lengthGroup;
+            clipboardDataGroup = new Uint8Array(lengthGroup);
+            for (let i=0;i<lengthGroup;i++) {
+                clipboardDataGroup[i] = allData[addr+i];
+            }
+            MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_copy_group, `${sel.group+1} (&quot;${P.getGroupName(sel.setup, sel.group)}&quot;)`), { hideAfter: 5000});
+        } else { // whole setup
+            const addr = addrPresets + (sel.setup*lengthSetup);
+            clipboardDataSetup.setupData = new Uint8Array(lengthSetup);
+            for (let i=0;i<lengthSetup;i++) {
+                clipboardDataSetup.setupData[i] = allData[addr+i];
+            }
+            const addrGNames = addrGroupNames + sel.setup*64;
+            clipboardDataSetup.groupNames = new Uint8Array(64);
+            for (let i=0;i<64;i++) {
+                clipboardDataSetup.groupNames[i] = allData[addrGNames+i];
+            }
+            MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_copy_setup, `${sel.setup+1} (&quot;${P.getSetupName(sel.setup)}&quot;)`), { hideAfter: 5000});
+        }
+    }
+    function pasteFromClipboard(what) {
+        if (what==='group') {
+            if (!clipboardDataGroup) {
+                MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, { hideAfter: 5000});
+            } else {
+                MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_paste_group, `${sel.group+1} (&quot;${P.getGroupName(sel.setup, sel.group)}&quot;)`), { 
+                    confirmCallback: function() {
+                        const addr = addrPresets + (sel.setup*16 + sel.group)*lengthGroup;
+                        for (var i=0;i<lengthGroup;i++) {
+                            allData[addr+i] = clipboardDataGroup[i];
+                        }
+                        syncValues();
+                        MBox.hide();
+                        MBox.show(SEC4.title_copypaste, SEC4.msg_pasted, { hideAfter: 5000});
+                    }
+                });
+            }
+        } else {
+            if (!clipboardDataSetup.setupData || !clipboardDataSetup.groupNames) {
+                MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, { hideAfter: 5000});
+            } else {
+                MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_paste_setup, `${sel.setup+1} (&quot;${P.getSetupName(sel.setup)}&quot;)`), { 
+                    confirmCallback: function() {
+                        const addr = addrPresets + (sel.setup*lengthSetup);
+                        for (let i=0;i<lengthSetup;i++) {
+                            allData[addr+i] = clipboardDataSetup.setupData[i];
+                        }
+                        const addrGNames = addrGroupNames + sel.setup*64;
+                        for (let i=0;i<64;i++) {
+                            allData[addrGNames+i] = clipboardDataSetup.groupNames[i];
+                        }
+                        syncValues();
+                        MBox.hide();
+                        MBox.show(SEC4.title_copypaste, SEC4.msg_pasted, { hideAfter: 5000});
+                    }
+                });
+            }
+        }
+    }
+    DOM.on('#btncopygroup', 'click', function() { copyToClipboard('group') });
+    DOM.on('#btnpastegroup', 'click', function() { pasteFromClipboard('group') });
+    DOM.on('#btncopysetup', 'click', function() { copyToClipboard('setup') });
+    DOM.on('#btnpastesetup', 'click', function() { pasteFromClipboard('setup') })
 
     sel.setAll(0, 0, 0);
 

@@ -27,11 +27,11 @@ let SEC4 = {
     msg_loaded: 'Sysex file successfully loaded!',
 
     title_copypaste: 'Copy & Paste',
-    $msg_copy: 'Current setup number {} copied to clipboard.',
-    $msg_paste: 'Paste clipboard content to current setup number {}? This will overwrite existing values.',
-    msg_pasted: 'Pasted clipboard to current setup.',
-    msg_clipboard_empty: 'Nothing to paste... clipboard is empty. ',
+    $msg_copy_setup: 'Current setup {} copied to clipboard.',
+    $msg_copy_group: 'Current group {} copied to clipboard.',
+    $msg_paste_group: 'Paste clipboard content to selected group {}?<br/>This will overwrite existing values.',
+    $msg_paste_setup: 'Paste clipboard content to selected setup {}?<br/>This will overwrite existing values.',
+    msg_pasted: 'Pasted clipboard data.',
+    msg_clipboard_empty: 'Nothing to paste... clipboard is empty. '
 
-    title_all_pots: "Set MIDI channel for all pots",
-    msg_all_pots: 'Enter a MIDI channel number to be applied to all pots in current setup.'
 }
