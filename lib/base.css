@@ -124,3 +124,11 @@ h1 {
 #midisettings select {
     max-width: 140px;
 }
+
+#midisettings button {
+    cursor: pointer;
+}
+
+#midisettings button:hover {
+    outline: 2px solid Highlight;
+}
