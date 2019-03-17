@@ -365,3 +365,25 @@ main section {
     background-color: #444;
 }
 
+#preset .tools {
+    margin-top: .5em;
+}
+
+#preset .tools button {
+    border: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background-color: #aaa;
+    cursor: pointer;
+}
+
+#preset .tools button:hover {
+    background-color: #fff;
+}
+
+#preset .col {
+    display: inline-block;
+    vertical-align: middle;
+    width: 50%;
+    box-sizing: border-box;
+}

@@ -37,8 +37,18 @@
         <main data-action="edit-nothing">
             <div id="preset">
                 <div class="header"><span>Setup</span><span>Group</span></div>
-                <div id="setupsandgroups"></div>
-                <p>Select setup, group and edit name.</p>
+                <div id="setupsandgroups" title="Select setup, group and edit name."></div>
+                <div class="tools">
+                    <div class="col">
+                        <button type="button" id="btncopysetup">Copy Setup</button>
+                    </div><div class="col">
+                            <button type="button" id="btncopygroup">Copy Group</button>
+                    </div><div class="col">
+                        <button type="button" id="btnpastesetup">Paste Setup</button>
+                    </div><div class="col">
+                        <button type="button" id="btnpastegroup">Paste Group</button>
+                    </div>
+                </div>
             </div>
             <div id="oled" class="watchparams"
                 ><span class="a">Ctrl:</span><select class="b" data-watch="select-encoder">
@@ -81,10 +91,6 @@
             </div>
         </main>
         <div id="tbbottom">
-            <button type="button" id="btncopysetup">Copy Setup</button>
-            <button type="button" id="btnpastesetup">Paste Setup</button>
-            <button type="button" id="btncopygroup" style="margin-left: 2em;">Copy Group</button>
-            <button type="button" id="btnpastegroup">Paste Group</button>
         </div>
     </div>
     <div class="credits">
