@@ -240,6 +240,7 @@ main section {
     box-shadow: inset 2px 2px 2px #000;
     border: none;
     border-radius: 0;
+    padding: 4px 0 2px 0;
 }
 
 .enc .mode, 
