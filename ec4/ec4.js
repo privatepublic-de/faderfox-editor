@@ -255,6 +255,7 @@ class InputHandler {
     }
 
     distributeValue(element, what) {
+        let reloadValues = false;
         if (what === 'name-setup') {
             const setupNumber = element.getAttribute('data-number');
             P.setSetupName(setupNumber, element.value);
@@ -275,6 +276,10 @@ class InputHandler {
             let storeVal = (typeof element.selectedIndex!=='undefined')?element.selectedIndex:element.value;
             P.set(this.selection.setup, this.selection.group, encid, what, storeVal);
             if (what===P.type) {
+                if (P.get(this.selection.setup, this.selection.group, encid, P.number)>31) {
+                    P.set(this.selection.setup, this.selection.group, encid, P.number, 31);
+                    reloadValues = true;
+                }
                 if (encid===this.selection.encoder) {
                     DOM.element('#oled').setAttribute('data-type', storeVal);
                 }
@@ -285,6 +290,7 @@ class InputHandler {
                 }));
             }
         }
+        return reloadValues;
     }
 
     findReferencedEncoder(element) {
@@ -465,12 +471,18 @@ document.addEventListener("DOMContentLoaded", function() {
         const what = element.getAttribute('data-watch');
         switch (element.tagName) {
             case 'SELECT': 
-                element.addEventListener('change', (ev)=>{watchHandler(ev); inputhandler.distributeValue(event.target, what)});
-            break;
+                element.addEventListener('change', (ev)=>{
+                    watchHandler(ev); 
+                    if (inputhandler.distributeValue(event.target, what)) {
+                        syncValues();
+                    }
+                });
+                break;
             case 'INPUT':
                 element.addEventListener('keydown', watchHandler);
                 element.addEventListener('keyup', ()=>{inputhandler.distributeValue(event.target, what);})
-            break;
+                element.addEventListener('focus', ()=>{element.select()});
+                break;
         }
         element.addEventListener('blur', ev => { 
             inputhandler.checkValue(element, what); 
@@ -707,7 +719,7 @@ function buildUI() {
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc">
                     <div class="knob"></div>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" tabindex="${200+i}"/></div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" tabindex="${200+i}" title="Edit name of encoder"/></div>
                     <div class="v">
                         <div class="number">
                             <div class="standard"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216+i}"/></div>
