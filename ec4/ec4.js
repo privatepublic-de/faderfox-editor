@@ -1,5 +1,5 @@
 "use strict";
-
+let isDirty = false;
 let allData = new Uint8Array(50240);
 const lengthGroup = 192;
 const lengthSetup = lengthGroup*16;
@@ -123,9 +123,12 @@ const P = { // P is short for Parameter
             addr += encoder*4;
             while (value.length<4) { value += ' '; }
             for (let i=0; i<4; i++) {
+                const oldValue = allData[addr+i];
                 allData[addr+i] = value.charCodeAt(i);
+                isDirty = isDirty | allData[addr+i]!=oldValue;
             }
         } else {
+            const oldValue = allData[addr];
             addr += encoder;
             value = parseInt(value);
             if (type === P.channel) value--;
@@ -140,6 +143,7 @@ const P = { // P is short for Parameter
                 value = value & spec.mask;
                 allData[addr] = value;
             }
+            isDirty = isDirty | allData[addr]!=oldValue;
         }
     },
     setSetupName: function(setupNumber, name) {
@@ -188,6 +192,7 @@ const P = { // P is short for Parameter
             }
         }
     }
+    isDirty = false;
     // console.log(allData.length, new TextDecoder("utf-8").decode(allData));
 })();
 
@@ -505,6 +510,7 @@ document.addEventListener("DOMContentLoaded", function() {
             allData.set(pagedata, addr - dataOffset);
         });
         syncValues();
+        isDirty = false;
     }
 
     function sysexHandler(data) {
@@ -643,7 +649,14 @@ document.addEventListener("DOMContentLoaded", function() {
     DOM.on('#btncopygroup', 'click', function() { copyToClipboard('group') });
     DOM.on('#btnpastegroup', 'click', function() { pasteFromClipboard('group') });
     DOM.on('#btncopysetup', 'click', function() { copyToClipboard('setup') });
-    DOM.on('#btnpastesetup', 'click', function() { pasteFromClipboard('setup') })
+    DOM.on('#btnpastesetup', 'click', function() { pasteFromClipboard('setup') });
+
+    window.addEventListener('beforeunload', function (e) {
+        if (isDirty) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+      });
 
     sel.setAll(0, 0, 0);
 
