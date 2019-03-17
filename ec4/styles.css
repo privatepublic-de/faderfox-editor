@@ -102,17 +102,17 @@
 #toallenc {
     position: absolute;
     bottom: -16px;
-    width: 60%;
+    width: 72%;
     left: 50%;
-    margin-left: -30%;
+    margin-left: -36%;
     text-align: center;
     background: #000;
-    border: 1px solid #eee;
+    border: 1px solid #ccc;
     border-radius: 8px;
     padding: 4px;
     font-size: 10px;
     font-weight: normal;
-    color: #ddd;
+    color: #ccc;
     line-height: 1em;
     font-family: Verdana, sans-serif;
     cursor: pointer;
@@ -120,6 +120,27 @@
 }
 #toallenc:hover {
     background-color: #770;
+}
+
+*[data-mode="nothing"] #editnothing {
+    display: none;
+}
+#editnothing {
+    position: absolute;
+    display: block;
+    width: 24px;
+    height: 24px;
+    right: -15px;
+    top: -20px;
+    border: 3px solid #ccc;
+    border-radius: 50%;
+    background: #000;
+    z-index: 1;
+    text-align: center;
+    font-size: 18px;
+}
+#editnothing:hover {
+    background: #666;
 }
 
 *[data-action]:not(main) {
@@ -369,21 +390,23 @@ main section {
     margin-top: .5em;
 }
 
-#preset .tools button {
-    border: none;
-    padding: 2px 4px;
-    border-radius: 4px;
-    background-color: #aaa;
+#preset .tools a {
     cursor: pointer;
-}
-
-#preset .tools button:hover {
-    background-color: #fff;
-}
-
-#preset .col {
+    color: #999;
+    font-size: 12px;
     display: inline-block;
     vertical-align: middle;
-    width: 50%;
+    width: 46%;
+    margin: 2% 3% 2% 1%;
+    padding: 2px;
+    text-align: center;
     box-sizing: border-box;
+    background: #333;
+    border-radius: 4px;
 }
+
+#preset .tools a:hover {
+    color: #fff;
+    background: #555;
+}
+
