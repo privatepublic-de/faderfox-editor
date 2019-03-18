@@ -14,11 +14,11 @@ h1 {
     opacity: 0;
     box-sizing: border-box;
     position: fixed;
-    width: 450px;
+    width: 500px;
     height: auto;
     left: 50%;
     top: 20%;
-    margin-left: -225px;
+    margin-left: -250px;
     background: #eee linear-gradient(#eee, #ddd);
     color: #000;
     border: 1px solid #000;
@@ -27,6 +27,7 @@ h1 {
     padding: 10px;
     overflow: auto;
     font-size: .8em;
+    z-index: 2;
 }
 .msgbox.visible {
     transition: visibility 0s, opacity 0.25s linear;

@@ -66,7 +66,7 @@
 #oled .d { width: 15%; }
 #oled .c.number_h { width: 13%; }
 #oled .d.number_h { width: 15%; }
-#oled .d.number_h + .d.number_h { border-left: 1px solid #FEFF5F; margin-left: 2%; padding-left: 1%; }
+#oled .d.number_h + .d.number_h { border-left: 1px solid #990; margin-left: 2%; padding-left: 1%; }
 
 #oled[data-type="0"] .lower,
 #oled[data-type="0"] .upper,
@@ -108,7 +108,7 @@
     text-align: center;
     background: #000;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 4px;
     font-size: 10px;
     font-weight: normal;
@@ -120,6 +120,7 @@
 }
 #toallenc:hover {
     background-color: #770;
+    color: #fff;
 }
 
 *[data-mode="nothing"] #editnothing {
@@ -131,8 +132,8 @@
     width: 24px;
     height: 24px;
     right: -15px;
-    top: -20px;
-    border: 3px solid #ccc;
+    top: -13px;
+    border: 2px solid #ccc;
     border-radius: 50%;
     background: #000;
     z-index: 1;
@@ -140,26 +141,29 @@
     font-size: 18px;
 }
 #editnothing:hover {
-    background: #666;
+    background-color: #770;
 }
 
 #fillnumbers {
     display: none;
+    box-sizing: border-box;
     position: absolute;
     width: 50%;
     left: 50%;
     margin-left: -25%;
-    bottom: -36px;
-    padding: 10px;
+    bottom: -8px;
+    padding: 5px;
     border: 1px solid #999;
-    border-radius: 4px;
+    color: #999;
+    border-radius: 6px;
     border-top: none;
-    font-size: 12px;
+    font-size: 10px;
     cursor: pointer;
     text-align: center;
 }
 #fillnumbers:hover {
-    background-color: #666;
+    background-color: #770;
+    color: #fff;
 }
 *[data-mode=number] #fillnumbers {
     display: block;
@@ -200,14 +204,14 @@ main section {
     width: 100%;
     height: 100%;
     border: 1px solid #333;
-    /* border-left: none;
-    border-right: none; */
-    /* background: rgba(0,0,0,.5); */
+}
+
+.enc:hover {
+    background-color: rgba(255, 255, 255, .1);;
 }
 
 .enc.selected {
     background-color: rgba(255, 255, 0, .3);
-    /*outline: 4px solid #FEFF5F;*/
 }
 
 .enc .knob {
@@ -362,7 +366,7 @@ main section {
 
 #preset #browser {
     border: 2px solid #eee;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 2px;
 }
 
@@ -405,7 +409,7 @@ main section {
 
 #preset #browser ul li,
 #preset #browser li:hover {
-    background-color: #444;
+    background-color: #440;
 }
 
 #preset .tools {
@@ -415,7 +419,7 @@ main section {
 #preset .tools a {
     cursor: pointer;
     color: #999;
-    font-size: 12px;
+    font-size: 10px;
     display: inline-block;
     vertical-align: middle;
     width: 46%;
@@ -424,11 +428,11 @@ main section {
     text-align: center;
     box-sizing: border-box;
     background: #333;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 #preset .tools a:hover {
     color: #fff;
-    background: #555;
+    background-color: #770;
 }
 
