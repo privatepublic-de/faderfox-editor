@@ -388,13 +388,22 @@ document.addEventListener("DOMContentLoaded", function() {
             const name = action.split('-')[1];
             DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
             DOM.element('#oled').setAttribute('data-mode', name);
-            
+            let lastFocused = DOM.element('#oled').getAttribute('data-last-focused');
+            const type = DOM.element('#oled').getAttribute('data-type');
+            if (type==='8' && lastFocused.indexOf('number')==-1) {
+                lastFocused = 'number';
+            }
+            const eled = DOM.element(`#oled *[data-watch=${name}]`);
+            if (eled) {
+                if (eled.tagName === 'INPUT') eled.select();
+                eled.focus();
+            }
             let copyalllabel = P.labels[name];
-            if ('8'===DOM.element('#oled').getAttribute('data-type')) {
-                const what = DOM.element('#oled').getAttribute('data-last-focused');
-                if (what==='number') {
+            if ('8'===type && name===P.number) {
+                console.log(`name ${name} lastFocused ${lastFocused}`);
+                if (lastFocused==='number') {
                     copyalllabel = 'LSB';
-                } else if (what==='number_h') {
+                } else if (lastFocused==='number_h') {
                     copyalllabel = 'MSB'
                 }
             }
@@ -403,11 +412,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 DOM.show('#toallenc');
             } else {
                 DOM.hide('#toallenc');
-            }
-            const eled = DOM.element(`#oled *[data-watch=${name}]`);
-            if (eled) {
-                if (eled.tagName === 'INPUT') eled.select();
-                eled.focus();
             }
         }
         switch (action) {
@@ -483,9 +487,12 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'SELECT': 
                 element.addEventListener('change', (ev)=>{
                     watchHandler(ev); 
-                    if (inputhandler.distributeValue(event.target, what)) {
+                    if (inputhandler.distributeValue(ev.target, what)) {
                         syncValues();
                     }
+                });
+                element.addEventListener('focus', ()=>{
+                    DOM.element('#oled').setAttribute('data-last-focused', what);
                 });
                 break;
             case 'INPUT':
