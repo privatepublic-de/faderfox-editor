@@ -753,7 +753,7 @@ function buildUI() {
                                 <option>Pitch bend</option>
                                 <option>Aftertouch</option>
                                 <option>Note</option>
-                                <option>NRPM</option>
+                                <option>NRPN</option>
                             </select>
                         </div>
                         <div class="mode"><label>Mode</label>
