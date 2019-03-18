@@ -9,22 +9,29 @@ h1 {
     font-size: 1.2em;
 }
  .msgbox {
-    display: none;
+    visibility: hidden;
+    transition: visibility 0.09s, opacity 0.1s linear;
+    opacity: 0;
     box-sizing: border-box;
     position: fixed;
     width: 450px;
     height: auto;
     left: 50%;
     top: 20%;
-    /* margin-top: -100px; */
     margin-left: -225px;
     background: #eee linear-gradient(#eee, #ddd);
     color: #000;
-    border: 6px solid #000;
+    border: 1px solid #000;
+    border-radius: 4px;
     box-shadow: 0 0 8px #000;
     padding: 10px;
     overflow: auto;
     font-size: .8em;
+}
+.msgbox.visible {
+    transition: visibility 0s, opacity 0.25s linear;
+    opacity: 1;
+    visibility: visible;
 }
 .msgbox.error {
     border-color:#f33;
@@ -34,7 +41,7 @@ h1 {
 #mboxtemp.msgbox.processing {
     background-image: url('../img/wait.gif');
     background-repeat: no-repeat;
-    background-position: center center;
+    background-position: center 70%;
     min-height: 200px;
 }
 .msgbox h2 {
@@ -63,7 +70,7 @@ h1 {
     border: none;
 }
 #mboxtemp {
-    background: #F0FBD7 linear-gradient(#fff, #F0FBD7);
+    background: #ccc linear-gradient(#eee, #ccc);
 }
 #mboxtemp button,
 #mbox button.close {
