@@ -69,7 +69,7 @@ const P = { // P is short for Parameter
 
     labels: {
         type: 'Type', channel: 'Channel', number: 'Number',
-        number_h: 'Number', lower: 'Lower', upper: 'Upper',
+        number_h: 'MSB', lower: 'Lower', upper: 'Upper',
         mode: 'Mode', scale: 'Display'
     },
 
@@ -388,8 +388,18 @@ document.addEventListener("DOMContentLoaded", function() {
             const name = action.split('-')[1];
             DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
             DOM.element('#oled').setAttribute('data-mode', name);
-            if (P.labels[name]) {
-                DOM.element('#toallenc span').innerText = P.labels[name];
+            
+            let copyalllabel = P.labels[name];
+            if ('8'===DOM.element('#oled').getAttribute('data-type')) {
+                const what = DOM.element('#oled').getAttribute('data-last-focused');
+                if (what==='number') {
+                    copyalllabel = 'LSB';
+                } else if (what==='number_h') {
+                    copyalllabel = 'MSB'
+                }
+            }
+            if (copyalllabel) {
+                DOM.element('#toallenc span').innerText = copyalllabel;
                 DOM.show('#toallenc');
             } else {
                 DOM.hide('#toallenc');
@@ -417,13 +427,13 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'copy2all':
                 const what = DOM.parentsUpAttribute(e.target, 'data-mode');
                 const type = DOM.parentsUpAttribute(e.target, 'data-type');
-                const value = P.get(sel.setup, sel.group, sel.encoder, what);
-                const number_h = P.get(sel.setup, sel.group, sel.encoder, P.number_h);
+                let target = what;
+                if (type==8) {
+                    target = DOM.parentsUpAttribute(e.target, 'data-last-focused') || what;
+                }
+                const value = P.get(sel.setup, sel.group, sel.encoder, target);
                 for (let i=0; i<16; i++) {
-                    P.set(sel.setup, sel.group, i, what, value);
-                    if (what===P.number && type==='8') {
-                        P.set(sel.setup, sel.group, i, P.number_h, number_h);
-                    }
+                    P.set(sel.setup, sel.group, i, target, value);
                 }
                 syncValues();
                 break;
@@ -481,7 +491,10 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'INPUT':
                 element.addEventListener('keydown', watchHandler);
                 element.addEventListener('keyup', ()=>{inputhandler.distributeValue(event.target, what);})
-                element.addEventListener('focus', ()=>{element.select()});
+                element.addEventListener('focus', ()=>{
+                    DOM.element('#oled').setAttribute('data-last-focused', what);
+                    element.select(); 
+                });
                 break;
         }
         element.addEventListener('blur', ev => { 
@@ -742,9 +755,9 @@ function buildUI() {
                     <div class="v">
                         <div class="number">
                             <div class="standard"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216+i}"/></div>
-                            <div class="hi-lo"><label># Hi/Low</label>
-                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216+i}" />
+                            <div class="hi-lo"><label>#MSB/LSB</label>
                                 <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216+i}" />
+                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216+i}" />
                             </div>
                         </div>
                         <div class="channel"><label>Channel</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216+i}" /></div>
