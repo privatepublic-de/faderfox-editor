@@ -258,6 +258,7 @@ encoder types: {Type}
 5	pitch bend 14 bit (PBnd){Pitch bend}
 6	aftertouch (AftT){Aftertouch}
 7	note (Note){Note}
+7	NRPN (NRPN){NRPN}
 (all other values will be converted to 2)
 
 encoder modes: {Mode}
@@ -277,7 +278,7 @@ F	channel 16
 command number: {Command number}
 0...127 {0...127}
 not used for types program change, aftertouch and pitch bend (each value possible)
-two values for NRPN, left = command number / right = command number high, each 0...127
+two values for NRPN, left = command number high{MSB} / right = command number low{LSB}, each 0...127
 
 lower/upper value: {Lower value} {Upper value}
 0...127 {0...127}
