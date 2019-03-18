@@ -597,6 +597,25 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    DOM.on('#fillnumbers', 'click', function() {
+        const startNumber = P.get(sel.setup, sel.group, 0, P.number);
+        MBox.show(
+            SEC4.title_fillnumbers, 
+            STR.apply(SEC4.$msg_fillnumbers, startNumber),
+            {
+                buttonLabel: 'Fill numbers',
+                confirmCallback: function() {
+                    for (let i=1; i<16; i++) {
+                        console.log('Filling', (startNumber+i) & 0x7f);
+                        P.set(sel.setup, sel.group, i, P.number, (startNumber+i) & 0x7f);
+                    }
+                    syncValues();
+                    MBox.hide();
+                }
+            }
+        );
+    });
+
     function copyToClipboard(what) {
         if (what==='group') {
             const addr = addrPresets + (sel.setup*16 + sel.group)*lengthGroup;

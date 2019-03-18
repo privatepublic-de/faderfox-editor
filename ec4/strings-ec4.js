@@ -20,18 +20,20 @@ let SEC4 = {
             <li>You can monitor the transfer progress on the EC4's display.</li></ul>\
             <p>A message will appear here, after the data has been received.</p>",
 
-    title_save: "Save as sysex file", 
+    title_save: "Save as Sysex file", 
     msg_save: 'Please enter a file name.',
-    title_load: "Load a sysex file",
-    msg_load: 'Please select a sysex file to load.',
+    title_load: "Load a Sysex file",
+    msg_load: 'Please select a Sysex file with EC4 data to load.',
     msg_loaded: 'Sysex file successfully loaded!',
 
     title_copypaste: 'Copy & Paste',
     $msg_copy_setup: 'Current setup {} copied to clipboard.',
     $msg_copy_group: 'Current group {} copied to clipboard.',
-    $msg_paste_group: 'Paste clipboard content to selected group {}?<br/>This will overwrite existing values.',
-    $msg_paste_setup: 'Paste clipboard content to selected setup {}?<br/>This will overwrite existing values.',
+    $msg_paste_group: 'Paste clipboard content to selected <b>group #{}</b>?<br/>This will overwrite existing values.',
+    $msg_paste_setup: 'Paste clipboard content to selected <b>setup #{}</b>?<br/>This will overwrite existing values.',
     msg_pasted: 'Pasted clipboard data.',
-    msg_clipboard_empty: 'Nothing to paste... clipboard is empty. '
+    msg_clipboard_empty: 'Nothing to paste... clipboard is empty. ',
 
+    title_fillnumbers: 'Fill command numbers',
+    $msg_fillnumbers: 'Fill all encoder command numbers in this group in ascending order starting with &quot;{}&quot; (number of encoder #1)?'
 }

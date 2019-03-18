@@ -143,6 +143,28 @@
     background: #666;
 }
 
+#fillnumbers {
+    display: none;
+    position: absolute;
+    width: 50%;
+    left: 50%;
+    margin-left: -25%;
+    bottom: -36px;
+    padding: 10px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    border-top: none;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+}
+#fillnumbers:hover {
+    background-color: #666;
+}
+*[data-mode=number] #fillnumbers {
+    display: block;
+}
+
 *[data-action]:not(main) {
     cursor: pointer;
 }
