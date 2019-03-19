@@ -34,15 +34,15 @@
         </div>
     </div>
     <div class="content">
-        <main data-action="edit-nothing">
+        <main>
             <div id="preset">
                 <div class="header"><span>Setup</span><span>Group</span></div>
                 <div id="setupsandgroups" title="Select setup, group and edit name."></div>
                 <div class="tools"><a
-                     id="btncopysetup" title="Copy selected setup to clipboard" tabindex="-1">Copy Setup</a><a
-                     id="btncopygroup" title="Copy selected group to clipboard" tabindex="-1">Copy Group</a><a
-                     id="btnpastesetup" title="Paste setup from clipboard to selected setup" tabindex="-1">Paste Setup</a><a
-                     id="btnpastegroup" title="Paste group from clipboard to selected group" tabindex="-1">Paste Group</a>
+                     id="btncopysetup" title="Copy selected setup to clipboard" class="buttonlike" tabindex="-1">Copy Setup</a><a
+                     id="btncopygroup" title="Copy selected group to clipboard" class="buttonlike" tabindex="-1">Copy Group</a><a
+                     id="btnpastesetup" title="Paste setup from clipboard to selected setup" class="buttonlike" tabindex="-1">Paste Setup</a><a
+                     id="btnpastegroup" title="Paste group from clipboard to selected group" class="buttonlike" tabindex="-1">Paste Group</a>
                 </div>
             </div>
             <div id="oled" class="watchparams"
@@ -62,7 +62,7 @@
                     <option>±500</option>
                     <option>ONOF</option>
                 </select><span class="c number number_l" data-action="edit-number">Numb :</span><input data-watch="number" data-action="edit-number" class="d number number_l" type="text" maxlength="3" value=""
-                /><span class="c number number_h" data-action="edit-number">N:</span><input data-watch="number_h" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value="" title="NPRM MSB"
+                /><span class="c number number_h">N:</span><input data-watch="number_h" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value="" title="NPRM MSB"
                 /><input data-watch="number" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value="" title="NPRM LSB"
                 /><span class="a type" data-action="edit-type">Type:</span><select data-watch="type" data-action="edit-type" class="b">
                     <option>CCR1</option>
@@ -81,10 +81,10 @@
                     <option>Acc2</option>
                     <option>Acc3</option>
                 </select><span class="c upper" data-action="edit-upper">Upper:</span><input data-watch="upper" data-action="edit-upper" class="d upper" type="text" maxlength="3" value=""
-            /><div id="toallenc" data-action="copy2all">Copy &quot;<span>XXXX</span>&quot; to all encoders in group</div></div>
+            /><div id="toallenc" class="buttonlike" data-action="copy2all">Copy &quot;<span>XXXX</span>&quot; to all encoders in group</div></div>
             <div id="ctrlcontainer" class="watchparams" data-mode="nothing">
                 <div id="editnothing" data-action="edit-nothing" title="Hide value fields">X</div>
-                <a id="fillnumbers" data-action="edit-number">Fill &quot;Numbers&quot; with ascending values...</a>
+                <a id="fillnumbers" class="buttonlike">Fill &quot;<span>Numbers</span>&quot; with ascending values...</a>
             </div>
         </main>
         <div id="tbbottom">

@@ -1,72 +1,99 @@
-
-/* @font-face kit by Fonts2u (https://fonts2u.com) */ @font-face {font-family:"5x8 LCD HD44780U A02 Regular";src:url("5x8_lcd_hd44780u_a02.eot?") format("eot"),url("5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02") format("svg"),url("5x8_lcd_hd44780u_a02.woff") format("woff"),url("5x8_lcd_hd44780u_a02.ttf") format("truetype");font-weight:normal;font-style:normal;}
-
+/* @font-face kit by Fonts2u (https://fonts2u.com) */
+@font-face {
+  font-family: "LCD5x8";
+  src: url("5x8_lcd_hd44780u_a02.eot?") format("eot"),
+    url("5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02") format("svg"),
+    url("5x8_lcd_hd44780u_a02.woff") format("woff"),
+    url("5x8_lcd_hd44780u_a02.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
 .content {
-    position: relative;
+  position: relative;
 }
 
 #oled {
-    position: absolute;
-    top: 102px;
-    left: 50%;
-    margin-left: -150px;
-    width: 300px;
-    height: 130px;
-    box-shadow: 0 0 10px #222;
-    color: #FEFF5F;
-    background: linear-gradient( 8deg, #000, #222, #333 );
-    font-family:"5x8 LCD HD44780U A02 Regular";
-    font-size: 16px;
-    font-weight: bold;
-    line-height: 28px;
-    box-sizing: border-box;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    padding: 5px 5px 5px 9px;
+  position: absolute;
+  top: 102px;
+  left: 50%;
+  margin-left: -150px;
+  width: 300px;
+  height: 130px;
+  box-shadow: 0 0 10px #222;
+  color: #feff5f;
+  background: linear-gradient(8deg, #000, #222, #333);
+  font-family: "LCD5x8";
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 28px;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  padding: 5px 5px 5px 9px;
 }
 
 #oled .selected {
-    background: #FEFF5F;
-    color: #000;
+  background: #feff5f;
+  color: #000;
 }
 
-#oled input, #oled select {
-    background: transparent;
-    color: #FEFF5F;
-    font-family:"5x8 LCD HD44780U A02 Regular";
-    font-size: 16px;
-    font-weight: bold;
-    padding: 0;
-    margin: 0;
-    border: none;
-    box-sizing: border-box;
-    display: inline-block;
-    outline: none;
-    box-shadow: inset 2px 2px 2px #000;
+#oled input,
+#oled select {
+  background: transparent;
+  color: #feff5f;
+  font-family: "LCD5x8";
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-sizing: border-box;
+  display: inline-block;
+  outline: none;
+  box-shadow: inset 2px 2px 2px #000;
 }
 #oled select option {
-    background-color: #000;
+  background-color: #000;
 }
 #oled select:focus {
-    outline: 2px solid Highlight;
+  outline: 2px solid Highlight;
 }
 #oled input {
-    text-align: right;
-    padding: 2px 0;
+  text-align: right;
+  padding: 2px 0;
 }
 #oled span {
-    display: inline-block;
-    white-space: nowrap;
-    box-sizing: border-box;
+  display: inline-block;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
-#oled .a { width: 25%; }
-#oled .b { width: 26%; }
-#oled .c { width: 30%; margin-left: 1%; padding-left: 3%; border-left: 1px solid #FEFF5F}
-#oled .d { width: 15%; }
-#oled .c.number_h { width: 13%; }
-#oled .d.number_h { width: 15%; }
-#oled .d.number_h + .d.number_h { border-left: 1px solid #990; margin-left: 2%; padding-left: 1%; }
+#oled .a {
+  width: 25%;
+}
+#oled .b {
+  width: 26%;
+}
+#oled .c {
+  width: 30%;
+  margin-left: 1%;
+  padding-left: 3%;
+  border-left: 1px solid #feff5f;
+}
+#oled .d {
+  width: 15%;
+}
+#oled .c.number_h {
+  width: 13%;
+}
+#oled .d.number_h {
+  width: 15%;
+}
+#oled .d.number_h + .d.number_h {
+  border-left: 1px solid #990;
+  margin-left: 2%;
+  padding-left: 1%;
+}
 
 #oled[data-type="0"] .lower,
 #oled[data-type="0"] .upper,
@@ -77,362 +104,346 @@
 #oled[data-type="6"] .number,
 #oled[data-type="7"] .lower,
 #oled[data-type="7"] .upper,
-#oled[data-type="7"] .mode
-    { visibility: hidden;}
-
+#oled[data-type="7"] .mode {
+  visibility: hidden;
+}
 
 #oled[data-mode="channel"] span.channel,
 #oled[data-mode="number"] span.number,
 #oled[data-mode="type"] span.type,
 #oled[data-mode="scale"] span.scale,
 #oled[data-mode="mode"] span.mode,
-#oled[data-mode="upper"] span.upper,    
+#oled[data-mode="upper"] span.upper,
 #oled[data-mode="lower"] span.lower {
-    background-color: #660;
+  background-color: #660;
 }
 
 #oled .number_h,
 #oled[data-type="8"] .number_l {
-    display: none;
+  display: none;
 }
 #oled[data-type="8"] .number_h {
-    display: inline-block;
+  display: inline-block;
 }
 
 #toallenc {
-    position: absolute;
-    bottom: -16px;
-    width: 72%;
-    left: 50%;
-    margin-left: -36%;
-    text-align: center;
-    background: #000;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 4px;
-    font-size: 10px;
-    font-weight: normal;
-    color: #ccc;
-    line-height: 1em;
-    font-family: Verdana, sans-serif;
-    cursor: pointer;
-    display: none;
-}
-#toallenc:hover {
-    background-color: #770;
-    color: #fff;
+  position: absolute;
+  bottom: -16px;
+  width: 72%;
+  left: 50%;
+  margin-left: -36%;
+  padding: 4px;
+  font-weight: normal;
+  line-height: 1em;
+  font-family: Verdana, sans-serif;
+  display: none;
 }
 
 *[data-mode="nothing"] #editnothing {
-    display: none;
+  display: none;
 }
 #editnothing {
-    position: absolute;
-    display: block;
-    width: 24px;
-    height: 24px;
-    right: -15px;
-    top: -13px;
-    border: 2px solid #ccc;
-    border-radius: 50%;
-    background: #000;
-    z-index: 1;
-    text-align: center;
-    font-size: 18px;
+  position: absolute;
+  display: block;
+  width: 24px;
+  height: 24px;
+  right: -15px;
+  top: -13px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background: #000;
+  z-index: 1;
+  text-align: center;
+  font-size: 18px;
 }
 #editnothing:hover {
-    background-color: #770;
+  background-color: #770;
 }
 
 #fillnumbers {
-    display: none;
-    box-sizing: border-box;
-    position: absolute;
-    width: 50%;
-    left: 50%;
-    margin-left: -25%;
-    bottom: -8px;
-    padding: 5px;
-    border: 1px solid #999;
-    color: #999;
-    border-radius: 6px;
-    border-top: none;
-    font-size: 10px;
-    cursor: pointer;
-    text-align: center;
+  display: none;
+  position: absolute;
+  width: 60%;
+  left: 50%;
+  margin-left: -30%;
+  bottom: -8px;
+  padding: 5px;
 }
-#fillnumbers:hover {
-    background-color: #770;
-    color: #fff;
+
+*[data-mode="number"] #fillnumbers {
+  display: block;
 }
-*[data-mode=number] #fillnumbers {
-    display: block;
+*[data-mode="channel"] #fillnumbers {
+  display: block;
 }
 
 *[data-action]:not(main) {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 main {
-    box-sizing: border-box;
-    margin: 0 auto;
-    width: 500px;
-    height: 818px;
-    background: url("ec4 dummy.jpg") no-repeat;
-    background-size: 100% 100%;
-    position: relative;
-    /* border: 1px solid #666;
+  box-sizing: border-box;
+  margin: 0 auto;
+  width: 500px;
+  height: 818px;
+  background: url("ec4 dummy.jpg") no-repeat;
+  background-size: 100% 100%;
+  position: relative;
+  /* border: 1px solid #666;
     border-top: none; */
 }
 #ctrlcontainer {
-    position: absolute;
-    top: 265px;
-    bottom: 60px;
-    left: 22px;
-    right: 28px;
-}   
+  position: absolute;
+  top: 265px;
+  bottom: 60px;
+  left: 22px;
+  right: 28px;
+}
 main section {
-    box-sizing: border-box;
-    float: left;
-    width: 25%;
-    height: 24%;
-    position: relative;
+  box-sizing: border-box;
+  float: left;
+  width: 25%;
+  height: 24%;
+  position: relative;
 }
 
 .enc {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border: 1px solid #333;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #333;
 }
 
 .enc:hover {
-    background-color: rgba(255, 255, 255, .1);;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .enc.selected {
-    background-color: rgba(255, 255, 0, .3);
+  background-color: rgba(255, 255, 0, 0.3);
 }
 
 .enc .knob {
-    position: absolute;
-    left: 50%;
-    top: 65%;
-    width: 64px;
-    height: 64px;
-    margin-left: -32px;
-    margin-top: -32px;
-    border-radius: 50%;
-    background-color: #222;
-    box-shadow: 0 0 15px #777;
-    border: 2px solid #000;
+  position: absolute;
+  left: 50%;
+  top: 65%;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  margin-top: -32px;
+  border-radius: 50%;
+  background-color: #222;
+  box-shadow: 0 0 15px #777;
+  border: 2px solid #000;
 }
 
 .enc .n {
-    position: absolute;
-    right: 0;
-    left: 0;
-    top: 15%;
-    margin: 0 5px;
-    text-align: center;
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: 15%;
+  margin: 0 5px;
+  text-align: center;
 }
 
 .enc .v {
-    position: absolute;
-    right: 0;
-    left: 0;
-    top: 51%;
-    text-align: center;
-    /*background: #000;*/
-    margin: 0 5px;
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: 51%;
+  text-align: center;
+  /*background: #000;*/
+  margin: 0 5px;
 }
 
 .enc .n input {
-    color:  #FEFF5F;
-    background: #525322;
-    font-family:"5x8 LCD HD44780U A02 Regular";
-    font-size: 16px;
-    padding: 0 5px;
-    box-shadow: inset 1px 1px 2px #000;
-    border: none;
-    width: 3em;
-    text-align: left;
+  color: #feff5f;
+  background: #525322;
+  font-family: "LCD5x8";
+  font-size: 16px;
+  padding: 0 5px;
+  box-shadow: inset 1px 1px 2px #000;
+  border: none;
+  width: 3em;
+  text-align: left;
 }
 
 .enc .v input {
-    width: 40%;
-    text-align: right;
-    padding: 2px 5px 0 5px;
-    color: #000;
-    background: #ccc;
-    font-size: 18px;
-    box-shadow: inset 2px 2px 2px #000;
-    border: none;
+  width: 40%;
+  text-align: right;
+  padding: 2px 5px 0 5px;
+  color: #000;
+  background: #ccc;
+  font-size: 18px;
+  box-shadow: inset 2px 2px 2px #000;
+  border: none;
 }
 
 .enc .v label {
-    /* background: #000; */
-    color: #bbb;
-    font-size: .85em;
-    margin-bottom: 4px;
-    display: block;
-    text-transform: uppercase;
+  /* background: #000; */
+  color: #bbb;
+  font-size: 0.85em;
+  margin-bottom: 4px;
+  display: block;
+  text-transform: uppercase;
 }
 
 .enc select {
-    width: 100%;
-    color: #000;
-    background: #ccc;;
-    font-size: 16px;
-    box-shadow: inset 2px 2px 2px #000;
-    border: none;
-    border-radius: 0;
-    padding: 4px 0 2px 0;
+  width: 100%;
+  color: #000;
+  background: #ccc;
+  font-size: 16px;
+  box-shadow: inset 2px 2px 2px #000;
+  border: none;
+  border-radius: 0;
+  padding: 4px 0 2px 0;
 }
 
-.enc .mode, 
-.enc .type, 
+.enc .mode,
+.enc .type,
 .enc .scale,
 .enc .channel,
-.enc .number, 
-.enc .lower, 
+.enc .number,
+.enc .lower,
 .enc .upper {
-    display: none;
+  display: none;
 }
 
-
-*[data-mode=mode] .enc .mode, 
-*[data-mode=type] .enc .type, 
-*[data-mode=scale] .enc .scale,
-*[data-mode=channel] .enc .channel,
-*[data-mode=number] .enc .number, 
-*[data-mode=lower] .enc .lower, 
-*[data-mode=upper] .enc .upper {
-    display: block;
+*[data-mode="mode"] .enc .mode,
+*[data-mode="type"] .enc .type,
+*[data-mode="scale"] .enc .scale,
+*[data-mode="channel"] .enc .channel,
+*[data-mode="number"] .enc .number,
+*[data-mode="lower"] .enc .lower,
+*[data-mode="upper"] .enc .upper {
+  display: block;
 }
 
 .enc[data-type="8"] .standard {
-    display: none;
+  display: none;
 }
 .enc[data-type="8"] .hi-lo {
-    display: block;
+  display: block;
 }
 .enc .hi-lo {
-    display: none;
+  display: none;
 }
 
 .enc .hi-lo input {
-    width: 30%;
-    display: inline-block;
+  width: 30%;
+  display: inline-block;
 }
 
 #preset {
-    position: absolute;
-    top: 6px;
-    left: -150px;
-    width: 150px;
+  position: absolute;
+  top: 6px;
+  left: -150px;
+  width: 150px;
 }
 
 #preset .header span {
-    display: inline-block;
-    width: 50%;
-    box-sizing: border-box;
+  display: inline-block;
+  width: 50%;
+  box-sizing: border-box;
 }
 #preset .header span:first-child {
-    padding-left: 5px;
+  padding-left: 5px;
 }
 
 #preset ul {
-    position: relative;
-    font-family:"5x8 LCD HD44780U A02 Regular";
-    font-size: 16px;
-    display: block;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  position: relative;
+  font-family: "LCD5x8";
+  font-size: 16px;
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 #browser input {
-    background: transparent;
-    color: #FEFF5F;
-    font-family:"5x8 LCD HD44780U A02 Regular";
-    font-size: 16px;
-    padding: 0;
-    border: none;
-    width: 4em;
-    cursor: pointer;
-    outline: none;
+  background: transparent;
+  color: #feff5f;
+  font-family: "LCD5x8";
+  font-size: 16px;
+  padding: 0;
+  border: none;
+  width: 4em;
+  cursor: pointer;
+  outline: none;
 }
 
 #preset #browser {
-    border: 2px solid #eee;
-    border-radius: 6px;
-    padding: 2px;
+  border: 2px solid #eee;
+  border-radius: 6px;
+  padding: 2px;
 }
 
 #preset #browser li {
-    cursor: pointer;
-    padding: 4px;
-    border-bottom: 1px solid black;
-    color: #FEFF5F;
+  cursor: pointer;
+  padding: 4px;
+  border-bottom: 1px solid black;
+  color: #feff5f;
 }
 
 #preset ul#browser ul {
-    display: none;
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 50%;
-    background: #666;
-    border-left: 2px solid #666;
+  display: none;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 50%;
+  background: #666;
+  border-left: 2px solid #666;
 }
 
 #preset ul#browser > li {
-    width: 50%;
+  width: 50%;
 }
 
-
 #preset ul#browser .selected ul {
-    display: block;
+  display: block;
 }
 
 #preset #browser li.selected {
-    background-color: #c00!important;
+  background-color: #c00 !important;
 }
 #preset #browser li li.selected::after {
-    content: '▶';
-    font-family: Arial,sans-serif;
-    color: #fff;
-    position: absolute;
-    right: -12px;
+  content: "▶";
+  font-family: Arial, sans-serif;
+  color: #fff;
+  position: absolute;
+  right: -12px;
 }
 
 #preset #browser ul li,
 #preset #browser li:hover {
-    background-color: #440;
+  background-color: #440;
 }
 
 #preset .tools {
-    margin-top: .5em;
+  margin-top: 0.5em;
 }
 
 #preset .tools a {
-    cursor: pointer;
-    color: #999;
-    font-size: 10px;
-    display: inline-block;
-    vertical-align: middle;
-    width: 46%;
-    margin: 2% 3% 2% 1%;
-    padding: 2px;
-    text-align: center;
-    box-sizing: border-box;
-    background: #333;
-    border-radius: 6px;
+  display: inline-block;
+  vertical-align: middle;
+  width: 46%;
+  margin: 2% 3% 2% 1%;
+  padding: 2px;
 }
 
-#preset .tools a:hover {
-    color: #fff;
-    background-color: #770;
+.buttonlike {
+  cursor: pointer;
+  color: #aaa;
+  font-size: 10px;
+  text-align: center;
+  box-sizing: border-box;
+  background: #333;
+  background-image: linear-gradient(to bottom, #585858, #282828);
+  border-radius: 4px;
+  box-shadow: 0 0 5px #000;
 }
 
+.buttonlike:hover {
+  color: #fff;
+  background-color: #777;
+  background-image: none;
+}
