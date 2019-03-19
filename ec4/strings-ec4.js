@@ -35,5 +35,5 @@ let SEC4 = {
     msg_clipboard_empty: 'Nothing to paste... clipboard is empty. ',
 
     title_fillnumbers: 'Fill command numbers',
-    $msg_fillnumbers: 'Fill all encoder command numbers in this group in ascending order starting with &quot;{}&quot; (number of encoder #1)?'
+    $msg_fillnumbers: 'Fill all encoder <b>{}</b> in this group in ascending order starting with &quot;{}&quot; (value of encoder #1)?'
 }

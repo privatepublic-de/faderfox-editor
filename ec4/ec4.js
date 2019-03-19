@@ -19,6 +19,7 @@ class Selection {
         this.s = 0;
         this.g = 0;
         this.e = 0;
+        this._lastFocused = null;
         this.updatecallback = updatecallback;
     }
 
@@ -59,6 +60,13 @@ class Selection {
         this.updatecallback(this);
     }
 
+    set lastFocused(s) {
+        this._lastFocused = s;
+    }
+
+    get lastFocused() {
+        return this._lastFocused;
+    }
 }
 
 
@@ -73,18 +81,20 @@ const P = { // P is short for Parameter
         mode: 'Mode', scale: 'Display'
     },
 
-    $type: { pos: 0, mask: 0xf0, min: 0, max: 8, default: 2 },
-    $channel: { pos: 0, mask: 0x0f },
-    $number: { pos: 16, mask: 0xff },
-    $number_h: { pos: 32, mask: 0xff },
-    $lower: { pos: 48, mask: 0xff },
-    $upper: { pos: 64, mask: 0xff },
-    $mode: { pos: 80, mask: 0xf0, min: 0, max: 3, default: 3 },
-    $scale: { pos: 80, mask: 0x0f, min: 0, max: 7, default: 1 },
-    $name: { pos: 128 },
+    _dataFormat: {
+        type: { pos: 0, mask: 0xf0, min: 0, max: 8, default: 2 },
+        channel: { pos: 0, mask: 0x0f },
+        number: { pos: 16, mask: 0xff },
+        number_h: { pos: 32, mask: 0xff },
+        lower: { pos: 48, mask: 0xff },
+        upper: { pos: 64, mask: 0xff },
+        mode: { pos: 80, mask: 0xf0, min: 0, max: 3, default: 3 },
+        scale: { pos: 80, mask: 0x0f, min: 0, max: 7, default: 1 },
+        name: { pos: 128 }
+    },
 
     get: function(setup, group, encoder, type) {
-        const spec = P['$'+type];
+        const spec = P._dataFormat[type];
         if (!spec) {
             console.log('Unknown parameter type '+type);
             return;
@@ -113,7 +123,7 @@ const P = { // P is short for Parameter
         }
     },
     set: function(setup, group, encoder, type, value) {
-        const spec = P['$'+type];
+        const spec = P._dataFormat[type];
         if (!spec) {
             console.log('Unknown parameter type: '+type);
             return;
@@ -305,27 +315,27 @@ class InputHandler {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    const sel = new Selection(selection => {
-        console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
-        // sync values
+    const selection = new Selection(selection => {
+        // console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
         DOM.removeClass('#ctrlcontainer .enc', 'selected');
         DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, 'selected');
         syncValues();
     });
-    const inputhandler = new InputHandler(sel);
+    const inputhandler = new InputHandler(selection);
     const sysex = new Sysex('EC4');
 
     buildUI();
+    let fillLabel = '';
 
     function syncValues() {
         DOM.removeClass('#browser li', 'selected');
-        DOM.addClass(`#browser > li:nth-child(${sel.setup+1})`, 'selected');
-        DOM.addClass(`#browser > li:nth-child(${sel.setup+1}) li:nth-child(${sel.group+1})`, 'selected');
+        DOM.addClass(`#browser > li:nth-child(${selection.setup+1})`, 'selected');
+        DOM.addClass(`#browser > li:nth-child(${selection.setup+1}) li:nth-child(${selection.group+1})`, 'selected');
 
         DOM.all('.watchparams *[data-watch]', el=>{
             const what = el.getAttribute('data-watch');
             const encoderId = inputhandler.findReferencedEncoder(el);
-            const value = P.get(sel.setup, sel.group, encoderId, what);
+            const value = P.get(selection.setup, selection.group, encoderId, what);
             if (typeof value === 'undefined') {
                 return;
             }
@@ -339,10 +349,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
-        DOM.element('#oled').setAttribute('data-type', P.get(sel.setup, sel.group, sel.encoder, P.type));
+        DOM.element('#oled').setAttribute('data-type', P.get(selection.setup, selection.group, selection.encoder, P.type));
         DOM.all('#ctrlcontainer .enc', (el=>{
             const eid = inputhandler.findReferencedEncoder(el);
-            const type = P.get(sel.setup, sel.group, eid, P.type);
+            const type = P.get(selection.setup, selection.group, eid, P.type);
             el.setAttribute('data-type', type);
         }));
         for (let i=0; i<16; i++) {
@@ -376,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         console.log(`selectedId ${selectedId}`);
         if (selectedId>-1) {
-            sel.encoder = selectedId;
+            selection.encoder = selectedId;
             DOM.element('#oled *[data-watch=select-encoder]').selectedIndex = selectedId;
         }
     }
@@ -388,7 +398,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const name = action.split('-')[1];
             DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
             DOM.element('#oled').setAttribute('data-mode', name);
-            let lastFocused = DOM.element('#oled').getAttribute('data-last-focused');
+            let lastFocused = selection.lastFocused;
             const type = DOM.element('#oled').getAttribute('data-type');
             if (type==='8' && lastFocused.indexOf('number')==-1) {
                 lastFocused = 'number';
@@ -413,16 +423,29 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 DOM.hide('#toallenc');
             }
+            let fillButtonLabel = name+'s';
+            fillLabel = name;
+            switch (name) {
+                case P.channel:
+                    fillButtonLabel = 'Channels';
+                    fillLabel = 'channels'
+                    break;
+                case P.number:
+                    fillButtonLabel = 'Numbers'+(type==='8'?' (LSB)':'');
+                    fillLabel = 'command numbers'+(type==='8'?' (LSB)':'');
+                    break;
+            }
+            DOM.element('#fillnumbers span').innerText = fillButtonLabel;
         }
         switch (action) {
             case 'select-setup':
             case 'select-group':
                 let number = e.currentTarget.getAttribute('data-number');
                 if (action === 'select-setup') {
-                    sel.setup = number;
-                    sel.group = 0;
+                    selection.setup = number;
+                    selection.group = 0;
                 } else {
-                    sel.group = number;
+                    selection.group = number;
                 }
                 break;
             case 'select-encoder':
@@ -433,11 +456,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 const type = DOM.parentsUpAttribute(e.target, 'data-type');
                 let target = what;
                 if (type==8) {
-                    target = DOM.parentsUpAttribute(e.target, 'data-last-focused') || what;
+                    target = selection.lastFocused || what;
                 }
-                const value = P.get(sel.setup, sel.group, sel.encoder, target);
+                const value = P.get(selection.setup, selection.group, selection.encoder, target);
                 for (let i=0; i<16; i++) {
-                    P.set(sel.setup, sel.group, i, target, value);
+                    P.set(selection.setup, selection.group, i, target, value);
                 }
                 syncValues();
                 break;
@@ -452,8 +475,8 @@ document.addEventListener("DOMContentLoaded", function() {
     function watchHandler(event) {
         const what = event.currentTarget.getAttribute('data-watch') || event.target.getAttribute('data-watch');
         let encoderId = null;
-        encoderId = inputhandler.findReferencedEncoder(event.target) || sel.encoder;
-        console.log(`Watch ${what} on ${event.target} ${encoderId}`);
+        encoderId = inputhandler.findReferencedEncoder(event.target) || selection.encoder;
+        console.log(`Watch ${what} on encoder #${encoderId}`);
         switch (what) {
             case P.name:
             case 'name-setup':
@@ -492,14 +515,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 });
                 element.addEventListener('focus', ()=>{
-                    DOM.element('#oled').setAttribute('data-last-focused', what);
+                    selection.lastFocused = what;
                 });
                 break;
             case 'INPUT':
                 element.addEventListener('keydown', watchHandler);
                 element.addEventListener('keyup', ()=>{inputhandler.distributeValue(event.target, what);})
                 element.addEventListener('focus', ()=>{
-                    DOM.element('#oled').setAttribute('data-last-focused', what);
+                    selection.lastFocused = what;
                     element.select(); 
                 });
                 break;
@@ -617,17 +640,30 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    DOM.on('#fillnumbers', 'click', function() {
-        const startNumber = P.get(sel.setup, sel.group, 0, P.number);
+    DOM.on('#fillnumbers', 'click', function(e) {
+        const what = DOM.parentsUpAttribute(e.target, 'data-mode');
+        const startValue = P.get(selection.setup, selection.group, 0, what);
         MBox.show(
             SEC4.title_fillnumbers, 
-            STR.apply(SEC4.$msg_fillnumbers, startNumber),
+            STR.apply(SEC4.$msg_fillnumbers, fillLabel,startValue),
             {
                 buttonLabel: 'Fill numbers',
                 confirmCallback: function() {
                     for (let i=1; i<16; i++) {
-                        console.log('Filling', (startNumber+i) & 0x7f);
-                        P.set(sel.setup, sel.group, i, P.number, (startNumber+i) & 0x7f);
+                        let value = (startValue+i);
+                        switch (what) {
+                            case P.number:
+                                value = value & 0x7f;
+                                if (P.get(selection.setup, selection.group, i, P.type)===4) {
+                                    value = value & 0x1f;
+                                }
+                                P.set(selection.setup, selection.group, i, P.number, value);
+                                break;
+                            case P.channel:
+                                while (value>16) { value= value-16; }
+                                P.set(selection.setup, selection.group, i, P.channel, value);
+                                break;
+                        }
                     }
                     syncValues();
                     MBox.hide();
@@ -638,24 +674,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function copyToClipboard(what) {
         if (what==='group') {
-            const addr = addrPresets + (sel.setup*16 + sel.group)*lengthGroup;
+            const addr = addrPresets + (selection.setup*16 + selection.group)*lengthGroup;
             clipboardDataGroup = new Uint8Array(lengthGroup);
             for (let i=0;i<lengthGroup;i++) {
                 clipboardDataGroup[i] = allData[addr+i];
             }
-            MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_copy_group, `${sel.group+1} (&quot;${P.getGroupName(sel.setup, sel.group)}&quot;)`), { hideAfter: 5000});
+            MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_copy_group, `${selection.group+1} (&quot;${P.getGroupName(selection.setup, selection.group)}&quot;)`), { hideAfter: 5000});
         } else { // whole setup
-            const addr = addrPresets + (sel.setup*lengthSetup);
+            const addr = addrPresets + (selection.setup*lengthSetup);
             clipboardDataSetup.setupData = new Uint8Array(lengthSetup);
             for (let i=0;i<lengthSetup;i++) {
                 clipboardDataSetup.setupData[i] = allData[addr+i];
             }
-            const addrGNames = addrGroupNames + sel.setup*64;
+            const addrGNames = addrGroupNames + selection.setup*64;
             clipboardDataSetup.groupNames = new Uint8Array(64);
             for (let i=0;i<64;i++) {
                 clipboardDataSetup.groupNames[i] = allData[addrGNames+i];
             }
-            MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_copy_setup, `${sel.setup+1} (&quot;${P.getSetupName(sel.setup)}&quot;)`), { hideAfter: 5000});
+            MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_copy_setup, `${selection.setup+1} (&quot;${P.getSetupName(selection.setup)}&quot;)`), { hideAfter: 5000});
         }
     }
     function pasteFromClipboard(what) {
@@ -663,9 +699,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!clipboardDataGroup) {
                 MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, { hideAfter: 5000});
             } else {
-                MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_paste_group, `${sel.group+1} (&quot;${P.getGroupName(sel.setup, sel.group)}&quot;)`), { 
+                MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_paste_group, `${selection.group+1} (&quot;${P.getGroupName(selection.setup, selection.group)}&quot;)`), { 
                     confirmCallback: function() {
-                        const addr = addrPresets + (sel.setup*16 + sel.group)*lengthGroup;
+                        const addr = addrPresets + (selection.setup*16 + selection.group)*lengthGroup;
                         for (var i=0;i<lengthGroup;i++) {
                             allData[addr+i] = clipboardDataGroup[i];
                         }
@@ -679,13 +715,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!clipboardDataSetup.setupData || !clipboardDataSetup.groupNames) {
                 MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, { hideAfter: 5000});
             } else {
-                MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_paste_setup, `${sel.setup+1} (&quot;${P.getSetupName(sel.setup)}&quot;)`), { 
+                MBox.show(SEC4.title_copypaste, STR.apply(SEC4.$msg_paste_setup, `${selection.setup+1} (&quot;${P.getSetupName(selection.setup)}&quot;)`), { 
                     confirmCallback: function() {
-                        const addr = addrPresets + (sel.setup*lengthSetup);
+                        const addr = addrPresets + (selection.setup*lengthSetup);
                         for (let i=0;i<lengthSetup;i++) {
                             allData[addr+i] = clipboardDataSetup.setupData[i];
                         }
-                        const addrGNames = addrGroupNames + sel.setup*64;
+                        const addrGNames = addrGroupNames + selection.setup*64;
                         for (let i=0;i<64;i++) {
                             allData[addrGNames+i] = clipboardDataSetup.groupNames[i];
                         }
@@ -709,7 +745,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
 
-    sel.setAll(0, 0, 0);
+    selection.setAll(0, 0, 0);
 
 });
 
