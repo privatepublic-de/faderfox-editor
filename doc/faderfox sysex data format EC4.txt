@@ -258,7 +258,7 @@ encoder types: {Type}
 5	pitch bend 14 bit (PBnd){Pitch bend}
 6	aftertouch (AftT){Aftertouch}
 7	note (Note){Note}
-7	NRPN (NRPN){NRPN}
+8	NRPN (NRPN){NRPN}
 (all other values will be converted to 2)
 
 encoder modes: {Mode}
