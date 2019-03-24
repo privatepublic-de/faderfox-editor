@@ -95,21 +95,24 @@ const P = {
   },
 
   _dataFormat: {
-    type: { pos: 0, mask: 0xf0, min: 0, max: 8, default: 2 },
+    type: { pos: 0, mask: 0xf0, lsb: 4, min: 0, max: 8, default: 2 },
     channel: { pos: 0, mask: 0x0f },
     number: { pos: 16, mask: 0xff },
     number_h: { pos: 32, mask: 0xff },
     lower: { pos: 48, mask: 0xff },
     upper: { pos: 64, mask: 0xff },
-    mode: { pos: 80, mask: 0xf0, min: 0, max: 3, default: 3 },
-    scale: { pos: 80, mask: 0x0f, min: 0, max: 7, default: 1 },
+    mode: { pos: 80,  mask: parseInt('11000000', 2), lsb: 6, min: 0, max: 3, default: 3 },
+    scale: { pos: 80, mask: parseInt('00111111', 2), min: 0, max: 7, default: 1 },
     name: { pos: 128 }
   },
 
   get: function(setup, group, encoder, type) {
+    if (type==='select-encoder') {
+      return;
+    }
     const spec = P._dataFormat[type];
     if (!spec) {
-      console.log("Unknown parameter type " + type);
+      console.log("Get unknown parameter type: " + type);
       return;
     }
     let addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
@@ -123,11 +126,10 @@ const P = {
       );
     } else {
       addr += encoder;
+      const shift = spec.lsb || 0;
       if (spec.mask != 0xff) {
         let val = MEM.data[addr] & spec.mask;
-        if (spec.mask > 0x0f) {
-          val = val >> 4;
-        }
+        val = val >> shift;
         if (spec.hasOwnProperty("min")) {
           if (val < spec.min || val > spec.max) {
             val = spec.default;
@@ -143,7 +145,7 @@ const P = {
   set: function(setup, group, encoder, type, value) {
     const spec = P._dataFormat[type];
     if (!spec) {
-      console.log("Unknown parameter type: " + type);
+      console.log("Set unknown parameter type: " + type);
       return;
     }
     let addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
@@ -158,19 +160,17 @@ const P = {
         isDirty = isDirty | (MEM.data[addr + i] != oldValue);
       }
     } else {
-      const oldValue = MEM.data[addr];
       addr += encoder;
+      const oldValue = MEM.data[addr];
       value = parseInt(value);
       if (type === P.channel) value--;
+      const shift = spec.lsb || 0;
       if (spec.mask != 0xff) {
-        if (spec.mask > 0x0f) {
-          value = (value & 0x0f) << 4;
-          MEM.data[addr] = (MEM.data[addr] & 0x0f) | value;
-        } else {
-          MEM.data[addr] = (MEM.data[addr] & 0xf0) | value;
-        }
+        const invMask = 0xff ^ spec.mask;
+        value = (value & (spec.mask>>shift)) << shift;
+        MEM.data[addr] = (MEM.data[addr] & invMask) | value;
       } else {
-        value = value & spec.mask;
+        value = value & 0xff; // ensure 8 bit
         MEM.data[addr] = value;
       }
       isDirty = isDirty | (MEM.data[addr] != oldValue);
@@ -226,6 +226,17 @@ const P = {
     }
   }
   isDirty = false;
+  // console.log('TESTING -------------');
+  // console.log('scale', P.get(0, 0, 0, P.scale));
+  // console.log('  set to 1');
+  // P.set(0, 0, 0, P.scale, 1);
+  // console.log('  is', P.get(0, 0, 0, P.scale));
+
+  // console.log('mode', P.get(0, 0, 0, P.mode));
+  // console.log('  set to 1');
+  // P.set(0, 0, 0, P.mode, 1);
+  // console.log('  is', P.get(0, 0, 0, P.mode));
+
 })();
 
 const REnameChars = new RegExp("[A-Za-z0-9.\\-/ ]");
@@ -426,10 +437,11 @@ document.addEventListener("DOMContentLoaded", function() {
   function selectEncoder(e) {
     let selectedId = -1;
     switch (e.type) {
+      case "focus":
       case "click":
-        if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
-          return;
-        }
+        // if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
+        //   return;
+        // }
         selectedId = inputhandler.findReferencedEncoder(e.target);
         break;
       case "change":
@@ -518,7 +530,12 @@ document.addEventListener("DOMContentLoaded", function() {
           target
         );
         for (let i = 0; i < 16; i++) {
-          P.set(selection.setup, selection.group, i, target, value);
+          const targetType = P.get(selection.setup, selection.group, i, 'type');
+          let setValue = value;
+          if (targetType===4 && target==='number') {
+            setValue = value & 0x1f;
+          }
+          P.set(selection.setup, selection.group, i, target, setValue);
         }
         syncValues();
         break;
@@ -575,8 +592,9 @@ document.addEventListener("DOMContentLoaded", function() {
             syncValues();
           }
         });
-        element.addEventListener("focus", () => {
+        element.addEventListener("focus", (ev) => {
           selection.lastFocused = what;
+          selectEncoder(ev);
         });
         break;
       case "INPUT":
@@ -584,9 +602,10 @@ document.addEventListener("DOMContentLoaded", function() {
         element.addEventListener("keyup", () => {
           inputhandler.distributeValue(event.target, what);
         });
-        element.addEventListener("focus", () => {
+        element.addEventListener("focus", (ev) => {
           selection.lastFocused = what;
           element.select();
+          selectEncoder(ev);
         });
         break;
     }
@@ -614,7 +633,7 @@ document.addEventListener("DOMContentLoaded", function() {
       0x10,
       0x44,
       0x20,
-      0x12
+      0x14
     ];
     const pages = MEM.data.length / 64;
     for (let page = 0; page < pages; page++) {
@@ -680,7 +699,7 @@ document.addEventListener("DOMContentLoaded", function() {
         confirmCallback: function() {
           MBox.hide();
           let data = generateSysexData();
-          midi.sendSysex(data, 25000);
+          midi.sendSysex(data, 50000);
         }
       });
     } else {
