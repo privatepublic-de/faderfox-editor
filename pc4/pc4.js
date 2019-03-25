@@ -23,6 +23,7 @@ SOFTWARE.
 */
 "use strict";
 document.addEventListener("DOMContentLoaded", function() {
+
     let selectedPreset = 0;
     let sysex = new Sysex('PC4');
     // build factory preset data
@@ -162,13 +163,46 @@ document.addEventListener("DOMContentLoaded", function() {
 
     updateView();
     var midi = new MIDI("Faderfox PC4", sysexHandler);
+
+    function generateSysexData(editordata) {
+        let deviceparts = sysex.hilo(sysex.deviceId);
+        const _typemap = {'cc':0x0b, 'pgm':0x0c, 'pb':0x0e };
+        let result = [0xf0, 0x00, 0x00, 0x00, 0x41, deviceparts[0], deviceparts[1], 0x42, 0x20, 0x13, 0x43, 0x26, 0x13, 0x44, 0x26, 0x13];
+        let crc = 0;
+        for (let si=0;si<editordata.length;si++) {
+            for (let ci=0;ci<editordata[si].length;ci++) {
+                let ctrl = editordata[si][ci];
+                result.push(0x4d);
+                result.push(0x20 + _typemap[ctrl.type]);
+                result.push(0x10 + (ctrl.channel-1));
+                crc += ((_typemap[ctrl.type]&0xf)*16) + ((ctrl.channel-1)&0xf);
+                result = result.concat(Sysex._padding);
+                result.push(0x4d);
+                let ccv = sysex.hilo(ctrl.ccno);
+                result = result.concat(ccv);
+                result = result.concat(Sysex._padding);
+                crc += ((ccv[0]&0xf)*16) + (ccv[1]&0xf);
+            }
+        }
+        crc = crc&0xffff;
+        result.push(0x4b); // CRC high
+        result = result.concat(sysex.hilo((crc&0xff00)>>8));
+        result.push(0x4c); // CRC low
+        result = result.concat(sysex.hilo((crc&0x00ff)));
+        result.push(0x4f); // download stop
+        result = result.concat(deviceparts);
+        result.push(0xf7);
+    
+        return new Uint8Array(result);
+    }
+    
     DOM.on('#btntransfer', 'click', function() {
         if (midi.hasOutput()) {
             MBox.show(SPC4.title_send, SPC4.msg_send, {
                 buttonLabel: "Send",
                 confirmCallback: function() {
                     MBox.hide();
-                    let data = sysex.generateSysexData(datastore);
+                    let data = generateSysexData(datastore);
                     midi.sendSysex(data);
                 }
             });
@@ -208,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function() {
             confirmCallback: function() {
                 let filename = DOM.element('#mbox input[name=filename]').value;
                 if (filename && filename!=="") {
-                    let data = sysex.generateSysexData(datastore);
+                    let data = generateSysexData(datastore);
                     download(data, filename+".syx", "application/octet-stream" );                    
                 }
                 MBox.hide();
