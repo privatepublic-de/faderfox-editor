@@ -226,17 +226,6 @@ const P = {
     }
   }
   isDirty = false;
-  // console.log('TESTING -------------');
-  // console.log('scale', P.get(0, 0, 0, P.scale));
-  // console.log('  set to 1');
-  // P.set(0, 0, 0, P.scale, 1);
-  // console.log('  is', P.get(0, 0, 0, P.scale));
-
-  // console.log('mode', P.get(0, 0, 0, P.mode));
-  // console.log('  set to 1');
-  // P.set(0, 0, 0, P.mode, 1);
-  // console.log('  is', P.get(0, 0, 0, P.mode));
-
 })();
 
 const REnameChars = new RegExp("[A-Za-z0-9.\\-/ ]");
