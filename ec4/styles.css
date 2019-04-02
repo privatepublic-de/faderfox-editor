@@ -33,6 +33,15 @@
   padding: 5px 5px 5px 9px;
 }
 
+#oled .centerline {
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  top: 10px;
+  bottom: 10px;
+  border-left: 1px solid #feff5f;
+}
+
 #oled .selected {
   background: #feff5f;
   color: #000;
@@ -69,16 +78,15 @@
   box-sizing: border-box;
 }
 #oled .a {
-  width: 25%;
+  width: 22%;
 }
 #oled .b {
-  width: 26%;
+  width: 25%;
+  margin-right: 3%;
 }
 #oled .c {
-  width: 30%;
-  margin-left: 1%;
-  padding-left: 3%;
-  border-left: 1px solid #feff5f;
+  margin-left: 4%;
+  width: 25%;
 }
 #oled .d {
   width: 15%;
@@ -175,10 +183,6 @@
 }
 *[data-mode="channel"] #fillnumbers {
   display: block;
-}
-
-*[data-action]:not(main) {
-  cursor: pointer;
 }
 
 main {
@@ -430,7 +434,7 @@ main section {
   padding: 2px;
 }
 
-.buttonlike {
+.asbutton {
   cursor: pointer;
   color: #aaa;
   font-size: 10px;
@@ -442,7 +446,7 @@ main section {
   box-shadow: 0 0 5px #000;
 }
 
-.buttonlike:hover {
+.asbutton:hover {
   color: #fff;
   background-color: #777;
   background-image: none;
