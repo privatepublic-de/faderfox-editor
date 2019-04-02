@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var midi = new MIDI("Faderfox PC4", sysexHandler);
 
     function generateSysexData(editordata) {
-        let deviceparts = sysex.hilo(sysex.deviceId);
+        let deviceparts = sysex.hiloNibbles(sysex.deviceId);
         const _typemap = {'cc':0x0b, 'pgm':0x0c, 'pb':0x0e };
         let result = [0xf0, 0x00, 0x00, 0x00, 0x41, deviceparts[0], deviceparts[1], 0x42, 0x20, 0x13, 0x43, 0x26, 0x13, 0x44, 0x26, 0x13];
         let crc = 0;
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 crc += ((_typemap[ctrl.type]&0xf)*16) + ((ctrl.channel-1)&0xf);
                 result = result.concat(Sysex._padding);
                 result.push(0x4d);
-                let ccv = sysex.hilo(ctrl.ccno);
+                let ccv = sysex.hiloNibbles(ctrl.ccno);
                 result = result.concat(ccv);
                 result = result.concat(Sysex._padding);
                 crc += ((ccv[0]&0xf)*16) + (ccv[1]&0xf);
@@ -186,9 +186,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         crc = crc&0xffff;
         result.push(0x4b); // CRC high
-        result = result.concat(sysex.hilo((crc&0xff00)>>8));
+        result = result.concat(sysex.hiloNibbles((crc&0xff00)>>8));
         result.push(0x4c); // CRC low
-        result = result.concat(sysex.hilo((crc&0x00ff)));
+        result = result.concat(sysex.hiloNibbles((crc&0x00ff)));
         result.push(0x4f); // download stop
         result = result.concat(deviceparts);
         result.push(0xf7);
