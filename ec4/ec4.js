@@ -289,17 +289,17 @@ class InputHandler {
   checkValue(element, what) {
     let value = element.value;
     switch (what) {
-      case "channel":
+      case P.channel:
         if (value < 1) value = 1;
         else if (value > 16) value = 16;
         break;
-      case "number":
+      case P.number:
         if (DOM.parentsUpAttribute(element, "data-type") == 4 /*CC14bit*/ && value > 31) {
           value = 31;
         }
-      case "number_h":
-      case "lower":
-      case "upper":
+      case P.number_h:
+      case P.lower:
+      case P.upper:
         if (value < 0) value = 0;
         else if (value > 127) value = 127;
         break;
@@ -478,8 +478,8 @@ document.addEventListener("DOMContentLoaded", function() {
       DOM.element("#oled").setAttribute("data-mode", name);
       let lastFocused = selection.lastFocused;
       const isNPRN = DOM.element("#oled").getAttribute("data-type") === 8;
-      if (isNPRN && lastFocused.indexOf("number") == -1) {
-        lastFocused = "number";
+      if (isNPRN && lastFocused.indexOf(P.number) == -1) {
+        lastFocused = P.number;
       }
       const eled = DOM.element(`#oled *[data-watch=${name}]`);
       if (eled) {
@@ -488,9 +488,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       let copyalllabel = P.labels[name];
       if (isNPRN && name === P.number) {
-        if (lastFocused === "number") {
+        if (lastFocused === P.number) {
           copyalllabel = "LSB";
-        } else if (lastFocused === "number_h") {
+        } else if (lastFocused === P.number_h) {
           copyalllabel = "MSB";
         }
       }
@@ -575,11 +575,11 @@ document.addEventListener("DOMContentLoaded", function() {
       case "select-encoder":
         selectEncoder(event);
         return;
-      case "number":
-      case "number_h":
-      case "lower":
-      case "upper":
-      case "channel":
+      case P.number:
+      case P.number_h:
+      case P.lower:
+      case P.upper:
+      case P.channel:
         if (event.key === "ArrowUp" || event.key === "ArrowDown") {
           const add = event.key === "ArrowUp" ? 1 : -1;
           event.target.value = parseInt(event.target.value) + add;
@@ -628,7 +628,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   function generateSysexData() {
-    const deviceparts = sysex.hilo(sysex.deviceId);
+    const deviceparts = sysex.hiloNibbles(sysex.deviceId);
     let dataout = [
       0xf0,
       0x00,
@@ -651,16 +651,16 @@ document.addEventListener("DOMContentLoaded", function() {
     for (let page = 0; page < pages; page++) {
       const pos = page * 64;
       const addr = pos + MEM.dataOffset;
-      dataout.push(0x49, ...sysex.hilo(addr >> 8));
-      dataout.push(0x4a, ...sysex.hilo(addr & 0xff));
+      dataout.push(0x49, ...sysex.hiloNibbles(addr >> 8));
+      dataout.push(0x4a, ...sysex.hiloNibbles(addr & 0xff));
       let crc = 0;
       for (let i = 0; i < 64; i++) {
-        dataout.push(0x4d, ...sysex.hilo(MEM.data[pos + i]));
+        dataout.push(0x4d, ...sysex.hiloNibbles(MEM.data[pos + i]));
         crc += MEM.data[pos + i];
       }
       crc = crc & 0xffff;
-      dataout.push(0x4b, ...sysex.hilo((crc & 0xff00) >> 8)); // CRC high
-      dataout.push(0x4c, ...sysex.hilo(crc & 0x00ff)); // CRC low
+      dataout.push(0x4b, ...sysex.hiloNibbles((crc & 0xff00) >> 8)); // CRC high
+      dataout.push(0x4c, ...sysex.hiloNibbles(crc & 0x00ff)); // CRC low
       dataout.push(...Sysex._padding);
     }
     dataout.push(0x4f); // download stop
@@ -999,7 +999,7 @@ function buildUI() {
   // build encoders
   for (let i = 0; i < 16; i++) {
     const twodig = (i < 9 ? "0" : "") + (i + 1);
-    let html = `
+    const html = `
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc">
                     <div class="knob"></div>
