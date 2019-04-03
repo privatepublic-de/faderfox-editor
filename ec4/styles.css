@@ -13,6 +13,14 @@
   position: relative;
 }
 
+*[data-action] {
+  cursor: pointer;
+}
+select[data-watch="scale"], select[data-watch="scale"] option {
+  text-align: right;
+  text-align-last: right;
+}
+
 #oled {
   position: absolute;
   top: 102px;
@@ -103,16 +111,16 @@
   padding-left: 1%;
 }
 
-#oled[data-type="0"] .lower,
-#oled[data-type="0"] .upper,
-#oled[data-type="1"] .lower,
-#oled[data-type="1"] .upper,
-#oled[data-type="3"] .number,
-#oled[data-type="5"] .number,
-#oled[data-type="6"] .number,
-#oled[data-type="7"] .lower,
-#oled[data-type="7"] .upper,
-#oled[data-type="7"] .mode {
+.typed[data-type="0"] .lower,
+.typed[data-type="0"] .upper,
+.typed[data-type="1"] .lower,
+.typed[data-type="1"] .upper,
+.typed[data-type="3"] .number,
+.typed[data-type="5"] .number,
+.typed[data-type="6"] .number,
+.typed[data-type="7"] .lower,
+.typed[data-type="7"] .upper,
+.typed[data-type="7"] .mode {
   visibility: hidden;
 }
 
@@ -193,8 +201,6 @@ main {
   background: url("ec4 dummy.jpg") no-repeat;
   background-size: 100% 100%;
   position: relative;
-  /* border: 1px solid #666;
-    border-top: none; */
 }
 #ctrlcontainer {
   position: absolute;
@@ -255,7 +261,6 @@ main section {
   left: 0;
   top: 51%;
   text-align: center;
-  /*background: #000;*/
   margin: 0 5px;
 }
 
@@ -283,7 +288,6 @@ main section {
 }
 
 .enc .v label {
-  /* background: #000; */
   color: #bbb;
   font-size: 0.85em;
   margin-bottom: 4px;

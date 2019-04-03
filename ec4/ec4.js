@@ -1001,7 +1001,7 @@ function buildUI() {
     const twodig = (i < 9 ? "0" : "") + (i + 1);
     const html = `
             <section>
-                <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc">
+                <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
                     <div class="knob"></div>
                     <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 +
       i}" title="Edit name of encoder"/></div>
@@ -1036,8 +1036,8 @@ function buildUI() {
                         </div>
                         <div class="type"><label>Type</label>
                             <select data-watch="type" tabindex="${216 + i}">
-                                <option>CC relative 1</option>
-                                <option>CC relative 2</option>
+                                <option>CC rel. 1</option>
+                                <option>CC rel. 2</option>
                                 <option>CC absolute</option>
                                 <option>Program change</option>
                                 <option>CC 14bit absolute</option>
