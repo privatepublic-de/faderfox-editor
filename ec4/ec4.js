@@ -37,7 +37,7 @@ const MEM = {
     groupNames: undefined,
     setupData: undefined
   }
-}
+};
 
 class Selection {
   constructor(updatecallback) {
@@ -111,6 +111,7 @@ const P = {
     channel: "Channel",
     number: "Number",
     number_h: "MSB",
+    number_nrpn: "#MSB/LSB",
     lower: "Lower",
     upper: "Upper",
     mode: "Mode",
@@ -124,13 +125,28 @@ const P = {
     number_h: { pos: 32, mask: 0xff },
     lower: { pos: 48, mask: 0xff },
     upper: { pos: 64, mask: 0xff },
-    mode: { pos: 80,  mask: parseInt('11000000', 2), lsb: 6, min: 0, max: 3, default: 3 },
-    scale: { pos: 80, mask: parseInt('00111111', 2), min: 0, max: 7, default: 1 },
+    mode: {
+      pos: 80,
+      mask: parseInt("11000000", 2),
+      lsb: 6,
+      min: 0,
+      max: 3,
+      default: 3
+    },
+    scale: {
+      pos: 80,
+      mask: parseInt("00111111", 2),
+      min: 0,
+      max: 7,
+      default: 1
+    },
     name: { pos: 128 }
   },
 
-  get: function(setup, group, encoder, type) {
-    if (type==='select-encoder') {
+  get: function(selection, encoder, type) {
+    const setup = selection.setup;
+    const group = selection.group;
+    if (type === "select-encoder") {
       return;
     }
     const spec = P._dataFormat[type];
@@ -138,7 +154,8 @@ const P = {
       console.log("Get unknown parameter type: " + type);
       return;
     }
-    let addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+    let addr =
+      MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
     if (type === P.name) {
       addr += encoder * 4;
       return String.fromCharCode(
@@ -165,13 +182,16 @@ const P = {
       }
     }
   },
-  set: function(setup, group, encoder, type, value) {
+  set: function(selection, encoder, type, value) {
+    const setup = selection.setup;
+    const group = selection.group;
     const spec = P._dataFormat[type];
     if (!spec) {
       console.log("Set unknown parameter type: " + type);
       return;
     }
-    let addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+    let addr =
+      MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
     if (type === P.name) {
       addr += encoder * 4;
       while (value.length < 4) {
@@ -190,7 +210,7 @@ const P = {
       const shift = spec.lsb || 0;
       if (spec.mask != 0xff) {
         const invMask = 0xff ^ spec.mask;
-        value = (value & (spec.mask>>shift)) << shift;
+        value = (value & (spec.mask >> shift)) << shift;
         MEM.data[addr] = (MEM.data[addr] & invMask) | value;
       } else {
         value = value & 0xff; // ensure 8 bit
@@ -229,7 +249,7 @@ const P = {
   }
 };
 
-(function initialiseValues() {
+function initialiseValues() {
   MEM.data.fill(0);
   for (let setup = 0; setup < 16; setup++) {
     const name = `SE${(setup < 9 ? "0" : "") + (setup + 1)}`;
@@ -237,19 +257,21 @@ const P = {
     for (let group = 0; group < 16; group++) {
       const name = `GR${(group < 9 ? "0" : "") + (group + 1)}`;
       P.setGroupName(setup, group, name);
+      const selection = { setup: setup, group: group };
       for (let encoder = 0; encoder < 16; encoder++) {
         const name = `EC${(encoder < 9 ? "0" : "") + (encoder + 1)}`;
-        P.set(setup, group, encoder, P.name, name);
-        P.set(setup, group, encoder, P.channel, group + 1);
-        P.set(setup, group, encoder, P.scale, 1);
-        P.set(setup, group, encoder, P.type, 2);
-        P.set(setup, group, encoder, P.mode, 3);
-        P.set(setup, group, encoder, P.upper, 127);
+        P.set(selection, encoder, P.name, name);
+        P.set(selection, encoder, P.channel, group + 1);
+        P.set(selection, encoder, P.scale, 1);
+        P.set(selection, encoder, P.type, 2);
+        P.set(selection, encoder, P.mode, 3);
+        P.set(selection, encoder, P.upper, 127);
       }
     }
   }
   isDirty = false;
-})();
+};
+initialiseValues();
 
 const REnameChars = new RegExp("[A-Za-z0-9.\\-/ ]");
 const REnotNameChars = new RegExp("[^A-Za-z0-9.\\-/ ]");
@@ -294,7 +316,10 @@ class InputHandler {
         else if (value > 16) value = 16;
         break;
       case P.number:
-        if (DOM.parentsUpAttribute(element, "data-type") == 4 /*CC14bit*/ && value > 31) {
+        if (
+          DOM.parentsUpAttribute(element, "data-type") == 4 /*CC14bit*/ &&
+          value > 31
+        ) {
           value = 31;
         }
       case P.number_h:
@@ -330,19 +355,10 @@ class InputHandler {
         typeof element.selectedIndex !== "undefined"
           ? element.selectedIndex
           : element.value;
-      P.set(this.selection.setup, this.selection.group, encid, what, storeVal);
+      P.set(this.selection, encid, what, storeVal);
       if (what === P.type) {
-        if (
-          P.get(this.selection.setup, this.selection.group, encid, P.number) >
-          31
-        ) {
-          P.set(
-            this.selection.setup,
-            this.selection.group,
-            encid,
-            P.number,
-            31
-          );
+        if (P.get(this.selection, encid, P.number) > 31) {
+          P.set(this.selection, encid, P.number, 31);
           reloadValues = true;
         }
         if (encid === this.selection.encoder) {
@@ -350,12 +366,7 @@ class InputHandler {
         }
         DOM.all("#ctrlcontainer .enc", el => {
           const eid = this.findReferencedEncoder(el);
-          const type = P.get(
-            this.selection.setup,
-            this.selection.group,
-            eid,
-            P.type
-          );
+          const type = P.get(this.selection, eid, P.type);
           el.setAttribute("data-type", type);
         });
       }
@@ -386,6 +397,23 @@ document.addEventListener("DOMContentLoaded", function() {
   buildUI();
   let fillLabel = "";
 
+  // read factory preset
+  const req = new XMLHttpRequest();
+  req.open("GET", "factory-preset.syx", true);
+  req.responseType = "arraybuffer";
+  req.onload = function(oEvent) {
+    const data = req.response;
+    if (data) {
+      try {
+        interpretSysExData(new Uint8Array(data));
+      } catch(e) {
+        console.log('Error reading factory preset', e);
+        initialiseValues();
+      }
+    }
+  };
+  req.send();
+
   function syncValues() {
     DOM.removeClass("#browser li", "selected");
     DOM.addClass(`#browser > li:nth-child(${selection.setup + 1})`, "selected");
@@ -398,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function() {
     DOM.all(".watchparams *[data-watch]", el => {
       const what = el.getAttribute("data-watch");
       const encoderId = inputhandler.findReferencedEncoder(el);
-      const value = P.get(selection.setup, selection.group, encoderId, what);
+      const value = P.get(selection, encoderId, what);
       if (typeof value === "undefined") {
         return;
       }
@@ -413,11 +441,11 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     DOM.element("#oled").setAttribute(
       "data-type",
-      P.get(selection.setup, selection.group, selection.encoder, P.type)
+      P.get(selection, selection.encoder, P.type)
     );
     DOM.all("#ctrlcontainer .enc", el => {
       const eid = inputhandler.findReferencedEncoder(el);
-      const type = P.get(selection.setup, selection.group, eid, P.type);
+      const type = P.get(selection, eid, P.type);
       el.setAttribute("data-type", type);
     });
     for (let i = 0; i < 16; i++) {
@@ -535,19 +563,14 @@ document.addEventListener("DOMContentLoaded", function() {
         if (type == 8) {
           target = selection.lastFocused || what;
         }
-        const value = P.get(
-          selection.setup,
-          selection.group,
-          selection.encoder,
-          target
-        );
+        const value = P.get(selection, selection.encoder, target);
         for (let i = 0; i < 16; i++) {
-          const targetType = P.get(selection.setup, selection.group, i, 'type');
+          const targetType = P.get(selection, i, "type");
           let setValue = value;
-          if (targetType===4 && target==='number') {
+          if (targetType === 4 && target === "number") {
             setValue = value & 0x1f;
           }
-          P.set(selection.setup, selection.group, i, target, setValue);
+          P.set(selection, i, target, setValue);
         }
         syncValues();
         break;
@@ -604,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function() {
             syncValues();
           }
         });
-        element.addEventListener("focus", (ev) => {
+        element.addEventListener("focus", ev => {
           selection.lastFocused = what;
           selectEncoder(ev);
         });
@@ -614,7 +637,7 @@ document.addEventListener("DOMContentLoaded", function() {
         element.addEventListener("keyup", () => {
           inputhandler.distributeValue(event.target, what);
         });
-        element.addEventListener("focus", (ev) => {
+        element.addEventListener("focus", ev => {
           selection.lastFocused = what;
           element.select();
           selectEncoder(ev);
@@ -778,7 +801,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   DOM.on("#fillnumbers", "click", function(e) {
     const what = DOM.parentsUpAttribute(e.target, "data-mode");
-    const startValue = P.get(selection.setup, selection.group, 0, what);
+    const startValue = P.get(selection, 0, what);
     MBox.show(
       SEC4.title_fillnumbers,
       STR.apply(SEC4.$msg_fillnumbers, fillLabel, startValue),
@@ -790,16 +813,16 @@ document.addEventListener("DOMContentLoaded", function() {
             switch (what) {
               case P.number:
                 value = value & 0x7f;
-                if (P.get(selection.setup, selection.group, i, P.type) === 4 /*CC14bit*/) {
+                if (P.get(selection, i, P.type) === 4 /*CC14bit*/) {
                   value = value & 0x1f;
                 }
-                P.set(selection.setup, selection.group, i, P.number, value);
+                P.set(selection, i, P.number, value);
                 break;
               case P.channel:
                 while (value > 16) {
                   value = value - 16;
                 }
-                P.set(selection.setup, selection.group, i, P.channel, value);
+                P.set(selection, i, P.channel, value);
                 break;
             }
           }
@@ -813,7 +836,8 @@ document.addEventListener("DOMContentLoaded", function() {
   function copyToClipboard(what) {
     if (what === "group") {
       const addr =
-        MEM.addrPresets + (selection.setup * 16 + selection.group) * MEM.lengthGroup;
+        MEM.addrPresets +
+        (selection.setup * 16 + selection.group) * MEM.lengthGroup;
       MEM.clipboardDataGroup = new Uint8Array(MEM.lengthGroup);
       for (let i = 0; i < MEM.lengthGroup; i++) {
         MEM.clipboardDataGroup[i] = MEM.data[addr + i];
@@ -887,7 +911,10 @@ document.addEventListener("DOMContentLoaded", function() {
         );
       }
     } else {
-      if (!MEM.clipboardDataSetup.setupData || !MEM.clipboardDataSetup.groupNames) {
+      if (
+        !MEM.clipboardDataSetup.setupData ||
+        !MEM.clipboardDataSetup.groupNames
+      ) {
         MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, {
           hideAfter: 5000
         });
@@ -1003,26 +1030,36 @@ function buildUI() {
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
                     <div class="knob"></div>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 +
+                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 +
       i}" title="Edit name of encoder"/></div>
                     <div class="v">
                         <div class="number">
-                            <div class="standard"><label>Number</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 +
-                              i}"/></div>
-                            <div class="hi-lo"><label>#MSB/LSB</label>
+                            <div class="standard"><label>${
+                              P.labels.number
+                            }</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 +
+      i}"/></div>
+                            <div class="hi-lo"><label>${
+                              P.labels.number_nrpn
+                            }</label>
                                 <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216 +
                                   i}" />
                                 <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 +
                                   i}" />
                             </div>
                         </div>
-                        <div class="channel"><label>Channel</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216 +
-                          i}" /></div>
-                        <div class="lower"><label>Lower</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${216 +
-                          i}" /></div>
-                        <div class="upper"><label>Upper</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${216 +
-                          i}" /></div>
-                        <div class="scale"><label>Display</label>
+                        <div class="channel"><label>${
+                          P.labels.channel
+                        }</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216 +
+      i}" /></div>
+                        <div class="lower"><label>${
+                          P.labels.lower
+                        }</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${216 +
+      i}" /></div>
+                        <div class="upper"><label>${
+                          P.labels.upper
+                        }</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${216 +
+      i}" /></div>
+                        <div class="scale"><label>${P.labels.scale}</label>
                             <select data-watch="scale" tabindex="${216 + i}">
                                 <option>display off</option>
                                 <option>0...127</option>
@@ -1034,7 +1071,7 @@ function buildUI() {
                                 <option>ON / OFF</option>
                             </select>
                         </div>
-                        <div class="type"><label>Type</label>
+                        <div class="type"><label>${P.labels.type}</label>
                             <select data-watch="type" tabindex="${216 + i}">
                                 <option>CC rel. 1</option>
                                 <option>CC rel. 2</option>
@@ -1047,7 +1084,7 @@ function buildUI() {
                                 <option>NRPN</option>
                             </select>
                         </div>
-                        <div class="mode"><label>Mode</label>
+                        <div class="mode"><label>${P.labels.mode}</label>
                             <select data-watch="mode" tabindex="${216 + i}">
                                 <option>no acceleration</option>
                                 <option>low acceleration</option>
