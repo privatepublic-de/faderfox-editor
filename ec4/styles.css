@@ -21,6 +21,16 @@ select[data-watch="scale"], select[data-watch="scale"] option {
   text-align-last: right;
 }
 
+#oled input,
+#oled select,
+#browser input,
+#preset ul,
+.matrixfont {
+  font-family: "LCD5x8", Courier, monospace;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 #oled {
   position: absolute;
   top: 102px;
@@ -31,9 +41,6 @@ select[data-watch="scale"], select[data-watch="scale"] option {
   box-shadow: 0 0 10px #222;
   color: #feff5f;
   background: linear-gradient(8deg, #000, #222, #333);
-  font-family: "LCD5x8";
-  font-size: 16px;
-  font-weight: bold;
   line-height: 28px;
   box-sizing: border-box;
   border: 2px solid #ddd;
@@ -59,9 +66,6 @@ select[data-watch="scale"], select[data-watch="scale"] option {
 #oled select {
   background: transparent;
   color: #feff5f;
-  font-family: "LCD5x8";
-  font-size: 16px;
-  font-weight: bold;
   padding: 0;
   margin: 0;
   border: none;
@@ -171,6 +175,7 @@ select[data-watch="scale"], select[data-watch="scale"] option {
   z-index: 1;
   text-align: center;
   font-size: 18px;
+  box-shadow: 0 0 6px #000;
 }
 #editnothing:hover {
   background-color: #770;
@@ -223,6 +228,9 @@ main section {
   height: 100%;
   border: 1px solid #333;
 }
+.enc:nth-child(-n+3) {
+  border-top: none;
+}
 
 .enc:hover {
   background-color: rgba(255, 255, 255, 0.1);
@@ -267,8 +275,6 @@ main section {
 .enc .n input {
   color: #feff5f;
   background: #525322;
-  font-family: "LCD5x8";
-  font-size: 16px;
   padding: 0 5px;
   box-shadow: inset 1px 1px 2px #000;
   border: none;
@@ -359,8 +365,6 @@ main section {
 
 #preset ul {
   position: relative;
-  font-family: "LCD5x8";
-  font-size: 16px;
   display: block;
   list-style: none;
   padding: 0;
@@ -370,8 +374,6 @@ main section {
 #browser input {
   background: transparent;
   color: #feff5f;
-  font-family: "LCD5x8";
-  font-size: 16px;
   padding: 0;
   border: none;
   width: 4em;
