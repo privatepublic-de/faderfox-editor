@@ -16,9 +16,10 @@
 *[data-action] {
   cursor: pointer;
 }
-select[data-watch="scale"], select[data-watch="scale"] option,
-select[data-watch="select-encoder"], select[data-watch="select-encoder"] option
- {
+select[data-watch="scale"],
+select[data-watch="scale"] option,
+select[data-watch="select-encoder"],
+select[data-watch="select-encoder"] option {
   text-align: right;
   text-align-last: right;
 }
@@ -230,7 +231,7 @@ main section {
   height: 100%;
   border: 1px solid #333;
 }
-.enc:nth-child(-n+3) {
+.enc:nth-child(-n + 3) {
   border-top: none;
 }
 
