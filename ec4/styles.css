@@ -16,7 +16,9 @@
 *[data-action] {
   cursor: pointer;
 }
-select[data-watch="scale"], select[data-watch="scale"] option {
+select[data-watch="scale"], select[data-watch="scale"] option,
+select[data-watch="select-encoder"], select[data-watch="select-encoder"] option
+ {
   text-align: right;
   text-align-last: right;
 }
