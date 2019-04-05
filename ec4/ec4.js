@@ -567,10 +567,13 @@ document.addEventListener("DOMContentLoaded", function() {
         for (let i = 0; i < 16; i++) {
           const targetType = P.get(selection, i, "type");
           let setValue = value;
-          if (targetType === 4 && target === "number") {
-            setValue = value & 0x1f;
+          if (targetType === 4 /* CC14bit */ && target === "number") {
+            if (setValue<32) {
+              P.set(selection, i, target, setValue);
+            }
+          } else {
+            P.set(selection, i, target, setValue);
           }
-          P.set(selection, i, target, setValue);
         }
         syncValues();
         break;
@@ -814,9 +817,12 @@ document.addEventListener("DOMContentLoaded", function() {
               case P.number:
                 value = value & 0x7f;
                 if (P.get(selection, i, P.type) === 4 /*CC14bit*/) {
-                  value = value & 0x1f;
+                  if (value<32) {
+                    P.set(selection, i, P.number, value);
+                  }
+                } else {
+                  P.set(selection, i, P.number, value);
                 }
-                P.set(selection, i, P.number, value);
                 break;
               case P.channel:
                 while (value > 16) {
