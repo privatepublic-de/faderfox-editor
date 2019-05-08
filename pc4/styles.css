@@ -1,151 +1,151 @@
 .content {
-    position: relative;
+  position: relative;
 }
 
 main {
-    box-sizing: border-box;
-    margin: 0 auto;
-    width: 500px;
-    height: 818px;
-    background: url("pc4.jpg") no-repeat;
-    background-size: 100% 100%;
-    position: relative;
-    border: 1px solid #666;
-    border-top: none;
+  box-sizing: border-box;
+  margin: 0 auto;
+  width: 500px;
+  height: 818px;
+  background: url('pc4.jpg') no-repeat;
+  background-size: 100% 100%;
+  position: relative;
+  border: 1px solid #666;
+  border-top: none;
 }
 .ctrlcontainer {
-    position: absolute;
-    top: 4.4584%;
-    bottom: 9.78%;
-    left: 3.2%;
-    right: 3.2%;
+  position: absolute;
+  top: 4.4584%;
+  bottom: 9.78%;
+  left: 3.2%;
+  right: 3.2%;
 }
 main section {
-    box-sizing: border-box;
-    float: left;
-    width: 25%;
-    height: 16.667%;
-    position: relative;
+  box-sizing: border-box;
+  float: left;
+  width: 25%;
+  height: 16.667%;
+  position: relative;
 }
 main section:hover {
-    background-color: rgba(255,255,255,.3);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 .ctrl {
-    position: absolute;
-    box-sizing: border-box;
-    top: 21%;
-    left: 5px;
-    right: 5px;
-    box-shadow: 0 0 8px #000;
+  position: absolute;
+  box-sizing: border-box;
+  top: 21%;
+  left: 5px;
+  right: 5px;
+  box-shadow: 0 0 8px #000;
 }
 
 .params {
-    background-color: #eee;
-    color: #000;
-    border: 1px solid #666;
-    border-top: none;
-    font-size: .7em;
-    padding: 4px;
+  background-color: #eee;
+  color: #000;
+  border: 1px solid #666;
+  border-top: none;
+  font-size: 0.7em;
+  padding: 4px;
 }
 
 .params label {
-    width: 60%;
-    display: inline-block;
+  width: 60%;
+  display: inline-block;
 }
 .params input {
-    width: 40%;
-    padding: 0;
-    margin: 0;
-    text-align: right;
-    border: none;
-    font-size: 1.3em;
+  width: 40%;
+  padding: 0;
+  margin: 0;
+  text-align: right;
+  border: none;
+  font-size: 1.3em;
 }
-input[data-type="ccno"] {
-    border-top: 1px solid #bde;
+input[data-type='ccno'] {
+  border-top: 1px solid #bde;
 }
 
 ul.select {
-    display: block;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .msgbox h2::after,
 .select::after {
-    content:"";
-    display:table;
-    clear:both;
+  content: '';
+  display: table;
+  clear: both;
 }
 .select li {
-    display: block;
-    cursor: pointer;
-    background-color: #000;
+  display: block;
+  cursor: pointer;
+  background-color: #000;
 }
 
 .select li.selected,
 .select li:hover {
-    background-color: #ccc;
-    color: #000;
+  background-color: #ccc;
+  color: #000;
 }
 
 #preset {
-    width: 500px;
-    margin: 0 auto;
-    color: #aaa;
-    font-size: .85em;
+  width: 500px;
+  margin: 0 auto;
+  color: #aaa;
+  font-size: 0.85em;
 }
 
 #preset li.selected,
 #preset li:hover {
-    background-color: #e50a00;
-    font-weight: bold;
-    color: #fff;
+  background-color: #e50a00;
+  font-weight: bold;
+  color: #fff;
 }
 
 .ctrl ul.select {
-    width: 100%;
+  width: 100%;
 }
 
 #preset li,
 .ctrl li {
-    box-sizing: border-box;
-    border: 1px solid #666;
-    border-bottom: none;
-    float: left;
-    text-align: center;
-    font-size: .8em;
-    padding: 2px;
+  box-sizing: border-box;
+  border: 1px solid #666;
+  border-bottom: none;
+  float: left;
+  text-align: center;
+  font-size: 0.8em;
+  padding: 2px;
 }
 
 #preset li {
-    width: 6.25%;
+  width: 6.25%;
 }
 
 .ctrl li {
-    width: 33.334%;
-    font-size: .7em;
+  width: 33.334%;
+  font-size: 0.7em;
 }
 
 .cc .ctrl li.cc,
 .cc .params {
-    background-color: #bde;
-    color: black;
+  background-color: #bde;
+  color: black;
 }
 
 .pb .ctrl li.pb,
 .pb .params {
-    background-color: #fb9;
-    color: black;
+  background-color: #fb9;
+  color: black;
 }
 .pgm .ctrl li.pgm,
 .pgm .params {
-    background-color: #beb;
-    color: black;
+  background-color: #beb;
+  color: black;
 }
 .params .cc {
-    display: none;
+  display: none;
 }
 
 .cc .params .cc {
-    display: block;
+  display: block;
 }

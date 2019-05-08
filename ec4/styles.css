@@ -1,10 +1,10 @@
 /* @font-face kit by Fonts2u (https://fonts2u.com) */
 @font-face {
-  font-family: "LCD5x8";
-  src: url("5x8_lcd_hd44780u_a02.eot?") format("eot"),
-    url("5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02") format("svg"),
-    url("5x8_lcd_hd44780u_a02.woff") format("woff"),
-    url("5x8_lcd_hd44780u_a02.ttf") format("truetype");
+  font-family: 'LCD5x8';
+  src: url('5x8_lcd_hd44780u_a02.eot?') format('eot'),
+    url('5x8_lcd_hd44780u_a02.svg#5x8-LCD-HD44780U-A02') format('svg'),
+    url('5x8_lcd_hd44780u_a02.woff') format('woff'),
+    url('5x8_lcd_hd44780u_a02.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -16,10 +16,10 @@
 *[data-action] {
   cursor: pointer;
 }
-select[data-watch="scale"],
-select[data-watch="scale"] option,
-select[data-watch="select-encoder"],
-select[data-watch="select-encoder"] option {
+select[data-watch='scale'],
+select[data-watch='scale'] option,
+select[data-watch='select-encoder'],
+select[data-watch='select-encoder'] option {
   text-align: right;
   text-align-last: right;
 }
@@ -29,7 +29,7 @@ select[data-watch="select-encoder"] option {
 #browser input,
 #preset ul,
 .matrixfont {
-  font-family: "LCD5x8", Courier, monospace;
+  font-family: 'LCD5x8', Courier, monospace;
   font-size: 16px;
   font-weight: bold;
 }
@@ -118,34 +118,34 @@ select[data-watch="select-encoder"] option {
   padding-left: 1%;
 }
 
-.typed[data-type="0"] .lower,
-.typed[data-type="0"] .upper,
-.typed[data-type="1"] .lower,
-.typed[data-type="1"] .upper,
-.typed[data-type="3"] .number,
-.typed[data-type="5"] .number,
-.typed[data-type="6"] .number,
-.typed[data-type="7"] .lower,
-.typed[data-type="7"] .upper,
-.typed[data-type="7"] .mode {
+.typed[data-type='0'] .lower,
+.typed[data-type='0'] .upper,
+.typed[data-type='1'] .lower,
+.typed[data-type='1'] .upper,
+.typed[data-type='3'] .number,
+.typed[data-type='5'] .number,
+.typed[data-type='6'] .number,
+.typed[data-type='7'] .lower,
+.typed[data-type='7'] .upper,
+.typed[data-type='7'] .mode {
   visibility: hidden;
 }
 
-#oled[data-mode="channel"] span.channel,
-#oled[data-mode="number"] span.number,
-#oled[data-mode="type"] span.type,
-#oled[data-mode="scale"] span.scale,
-#oled[data-mode="mode"] span.mode,
-#oled[data-mode="upper"] span.upper,
-#oled[data-mode="lower"] span.lower {
+#oled[data-mode='channel'] span.channel,
+#oled[data-mode='number'] span.number,
+#oled[data-mode='type'] span.type,
+#oled[data-mode='scale'] span.scale,
+#oled[data-mode='mode'] span.mode,
+#oled[data-mode='upper'] span.upper,
+#oled[data-mode='lower'] span.lower {
   background-color: #660;
 }
 
 #oled .number_h,
-#oled[data-type="8"] .number_l {
+#oled[data-type='8'] .number_l {
   display: none;
 }
-#oled[data-type="8"] .number_h {
+#oled[data-type='8'] .number_h {
   display: inline-block;
 }
 
@@ -162,7 +162,7 @@ select[data-watch="select-encoder"] option {
   display: none;
 }
 
-*[data-mode="nothing"] #editnothing {
+*[data-mode='nothing'] #editnothing {
   display: none;
 }
 #editnothing {
@@ -194,10 +194,10 @@ select[data-watch="select-encoder"] option {
   padding: 5px;
 }
 
-*[data-mode="number"] #fillnumbers {
+*[data-mode='number'] #fillnumbers {
   display: block;
 }
-*[data-mode="channel"] #fillnumbers {
+*[data-mode='channel'] #fillnumbers {
   display: block;
 }
 
@@ -206,7 +206,7 @@ main {
   margin: 0 auto;
   width: 500px;
   height: 818px;
-  background: url("ec4.jpg") no-repeat;
+  background: url('ec4.jpg') no-repeat;
   background-size: 100% 100%;
   position: relative;
 }
@@ -325,20 +325,20 @@ main section {
   display: none;
 }
 
-*[data-mode="mode"] .enc .mode,
-*[data-mode="type"] .enc .type,
-*[data-mode="scale"] .enc .scale,
-*[data-mode="channel"] .enc .channel,
-*[data-mode="number"] .enc .number,
-*[data-mode="lower"] .enc .lower,
-*[data-mode="upper"] .enc .upper {
+*[data-mode='mode'] .enc .mode,
+*[data-mode='type'] .enc .type,
+*[data-mode='scale'] .enc .scale,
+*[data-mode='channel'] .enc .channel,
+*[data-mode='number'] .enc .number,
+*[data-mode='lower'] .enc .lower,
+*[data-mode='upper'] .enc .upper {
   display: block;
 }
 
-.enc[data-type="8"] .standard {
+.enc[data-type='8'] .standard {
   display: none;
 }
-.enc[data-type="8"] .hi-lo {
+.enc[data-type='8'] .hi-lo {
   display: block;
 }
 .enc .hi-lo {
@@ -419,7 +419,7 @@ main section {
   background-color: #c00 !important;
 }
 #preset #browser li li.selected::after {
-  content: "▶";
+  content: '▶';
   font-family: Arial, sans-serif;
   color: #fff;
   position: absolute;

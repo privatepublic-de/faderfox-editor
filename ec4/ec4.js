@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-"use strict";
+'use strict';
 let isDirty = false;
 
 const MEM = {
@@ -96,26 +96,26 @@ class Selection {
 
 const P = {
   // P is short for Parameter
-  type: "type",
-  channel: "channel",
-  number: "number",
-  number_h: "number_h",
-  lower: "lower",
-  upper: "upper",
-  mode: "mode",
-  scale: "scale",
-  name: "name",
+  type: 'type',
+  channel: 'channel',
+  number: 'number',
+  number_h: 'number_h',
+  lower: 'lower',
+  upper: 'upper',
+  mode: 'mode',
+  scale: 'scale',
+  name: 'name',
 
   labels: {
-    type: "Type",
-    channel: "Channel",
-    number: "Number",
-    number_h: "MSB",
-    number_nrpn: "#MSB/LSB",
-    lower: "Lower",
-    upper: "Upper",
-    mode: "Mode",
-    scale: "Display"
+    type: 'Type',
+    channel: 'Channel',
+    number: 'Number',
+    number_h: 'MSB',
+    number_nrpn: '#MSB/LSB',
+    lower: 'Lower',
+    upper: 'Upper',
+    mode: 'Mode',
+    scale: 'Display'
   },
 
   _dataFormat: {
@@ -127,7 +127,7 @@ const P = {
     upper: { pos: 64, mask: 0xff },
     mode: {
       pos: 80,
-      mask: parseInt("11000000", 2),
+      mask: parseInt('11000000', 2),
       lsb: 6,
       min: 0,
       max: 3,
@@ -135,7 +135,7 @@ const P = {
     },
     scale: {
       pos: 80,
-      mask: parseInt("00111111", 2),
+      mask: parseInt('00111111', 2),
       min: 0,
       max: 7,
       default: 1
@@ -146,12 +146,12 @@ const P = {
   get: function(selection, encoder, type) {
     const setup = selection.setup;
     const group = selection.group;
-    if (type === "select-encoder") {
+    if (type === 'select-encoder') {
       return;
     }
     const spec = P._dataFormat[type];
     if (!spec) {
-      console.log("Get unknown parameter type: " + type);
+      console.log('Get unknown parameter type: ' + type);
       return;
     }
     let addr =
@@ -170,7 +170,7 @@ const P = {
       if (spec.mask != 0xff) {
         let val = MEM.data[addr] & spec.mask;
         val = val >> shift;
-        if (spec.hasOwnProperty("min")) {
+        if (spec.hasOwnProperty('min')) {
           if (val < spec.min || val > spec.max) {
             val = spec.default;
           }
@@ -187,7 +187,7 @@ const P = {
     const group = selection.group;
     const spec = P._dataFormat[type];
     if (!spec) {
-      console.log("Set unknown parameter type: " + type);
+      console.log('Set unknown parameter type: ' + type);
       return;
     }
     let addr =
@@ -195,7 +195,7 @@ const P = {
     if (type === P.name) {
       addr += encoder * 4;
       while (value.length < 4) {
-        value += " ";
+        value += ' ';
       }
       for (let i = 0; i < 4; i++) {
         const oldValue = MEM.data[addr + i];
@@ -221,7 +221,7 @@ const P = {
   },
   setSetupName: function(setupNumber, name) {
     while (name.length < 4) {
-      name += " ";
+      name += ' ';
     }
     const addr = MEM.addrSetupNames + setupNumber * 4;
     for (let i = 0; i < 4; i++) {
@@ -230,7 +230,7 @@ const P = {
   },
   setGroupName: function(setupNumber, groupNumber, name) {
     while (name.length < 4) {
-      name += " ";
+      name += ' ';
     }
     const addr = MEM.addrGroupNames + setupNumber * 64 + groupNumber * 4;
     for (let i = 0; i < 4; i++) {
@@ -252,14 +252,14 @@ const P = {
 function initialiseValues() {
   MEM.data.fill(0);
   for (let setup = 0; setup < 16; setup++) {
-    const name = `SE${(setup < 9 ? "0" : "") + (setup + 1)}`;
+    const name = `SE${(setup < 9 ? '0' : '') + (setup + 1)}`;
     P.setSetupName(setup, name);
     for (let group = 0; group < 16; group++) {
-      const name = `GR${(group < 9 ? "0" : "") + (group + 1)}`;
+      const name = `GR${(group < 9 ? '0' : '') + (group + 1)}`;
       P.setGroupName(setup, group, name);
       const selection = { setup: setup, group: group };
       for (let encoder = 0; encoder < 16; encoder++) {
-        const name = `EC${(encoder < 9 ? "0" : "") + (encoder + 1)}`;
+        const name = `EC${(encoder < 9 ? '0' : '') + (encoder + 1)}`;
         P.set(selection, encoder, P.name, name);
         P.set(selection, encoder, P.channel, group + 1);
         P.set(selection, encoder, P.scale, 1);
@@ -270,12 +270,12 @@ function initialiseValues() {
     }
   }
   isDirty = false;
-};
+}
 initialiseValues();
 
-const REnameChars = new RegExp("[A-Za-z0-9.\\-/ ]");
-const REnotNameChars = new RegExp("[^A-Za-z0-9.\\-/ ]");
-const REnumberChars = new RegExp("[0-9]");
+const REnameChars = new RegExp('[A-Za-z0-9.\\-/ ]');
+const REnotNameChars = new RegExp('[^A-Za-z0-9.\\-/ ]');
+const REnumberChars = new RegExp('[0-9]');
 
 class InputHandler {
   constructor(selection) {
@@ -317,7 +317,7 @@ class InputHandler {
         break;
       case P.number:
         if (
-          DOM.parentsUpAttribute(element, "data-type") == 4 /*CC14bit*/ &&
+          DOM.ancestorAttribute(element, 'data-type') == 4 /*CC14bit*/ &&
           value > 31
         ) {
           value = 31;
@@ -334,11 +334,11 @@ class InputHandler {
 
   distributeValue(element, what) {
     let reloadValues = false;
-    if (what === "name-setup") {
-      const setupNumber = element.getAttribute("data-number");
+    if (what === 'name-setup') {
+      const setupNumber = element.getAttribute('data-number');
       P.setSetupName(setupNumber, element.value);
-    } else if (what === "name-group") {
-      const numbers = element.getAttribute("data-number").split(",");
+    } else if (what === 'name-group') {
+      const numbers = element.getAttribute('data-number').split(',');
       P.setGroupName(numbers[0], numbers[1], element.value);
     } else {
       const encid = this.findReferencedEncoder(element);
@@ -346,13 +346,13 @@ class InputHandler {
         let eid = this.findReferencedEncoder(el);
         if (eid === encid) {
           el.value = element.value;
-          if (typeof element.selectedIndex !== "undefined") {
+          if (typeof element.selectedIndex !== 'undefined') {
             el.selectedIndex = element.selectedIndex;
           }
         }
       });
       let storeVal =
-        typeof element.selectedIndex !== "undefined"
+        typeof element.selectedIndex !== 'undefined'
           ? element.selectedIndex
           : element.value;
       P.set(this.selection, encid, what, storeVal);
@@ -362,12 +362,12 @@ class InputHandler {
           reloadValues = true;
         }
         if (encid === this.selection.encoder) {
-          DOM.element("#oled").setAttribute("data-type", storeVal);
+          DOM.element('#oled').setAttribute('data-type', storeVal);
         }
-        DOM.all("#ctrlcontainer .enc", el => {
+        DOM.all('#ctrlcontainer .enc', el => {
           const eid = this.findReferencedEncoder(el);
           const type = P.get(this.selection, eid, P.type);
-          el.setAttribute("data-type", type);
+          el.setAttribute('data-type', type);
         });
       }
     }
@@ -375,7 +375,7 @@ class InputHandler {
   }
 
   findReferencedEncoder(element) {
-    let encoderId = DOM.parentsUpAttribute(element, "data-enc");
+    let encoderId = DOM.ancestorAttribute(element, 'data-enc');
     if (encoderId) {
       return parseInt(encoderId);
     } else {
@@ -384,29 +384,29 @@ class InputHandler {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener('DOMContentLoaded', function() {
   const selection = new Selection(selection => {
     // console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
-    DOM.removeClass("#ctrlcontainer .enc", "selected");
-    DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, "selected");
+    DOM.removeClass('#ctrlcontainer .enc', 'selected');
+    DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, 'selected');
     syncValues();
   });
   const inputhandler = new InputHandler(selection);
-  const sysex = new Sysex("EC4");
+  const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 183710 });
 
   buildUI();
-  let fillLabel = "";
+  let fillLabel = '';
 
   // read factory preset
   const req = new XMLHttpRequest();
-  req.open("GET", "factory-preset.syx", true);
-  req.responseType = "arraybuffer";
+  req.open('GET', 'factory-preset.syx', true);
+  req.responseType = 'arraybuffer';
   req.onload = function(oEvent) {
     const data = req.response;
     if (data) {
       try {
         interpretSysExData(new Uint8Array(data));
-      } catch(e) {
+      } catch (e) {
         console.log('Error reading factory preset', e);
         initialiseValues();
       }
@@ -415,38 +415,38 @@ document.addEventListener("DOMContentLoaded", function() {
   req.send();
 
   function syncValues() {
-    DOM.removeClass("#browser li", "selected");
-    DOM.addClass(`#browser > li:nth-child(${selection.setup + 1})`, "selected");
+    DOM.removeClass('#browser li', 'selected');
+    DOM.addClass(`#browser > li:nth-child(${selection.setup + 1})`, 'selected');
     DOM.addClass(
       `#browser > li:nth-child(${selection.setup +
         1}) li:nth-child(${selection.group + 1})`,
-      "selected"
+      'selected'
     );
 
-    DOM.all(".watchparams *[data-watch]", el => {
-      const what = el.getAttribute("data-watch");
+    DOM.all('.watchparams *[data-watch]', el => {
+      const what = el.getAttribute('data-watch');
       const encoderId = inputhandler.findReferencedEncoder(el);
       const value = P.get(selection, encoderId, what);
-      if (typeof value === "undefined") {
+      if (typeof value === 'undefined') {
         return;
       }
       // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
-      if (typeof el.selectedIndex !== "undefined") {
+      if (typeof el.selectedIndex !== 'undefined') {
         el.selectedIndex = value;
       } else {
-        if (typeof el.value !== "undefined") {
+        if (typeof el.value !== 'undefined') {
           el.value = value;
         }
       }
     });
-    DOM.element("#oled").setAttribute(
-      "data-type",
+    DOM.element('#oled').setAttribute(
+      'data-type',
       P.get(selection, selection.encoder, P.type)
     );
-    DOM.all("#ctrlcontainer .enc", el => {
+    DOM.all('#ctrlcontainer .enc', el => {
       const eid = inputhandler.findReferencedEncoder(el);
       const type = P.get(selection, eid, P.type);
-      el.setAttribute("data-type", type);
+      el.setAttribute('data-type', type);
     });
     for (let i = 0; i < 16; i++) {
       const setupAddr = MEM.addrSetupNames + i * 4;
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", function() {
         nameChars[1],
         nameChars[2],
         nameChars[3]
-      ).replace(REnotNameChars, " ");
+      ).replace(REnotNameChars, ' ');
       DOM.element(`#s${i}`).value = setupName;
       for (let j = 0; j < 16; j++) {
         const groupAddr = MEM.addrGroupNames + i * 64 + j * 4;
@@ -466,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function() {
           nameChars[1],
           nameChars[2],
           nameChars[3]
-        ).replace(REnotNameChars, " ");
+        ).replace(REnotNameChars, ' ');
         DOM.element(`#s${i}g${j}`).value = groupName;
       }
     }
@@ -477,14 +477,14 @@ document.addEventListener("DOMContentLoaded", function() {
   function selectEncoder(e) {
     let selectedId = -1;
     switch (e.type) {
-      case "focus":
-      case "click":
+      case 'focus':
+      case 'click':
         // if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
         //   return;
         // }
         selectedId = inputhandler.findReferencedEncoder(e.target);
         break;
-      case "change":
+      case 'change':
         selectedId = e.target.selectedIndex;
         break;
     }
@@ -492,83 +492,83 @@ document.addEventListener("DOMContentLoaded", function() {
     if (selectedId > -1) {
       selection.encoder = selectedId;
       DOM.element(
-        "#oled *[data-watch=select-encoder]"
+        '#oled *[data-watch=select-encoder]'
       ).selectedIndex = selectedId;
     }
   }
 
   function actionHandler(e) {
-    const action = e.currentTarget.getAttribute("data-action");
+    const action = e.currentTarget.getAttribute('data-action');
     // console.log(`Action ${action}`);
-    if (action.indexOf("edit-") === 0) {
-      const name = action.split("-")[1];
-      DOM.element("#ctrlcontainer").setAttribute("data-mode", name);
-      DOM.element("#oled").setAttribute("data-mode", name);
+    if (action.indexOf('edit-') === 0) {
+      const name = action.split('-')[1];
+      DOM.element('#ctrlcontainer').setAttribute('data-mode', name);
+      DOM.element('#oled').setAttribute('data-mode', name);
       let lastFocused = selection.lastFocused;
-      const isNPRN = DOM.element("#oled").getAttribute("data-type") === 8;
+      const isNPRN = DOM.element('#oled').getAttribute('data-type') === 8;
       if (isNPRN && lastFocused.indexOf(P.number) == -1) {
         lastFocused = P.number;
       }
       const eled = DOM.element(`#oled *[data-watch=${name}]`);
       if (eled) {
-        if (eled.tagName === "INPUT") eled.select();
+        if (eled.tagName === 'INPUT') eled.select();
         eled.focus();
       }
       let copyalllabel = P.labels[name];
       if (isNPRN && name === P.number) {
         if (lastFocused === P.number) {
-          copyalllabel = "LSB";
+          copyalllabel = 'LSB';
         } else if (lastFocused === P.number_h) {
-          copyalllabel = "MSB";
+          copyalllabel = 'MSB';
         }
       }
       if (copyalllabel) {
-        DOM.element("#toallenc span").innerText = copyalllabel;
-        DOM.show("#toallenc");
+        DOM.element('#toallenc span').innerText = copyalllabel;
+        DOM.show('#toallenc');
       } else {
-        DOM.hide("#toallenc");
+        DOM.hide('#toallenc');
       }
-      let fillButtonLabel = name + "s";
+      let fillButtonLabel = name + 's';
       fillLabel = name;
       switch (name) {
         case P.channel:
-          fillButtonLabel = "Channels";
-          fillLabel = "channels";
+          fillButtonLabel = 'Channels';
+          fillLabel = 'channels';
           break;
         case P.number:
-          fillButtonLabel = "Numbers" + (isNPRN ? " (LSB)" : "");
-          fillLabel = "command numbers" + (isNPRN ? " (LSB)" : "");
+          fillButtonLabel = 'Numbers' + (isNPRN ? ' (LSB)' : '');
+          fillLabel = 'command numbers' + (isNPRN ? ' (LSB)' : '');
           break;
       }
-      DOM.element("#fillnumbers span").innerText = fillButtonLabel;
+      DOM.element('#fillnumbers span').innerText = fillButtonLabel;
     }
     switch (action) {
-      case "select-setup":
-      case "select-group":
-        let number = e.currentTarget.getAttribute("data-number");
-        if (action === "select-setup") {
+      case 'select-setup':
+      case 'select-group':
+        let number = e.currentTarget.getAttribute('data-number');
+        if (action === 'select-setup') {
           selection.setup = number;
           selection.group = 0;
         } else {
           selection.group = number;
         }
         break;
-      case "select-encoder":
+      case 'select-encoder':
         selectEncoder(e);
         break;
-      case "copy2all":
-        const what = DOM.parentsUpAttribute(e.target, "data-mode");
-        const type = DOM.parentsUpAttribute(e.target, "data-type");
+      case 'copy2all':
+        const what = DOM.ancestorAttribute(e.target, 'data-mode');
+        const type = DOM.ancestorAttribute(e.target, 'data-type');
         let target = what;
         if (type == 8) {
           target = selection.lastFocused || what;
         }
         const value = P.get(selection, selection.encoder, target);
         for (let i = 0; i < 16; i++) {
-          const targetType = P.get(selection, i, "type");
+          const targetType = P.get(selection, i, 'type');
           let setValue = value;
-          if (targetType === 4 /* CC14bit */ && target === "number") {
-            if (setValue<32) {
+          if (targetType === 4 /* CC14bit */ && target === 'number') {
+            if (setValue < 32) {
               P.set(selection, i, target, setValue);
             }
           } else {
@@ -581,24 +581,24 @@ document.addEventListener("DOMContentLoaded", function() {
     e.stopPropagation();
   }
 
-  DOM.all("*[data-action]", e => {
-    e.addEventListener("click", actionHandler);
+  DOM.all('*[data-action]', e => {
+    e.addEventListener('click', actionHandler);
   });
 
   function watchHandler(event) {
     const what =
-      event.currentTarget.getAttribute("data-watch") ||
-      event.target.getAttribute("data-watch");
+      event.currentTarget.getAttribute('data-watch') ||
+      event.target.getAttribute('data-watch');
     let encoderId = null;
     encoderId =
       inputhandler.findReferencedEncoder(event.target) || selection.encoder;
     // console.log(`Watch ${what} on encoder #${encoderId}`);
     switch (what) {
       case P.name:
-      case "name-setup":
-      case "name-group":
+      case 'name-setup':
+      case 'name-group':
         return inputhandler.checkNameKey(event, event.target, what);
-      case "select-encoder":
+      case 'select-encoder':
         selectEncoder(event);
         return;
       case P.number:
@@ -606,8 +606,8 @@ document.addEventListener("DOMContentLoaded", function() {
       case P.lower:
       case P.upper:
       case P.channel:
-        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-          const add = event.key === "ArrowUp" ? 1 : -1;
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+          const add = event.key === 'ArrowUp' ? 1 : -1;
           event.target.value = parseInt(event.target.value) + add;
           inputhandler.checkValue(event.target, what);
           inputhandler.distributeValue(event.target, what);
@@ -615,39 +615,39 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         break;
     }
-    if (event.target.tagName === "INPUT") {
+    if (event.target.tagName === 'INPUT') {
       return inputhandler.checkNumberKey(event, event.target, what);
     }
   }
 
-  DOM.all("*[data-watch]", element => {
-    const what = element.getAttribute("data-watch");
+  DOM.all('*[data-watch]', element => {
+    const what = element.getAttribute('data-watch');
     switch (element.tagName) {
-      case "SELECT":
-        element.addEventListener("change", ev => {
+      case 'SELECT':
+        element.addEventListener('change', ev => {
           watchHandler(ev);
           if (inputhandler.distributeValue(ev.target, what)) {
             syncValues();
           }
         });
-        element.addEventListener("focus", ev => {
+        element.addEventListener('focus', ev => {
           selection.lastFocused = what;
           selectEncoder(ev);
         });
         break;
-      case "INPUT":
-        element.addEventListener("keydown", watchHandler);
-        element.addEventListener("keyup", () => {
+      case 'INPUT':
+        element.addEventListener('keydown', watchHandler);
+        element.addEventListener('keyup', () => {
           inputhandler.distributeValue(event.target, what);
         });
-        element.addEventListener("focus", ev => {
+        element.addEventListener('focus', ev => {
           selection.lastFocused = what;
           element.select();
           selectEncoder(ev);
         });
         break;
     }
-    element.addEventListener("blur", ev => {
+    element.addEventListener('blur', ev => {
       inputhandler.checkValue(element, what);
       inputhandler.distributeValue(element, what);
     });
@@ -687,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function() {
       crc = crc & 0xffff;
       dataout.push(0x4b, ...sysex.hiloNibbles((crc & 0xff00) >> 8)); // CRC high
       dataout.push(0x4c, ...sysex.hiloNibbles(crc & 0x00ff)); // CRC low
-      dataout.push(...Sysex._padding);
+      dataout.push(...Sysex.PADDING);
     }
     dataout.push(0x4f); // download stop
     dataout.push(...deviceparts);
@@ -723,17 +723,17 @@ document.addEventListener("DOMContentLoaded", function() {
       MBox.show(
         SEC4.title_data_received,
         STR.apply(SEC4.$msg_invalid_data, e.message),
-        { hideAfter: 10000, type: "error" }
+        { hideAfter: 10000, type: 'error' }
       );
     }
   }
 
-  const midi = new MIDI("Faderfox EC4", sysexHandler);
+  const midi = new MIDI('Faderfox EC4', sysexHandler);
 
-  DOM.on("#btntransfer", "click", function() {
+  DOM.on('#btntransfer', 'click', function() {
     if (midi.hasOutput()) {
       MBox.show(SEC4.title_send, SEC4.msg_send, {
-        buttonLabel: "Send",
+        buttonLabel: 'Send',
         confirmCallback: function() {
           MBox.hide();
           let data = generateSysexData();
@@ -742,34 +742,34 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     } else {
       MBox.show(STR.midictrl.title_error, STR.midictrl.nooutputs, {
-        type: "error"
+        type: 'error'
       });
     }
   });
-  DOM.on("#btnreceive", "click", function() {
+  DOM.on('#btnreceive', 'click', function() {
     if (midi.hasInput()) {
       MBox.show(SEC4.title_receive, SEC4.msg_receive);
     } else {
       MBox.show(STR.midictrl.title_error, STR.midictrl.noinputs, {
-        type: "error"
+        type: 'error'
       });
     }
   });
 
-  DOM.on("#btnfilesave", "click", function() {
+  DOM.on('#btnfilesave', 'click', function() {
     MBox.show(
       SEC4.title_save,
       SEC4.msg_save +
         '<br/><br/><div class="field"><label>Filename:</label><input name="filename" type="text" size="12" value="" placeholder="filename" /><b>.syx</b></div>',
       {
-        buttonLabel: "Save File",
+        buttonLabel: 'Save File',
         confirmCallback: function() {
-          let filename = DOM.element("#mbox input[name=filename]").value;
-          if (filename && filename !== "") {
+          let filename = DOM.element('#mbox input[name=filename]').value;
+          if (filename && filename !== '') {
             download(
               generateSysexData(),
-              filename + ".syx",
-              "application/octet-stream"
+              filename + '.syx',
+              'application/octet-stream'
             );
           }
           MBox.hide();
@@ -778,13 +778,13 @@ document.addEventListener("DOMContentLoaded", function() {
     );
   });
 
-  DOM.on("#btnfileload", "click", function() {
+  DOM.on('#btnfileload', 'click', function() {
     MBox.show(
       SEC4.title_load,
       SEC4.msg_load + '<br/><br/><input type="file" name="file" />',
       {
         attachHandlers: function(boxelement) {
-          DOM.attachInside(boxelement, "input[type=file]", "change", function(
+          DOM.attachInside(boxelement, 'input[type=file]', 'change', function(
             evt
           ) {
             sysex.readFile(evt.target, function(data) {
@@ -802,14 +802,14 @@ document.addEventListener("DOMContentLoaded", function() {
     );
   });
 
-  DOM.on("#fillnumbers", "click", function(e) {
-    const what = DOM.parentsUpAttribute(e.target, "data-mode");
+  DOM.on('#fillnumbers', 'click', function(e) {
+    const what = DOM.ancestorAttribute(e.target, 'data-mode');
     const startValue = P.get(selection, 0, what);
     MBox.show(
       SEC4.title_fillnumbers,
       STR.apply(SEC4.$msg_fillnumbers, fillLabel, startValue),
       {
-        buttonLabel: "Fill numbers",
+        buttonLabel: 'Fill numbers',
         confirmCallback: function() {
           for (let i = 1; i < 16; i++) {
             let value = startValue + i;
@@ -817,7 +817,7 @@ document.addEventListener("DOMContentLoaded", function() {
               case P.number:
                 value = value & 0x7f;
                 if (P.get(selection, i, P.type) === 4 /*CC14bit*/) {
-                  if (value<32) {
+                  if (value < 32) {
                     P.set(selection, i, P.number, value);
                   }
                 } else {
@@ -840,7 +840,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   function copyToClipboard(what) {
-    if (what === "group") {
+    if (what === 'group') {
       const addr =
         MEM.addrPresets +
         (selection.setup * 16 + selection.group) * MEM.lengthGroup;
@@ -884,7 +884,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
   function pasteFromClipboard(what) {
-    if (what === "group") {
+    if (what === 'group') {
       if (!MEM.clipboardDataGroup) {
         MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, {
           hideAfter: 5000
@@ -954,23 +954,23 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   }
-  DOM.on("#btncopygroup", "click", function() {
-    copyToClipboard("group");
+  DOM.on('#btncopygroup', 'click', function() {
+    copyToClipboard('group');
   });
-  DOM.on("#btnpastegroup", "click", function() {
-    pasteFromClipboard("group");
+  DOM.on('#btnpastegroup', 'click', function() {
+    pasteFromClipboard('group');
   });
-  DOM.on("#btncopysetup", "click", function() {
-    copyToClipboard("setup");
+  DOM.on('#btncopysetup', 'click', function() {
+    copyToClipboard('setup');
   });
-  DOM.on("#btnpastesetup", "click", function() {
-    pasteFromClipboard("setup");
+  DOM.on('#btnpastesetup', 'click', function() {
+    pasteFromClipboard('setup');
   });
 
-  window.addEventListener("beforeunload", function(e) {
+  window.addEventListener('beforeunload', function(e) {
     if (isDirty) {
       e.preventDefault();
-      e.returnValue = "";
+      e.returnValue = '';
     }
   });
 
@@ -979,39 +979,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function buildUI() {
   function createNameInput(id, type, number, value) {
-    let element = document.createElement("input");
-    element.setAttribute("id", id);
-    element.setAttribute("type", "text");
-    element.setAttribute("data-watch", "name-" + type);
-    element.setAttribute("data-number", number);
-    element.setAttribute("maxlength", 4);
-    element.setAttribute("value", value || "");
+    let element = document.createElement('input');
+    element.setAttribute('id', id);
+    element.setAttribute('type', 'text');
+    element.setAttribute('data-watch', 'name-' + type);
+    element.setAttribute('data-number', number);
+    element.setAttribute('maxlength', 4);
+    element.setAttribute('value', value || '');
     return element;
   }
-  let setupList = document.createElement("ul");
-  setupList.setAttribute("id", "browser");
+  let setupList = document.createElement('ul');
+  setupList.setAttribute('id', 'browser');
   for (let setupNumber = 0; setupNumber < 16; setupNumber++) {
-    let setupItem = document.createElement("li");
-    setupItem.setAttribute("data-action", "select-setup");
-    setupItem.setAttribute("data-number", setupNumber);
+    let setupItem = document.createElement('li');
+    setupItem.setAttribute('data-action', 'select-setup');
+    setupItem.setAttribute('data-number', setupNumber);
     if (setupNumber === 0) {
-      setupItem.classList.add("selected");
+      setupItem.classList.add('selected');
     }
-    let groupList = document.createElement("ul");
-    groupList.className = "group";
+    let groupList = document.createElement('ul');
+    groupList.className = 'group';
     for (let groupNumber = 0; groupNumber < 16; groupNumber++) {
-      let groupItem = document.createElement("li");
-      groupItem.setAttribute("data-action", "select-group");
-      groupItem.setAttribute("data-number", groupNumber);
+      let groupItem = document.createElement('li');
+      groupItem.setAttribute('data-action', 'select-group');
+      groupItem.setAttribute('data-number', groupNumber);
       if (groupNumber === 0) {
-        groupItem.classList.add("selected");
+        groupItem.classList.add('selected');
       }
       groupItem.appendChild(
         createNameInput(
           `s${setupNumber}g${groupNumber}`,
-          "group",
+          'group',
           `${setupNumber},${groupNumber}`,
-          "GR" + (groupNumber < 9 ? "0" : "") + (groupNumber + 1)
+          'GR' + (groupNumber < 9 ? '0' : '') + (groupNumber + 1)
         )
       );
       groupList.appendChild(groupItem);
@@ -1019,19 +1019,19 @@ function buildUI() {
     setupItem.appendChild(
       createNameInput(
         `s${setupNumber}`,
-        "setup",
+        'setup',
         setupNumber,
-        "SE" + (setupNumber < 9 ? "0" : "") + (setupNumber + 1)
+        'SE' + (setupNumber < 9 ? '0' : '') + (setupNumber + 1)
       )
     );
     setupItem.appendChild(groupList);
     setupList.appendChild(setupItem);
   }
-  DOM.element("#setupsandgroups").prepend(setupList);
+  DOM.element('#setupsandgroups').prepend(setupList);
 
   // build encoders
   for (let i = 0; i < 16; i++) {
-    const twodig = (i < 9 ? "0" : "") + (i + 1);
+    const twodig = (i < 9 ? '0' : '') + (i + 1);
     const html = `
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
@@ -1101,6 +1101,6 @@ function buildUI() {
                     </div>
                 </div>
             </section>`;
-    DOM.addHTML("#ctrlcontainer", "beforeend", html);
+    DOM.addHTML('#ctrlcontainer', 'beforeend', html);
   }
 }
