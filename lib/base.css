@@ -140,3 +140,10 @@ h1 {
 #midisettings button:hover {
   outline: 2px solid Highlight;
 }
+
+.privacydeclaration {
+  background-color: #333;
+  padding: 1em;
+  font-style: normal;
+  text-align: left;
+}
