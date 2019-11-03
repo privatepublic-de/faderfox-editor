@@ -1,13 +1,26 @@
 let SEC4 = {
+  welcome_title: 'Welcome to the Faderfox EC4 Editor',
+  welcome_text: `Before you start: Consider these steps to avoid loss of setup data on your EC4 by accidentially overwriting it.<ul>
+    <li>connect your EC4 via USB</li>
+    <li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>
+    <li>Select &quot;Send&quot; menu</li>
+    <li>Press and hold &quot;Send all setups&quot; until transfer starts</li>
+    <li>When the transfer is finished, a message appears here and the data can be applied to the editor</li>
+    </ul>
+  `,
   title_data_received: 'Data received',
   title_send: 'Send data to EC4',
+  warning_send: '<p>Warning: Sending the editor data overwrites all setups on the EC4.</p><p>If you want to make a backup copy of your current EC4 setups simply start the &quot;Send all setups&quot; function on the device *now*. After receiving the data, it will be stored as Sysex file in your downloads folder.<p>Then you can continue to send your editor setups to the EC4.</p>',
+  continue_without_backup: 'Continue without backup',
   msg_send:
     "To send the current editor settings to your EC4 device:\
                 <ul><li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>\
                 <li>Select &quot;Receive&quot; menu; the display shows &quot;Work in progress&quot;</li>\
                 <li>Then press the <i>Send</i> button below to start transfer</li>\
                 <li>You can monitor the transfer progress on the EC4's display.</li>\
-                </ul>",
+                </ul>\
+                <p>This will overwrite all existing setups on the device!</p>\
+              ",
 
   msg_apply: 'Received setup data from EC4. Apply to editor?',
   msg_data_applied: 'Setups from EC4 applied to editor!',

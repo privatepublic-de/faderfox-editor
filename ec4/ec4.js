@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   const inputhandler = new InputHandler(selection);
   const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 183710 });
-
+  let SYSEX_BACKUP_MODE = false;
   buildUI();
   let fillLabel = '';
 
@@ -709,35 +709,69 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function sysexHandler(data) {
-    try {
-      MBox.show(SEC4.title_data_received, SEC4.msg_apply, {
-        confirmCallback: function() {
-          MBox.hide();
-          interpretSysExData(data);
-          MBox.show(SEC4.title_data_received, SEC4.msg_data_applied, {
-            hideAfter: 5000
-          });
-        }
-      });
-    } catch (e) {
-      MBox.show(
-        SEC4.title_data_received,
-        STR.apply(SEC4.$msg_invalid_data, e.message),
-        { hideAfter: 10000, type: 'error' }
-      );
+    if (SYSEX_BACKUP_MODE) {
+      const now = new Date();
+      function twoDigits(v) {
+        return v < 10 ? `0${v}` : String(v);
+      }
+      let filename = `EC4-backup-${now.getFullYear()}-${twoDigits(
+        now.getMonth() + 1
+      )}-${twoDigits(now.getDate())}-${twoDigits(now.getHours())}-${twoDigits(
+        now.getMinutes()
+      )}.syx`;
+      download(data, filename, 'application/octet-stream');
+      SYSEX_BACKUP_MODE = false;
+      sendData();
+    } else {
+      try {
+        MBox.show(SEC4.title_data_received, SEC4.msg_apply, {
+          confirmCallback: function() {
+            MBox.hide();
+            interpretSysExData(data);
+            MBox.show(SEC4.title_data_received, SEC4.msg_data_applied, {
+              hideAfter: 5000
+            });
+          }
+        });
+      } catch (e) {
+        MBox.show(
+          SEC4.title_data_received,
+          STR.apply(SEC4.$msg_invalid_data, e.message),
+          { hideAfter: 10000, type: 'error' }
+        );
+      }
     }
   }
 
-  const midi = new MIDI('Faderfox EC4', sysexHandler);
+  const midi = new MIDI('Faderfox EC4', sysexHandler, midiavailable => {
+    if (midiavailable) {
+      MBox.show(SEC4.welcome_title, SEC4.welcome_text);
+    }
+  });
+
+  function sendData() {
+    MBox.show(SEC4.title_send, SEC4.msg_send, {
+      buttonLabel: 'Send',
+      confirmCallback: function() {
+        MBox.hide();
+        let data = generateSysexData();
+        midi.sendSysex(data, 50000);
+      }
+    });
+  }
 
   DOM.on('#btntransfer', 'click', function() {
     if (midi.hasOutput()) {
-      MBox.show(SEC4.title_send, SEC4.msg_send, {
-        buttonLabel: 'Send',
+      SYSEX_BACKUP_MODE = true;
+      MBox.show(SEC4.title_send, SEC4.warning_send, {
+        buttonLabel: SEC4.continue_without_backup,
         confirmCallback: function() {
+          SYSEX_BACKUP_MODE = false;
           MBox.hide();
-          let data = generateSysexData();
-          midi.sendSysex(data, 50000);
+          sendData();
+        },
+        cancelCallback: function() {
+          SYSEX_BACKUP_MODE = false;
         }
       });
     } else {
