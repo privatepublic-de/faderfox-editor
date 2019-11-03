@@ -743,9 +743,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  const midi = new MIDI('Faderfox EC4', sysexHandler, midiavailable => {
+  const midi = new MIDI('Faderfox EC4', sysexHandler, (midiavailable, message) => {
     if (midiavailable) {
       MBox.show(SEC4.welcome_title, SEC4.welcome_text);
+    } else {
+      MBox.show(STR.midictrl.title_error, message, { type: 'error' });;
     }
   });
 
