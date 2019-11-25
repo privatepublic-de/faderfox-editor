@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const data = req.response;
     if (data) {
       try {
-        interpretSysExData(new Uint8Array(data));
+        loadSysexData(new Uint8Array(data), true);
       } catch (e) {
         console.log('Error reading factory preset', e);
         initialiseValues();
@@ -687,17 +687,29 @@ document.addEventListener('DOMContentLoaded', function() {
     return new Uint8Array(dataout);
   }
 
-  function interpretSysExData(data) {
-    MEM.data.fill(0);
+  function parseSysex(sysexdata) {
+    const result = new Uint8Array(50240);
     sysex.parseSysexData(
-      data,
+      sysexdata,
       chunk => {},
       (addr, pagedata) => {
-        MEM.data.set(pagedata, addr - MEM.dataOffset);
+        result.set(pagedata, addr - MEM.dataOffset);
       }
     );
-    syncValues();
-    isDirty = false;
+    return result;
+  }
+
+  function loadSysexData(data, force) {
+    if (force) {
+      MEM.data.fill(0);
+      parseSysex(data).map((v, i) => (MEM.data[i] = v));
+      syncValues();
+      isDirty = false;
+    } else {
+      showMerge(parseSysex(data)).then(v => {
+        syncValues();
+      });
+    }
   }
 
   function sysexHandler(data) {
@@ -716,15 +728,16 @@ document.addEventListener('DOMContentLoaded', function() {
       sendData();
     } else {
       try {
-        MBox.show(SEC4.title_data_received, SEC4.msg_apply, {
-          confirmCallback: function() {
-            MBox.hide();
-            interpretSysExData(data);
-            MBox.show(SEC4.title_data_received, SEC4.msg_data_applied, {
-              hideAfter: 5000
-            });
-          }
-        });
+        loadSysexData(data);
+        // MBox.show(SEC4.title_data_received, SEC4.msg_apply, {
+        //   confirmCallback: function() {
+        //     MBox.hide();
+        //     loadSysexData(data);
+        //     MBox.show(SEC4.title_data_received, SEC4.msg_data_applied, {
+        //       hideAfter: 5000
+        //     });
+        //   }
+        // });
       } catch (e) {
         MBox.show(
           SEC4.title_data_received,
@@ -821,11 +834,12 @@ document.addEventListener('DOMContentLoaded', function() {
           ) {
             sysex.readFile(evt.target, function(data) {
               if (data) {
-                interpretSysExData(data);
                 MBox.hide();
-                MBox.show(SEC4.title_load, SEC4.msg_loaded, {
-                  hideAfter: 5000
-                });
+                loadSysexData(data);
+                // MBox.hide();
+                // MBox.show(SEC4.title_load, SEC4.msg_loaded, {
+                //   hideAfter: 5000
+                // });
               }
             });
           });
@@ -1135,57 +1149,104 @@ function buildUI() {
             </section>`;
     DOM.addHTML('#ctrlcontainer', 'beforeend', html);
   }
+}
 
-  function showMerge(data) {
-    return new Promise((resolve, reject) => {
-      let html = `<div id="merge"><p>Please select the setups and groups to import:</p><div class="mergecontainer">`;
-      for (let s = 0; s < 16; s++) {
-        const setupAddr = MEM.addrSetupNames + s * 4;
-        const sname = P.stringFromPosition(data, setupAddr);
-        html += `<div class="msetup"><span class="msetup" data-selected="0" data-setup="${s}">${sname}:</span>`;
-        for (let g = 0; g < 16; g++) {
-          const groupAddr = MEM.addrGroupNames + s * 64 + g * 4;
-          const gname = P.stringFromPosition(data, groupAddr);
-          html += `<span class="mgroup" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
-        }
-        html += '</div>';
+function doMerge(sourceData, selectedElements) {
+  selectedElements.forEach(element => {
+    const { group, setup } = element;
+    if (group !== null) {
+      const addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup;
+      for (let i = 0; i < MEM.lengthGroup; i++) {
+        MEM.data[addr + i] = sourceData[addr + i];
       }
-      html += `</div><button class="default" data-import="selected">Import selected</button><button data-import="cancel">Cancel</button><button data-import="all">Import *ALL*</button></div>`;
-      DOM.addHTML('body', 'beforeend', html);
-      DOM.on('.mergecontainer span[data-selected]', 'click', (e)=>{
-        const el = e.target;
-        let wholeSetup = !el.getAttribute('data-group');
-        let selected = Math.abs(el.getAttribute('data-selected')-1);
-        el.setAttribute('data-selected', selected);
-        if (wholeSetup) {
-          DOM.all(`.mergecontainer span[data-setup="${el.getAttribute('data-setup')}"]`, (e)=>{
+      const nameAddr = MEM.addrGroupNames + setup * 64 + group * 4;
+      for (let i = 0; i < 4; i++) {
+        MEM.data[nameAddr + i] = sourceData[nameAddr + i];
+      }
+    } else {
+      const nameAddr = MEM.addrSetupNames + setup * 4;
+      for (let i = 0; i < 4; i++) {
+        MEM.data[nameAddr + i] = sourceData[nameAddr + i];
+      }
+    }
+  });
+}
+
+function showMerge(data) {
+  return new Promise((resolve, reject) => {
+    let html = `<div id="merge"><div class="content"><p>Data received. Please select the setups and groups to import:</p></div><div class="mergecontainer">`;
+    for (let s = 0; s < 16; s++) {
+      const setupAddr = MEM.addrSetupNames + s * 4;
+      const sname = P.stringFromPosition(data, setupAddr);
+      html += `<div class="msetup"><span class="msetup" title="Toggle selection of entire setup" data-selected="0" data-setup="${s}">${sname}:</span>`;
+      for (let g = 0; g < 16; g++) {
+        const groupAddr = MEM.addrGroupNames + s * 64 + g * 4;
+        const gname = P.stringFromPosition(data, groupAddr);
+        html += `<span class="mgroup" title="Toggle group selection" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
+      }
+      html += '</div>';
+    }
+    html += `</div>
+      <div class="content">
+        <button class="default" data-import="selected">Import selected</button>
+        <button data-import="all">Import *ALL*</button>
+        <button data-import="cancel">Cancel</button>
+      </div>
+    </div>`;
+    DOM.addHTML('body', 'beforeend', html);
+    DOM.on('.mergecontainer span[data-selected]', 'click', e => {
+      const el = e.target;
+      let wholeSetup = !el.getAttribute('data-group');
+      let selected = Math.abs(el.getAttribute('data-selected') - 1);
+      el.setAttribute('data-selected', selected);
+      if (wholeSetup) {
+        DOM.all(
+          `.mergecontainer span[data-setup="${el.getAttribute('data-setup')}"]`,
+          e => {
             e.setAttribute('data-selected', selected);
-          });
-        }
-      });
-      function closeMergeDialog() {
-        DOM.element('#merge').remove();
+          }
+        );
       }
-      DOM.on('#merge button', 'click', (e)=>{
-        const action = e.target.getAttribute('data-import');
-        switch(action) {
-          case 'selected':
-            let selectedElements = [];
-            DOM.all('.mergecontainer span[data-selected="1"]', e=>{
-              selectedElements.push({setup: parseInt(e.getAttribute('data-setup')), group: e.getAttribute('data-group')?parseInt(e.getAttribute('data-group')):null});
-            });
-            console.log(selectedElements);
-            if (selectedElements.length==0) {
-              MBox.show('Import', 'Please select at least one setup or group to import!', { hideAfter: 5000 });
-            }
-            break;
-          case 'all':
-          case 'cancel':
-            closeMergeDialog();
-            break;
-        }
-      });
     });
-  }
-  showMerge(MEM.data).then();
+    function closeMergeDialog() {
+      DOM.element('#merge').remove();
+    }
+    DOM.on('#merge button', 'click', e => {
+      const action = e.target.getAttribute('data-import');
+      switch (action) {
+        case 'selected':
+          let selectedElements = [];
+          DOM.all('.mergecontainer span[data-selected="1"]', e => {
+            selectedElements.push({
+              setup: parseInt(e.getAttribute('data-setup')),
+              group: e.getAttribute('data-group')
+                ? parseInt(e.getAttribute('data-group'))
+                : null
+            });
+          });
+          if (selectedElements.length == 0) {
+            MBox.show(
+              'Import',
+              'Please select at least one setup or group to import!',
+              { hideAfter: 5000 }
+            );
+          } else {
+            doMerge(data, selectedElements);
+            closeMergeDialog();
+            resolve();
+          }
+          break;
+        case 'all':
+          MEM.data.fill(0);
+          data.map((v, i) => (MEM.data[i] = v));
+          closeMergeDialog();
+          resolve();
+          break;
+        case 'cancel':
+          closeMergeDialog();
+          resolve();
+          break;
+      }
+    });
+  });
 }
