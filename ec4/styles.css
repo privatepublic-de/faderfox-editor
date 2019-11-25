@@ -461,12 +461,21 @@ main section {
   background-image: none;
 }
 
+#dim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,.67);
+}
+
 #merge {
   position: fixed;
   top: 150px;
   left: 100px;
   right: 100px;
-  background: #ccc linear-gradient(#eee, #ccc);
+  background: #ccc linear-gradient(#ccc, #666);
   padding: 0 10px 10px 10px;
   box-shadow: 0 0 8px #000;
   max-height: 80%;
@@ -488,7 +497,9 @@ main section {
   font-family: monospace;
   text-align: center;
   width: 700px;
-  margin: 0 auto;
+  margin: 0 auto .5em auto;
+  background: #222;
+  padding: 8px 0 2px 0;
 }
 
 .mergecontainer div.msetup {
@@ -500,7 +511,7 @@ main section {
 .mergecontainer span {
   display: inline-block;
   padding: 3px;
-  border: 1px solid #999;
+  border: 1px solid #666;
   cursor: pointer;
   color: #777;
   white-space: pre;
@@ -513,14 +524,13 @@ main section {
 }
 
 .mergecontainer span:hover {
-  outline: 2px solid #000;
+  outline: 2px solid #feff5f;
 }
 
 .mergecontainer span.msetup {
   padding-right: 6px;
-  background-color: #ccc;
-  color: #c00;
-  border-color: #c00;
+  background-color: #700;
+  color: #000;
 }
 .mergecontainer span.msetup[data-selected="1"] {
   background-color: #c00;

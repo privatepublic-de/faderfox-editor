@@ -1174,7 +1174,7 @@ function doMerge(sourceData, selectedElements) {
 
 function showMerge(data) {
   return new Promise((resolve, reject) => {
-    let html = `<div id="merge"><div class="content"><p>Data received. Please select the setups and groups to import:</p></div><div class="mergecontainer">`;
+    let html = `<div id="dim"></div><div id="merge"><div class="content"><p>Data received. Please select the setups and groups to import:</p></div><div class="mergecontainer">`;
     for (let s = 0; s < 16; s++) {
       const setupAddr = MEM.addrSetupNames + s * 4;
       const sname = P.stringFromPosition(data, setupAddr);
@@ -1210,6 +1210,7 @@ function showMerge(data) {
     });
     function closeMergeDialog() {
       DOM.element('#merge').remove();
+      DOM.element('#dim').remove();
     }
     DOM.on('#merge button', 'click', e => {
       const action = e.target.getAttribute('data-import');
