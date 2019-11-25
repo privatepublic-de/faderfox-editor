@@ -460,3 +460,62 @@ main section {
   background-color: #777;
   background-image: none;
 }
+
+#merge {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222 linear-gradient(#222, #111);
+  padding: 0 10px 10px 10px;
+  box-shadow: 0 0 8px #000;
+}
+
+.mergecontainer {
+  font-size: 1em;
+  font-family: monospace;
+  text-align: center;
+  width: 680px;
+}
+
+.mergecontainer div.msetup {
+  border-left: none;
+  border-right: none;
+  margin: 0 0 8px 0;
+}
+
+.mergecontainer span {
+  display: inline-block;
+  padding: 3px;
+  border: 1px solid #555;
+  cursor: pointer;
+  color: #888;
+}
+
+.mergecontainer span[data-selected="1"] {
+  background: #feff5f;
+  color: #000;
+}
+
+.mergecontainer span:hover {
+  outline: 2px solid #ff0;
+}
+
+.mergecontainer span.msetup {
+  padding-right: 6px;
+  background-color: #400;
+}
+.mergecontainer span.msetup[data-selected="1"] {
+  background-color: #c00;
+  color: #fff;
+}
+
+#merge button {
+  float: right;
+  margin: 0 .75em;
+}
+
+#merge button.default {
+  font-weight: bold;
+  float: none;
+}

@@ -158,12 +158,7 @@ const P = {
       MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
     if (type === P.name) {
       addr += encoder * 4;
-      return String.fromCharCode(
-        MEM.data[addr + 0],
-        MEM.data[addr + 1],
-        MEM.data[addr + 2],
-        MEM.data[addr + 3]
-      );
+      return P.stringFromPosition(MEM.data, addr);
     } else {
       addr += encoder;
       const shift = spec.lsb || 0;
@@ -238,14 +233,17 @@ const P = {
     }
   },
   getGroupName: function(setupNumber, groupNumber) {
-    const addr = MEM.addrGroupNames + setupNumber * 64 + groupNumber * 4;
-    const name = MEM.data.subarray(addr, addr + 4);
-    return String.fromCharCode(name[0], name[1], name[2], name[3]);
+    return P.stringFromPosition(
+      MEM.data,
+      MEM.addrGroupNames + setupNumber * 64 + groupNumber * 4
+    );
   },
   getSetupName: function(setupNumber) {
-    const addr = MEM.addrSetupNames + setupNumber * 4;
-    const name = MEM.data.subarray(addr, addr + 4);
-    return String.fromCharCode(name[0], name[1], name[2], name[3]);
+    return P.stringFromPosition(MEM.data, MEM.addrSetupNames + setupNumber * 4);
+  },
+  stringFromPosition: function(data, position) {
+    const characters = data.subarray(position, position + 4);
+    return String.fromCharCode(...characters);
   }
 };
 
@@ -450,23 +448,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     for (let i = 0; i < 16; i++) {
       const setupAddr = MEM.addrSetupNames + i * 4;
-      const nameChars = MEM.data.subarray(setupAddr, setupAddr + 4);
-      const setupName = String.fromCharCode(
-        nameChars[0],
-        nameChars[1],
-        nameChars[2],
-        nameChars[3]
-      ).replace(REnotNameChars, ' ');
+      const setupName = P.stringFromPosition(MEM.data, setupAddr).replace(
+        REnotNameChars,
+        ' '
+      );
       DOM.element(`#s${i}`).value = setupName;
       for (let j = 0; j < 16; j++) {
         const groupAddr = MEM.addrGroupNames + i * 64 + j * 4;
-        const nameChars = MEM.data.subarray(groupAddr, groupAddr + 4);
-        const groupName = String.fromCharCode(
-          nameChars[0],
-          nameChars[1],
-          nameChars[2],
-          nameChars[3]
-        ).replace(REnotNameChars, ' ');
+        const groupName = P.stringFromPosition(MEM.data, groupAddr).replace(
+          REnotNameChars,
+          ' '
+        );
         DOM.element(`#s${i}g${j}`).value = groupName;
       }
     }
@@ -743,13 +735,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  const midi = new MIDI('Faderfox EC4', sysexHandler, (midiavailable, message) => {
-    if (midiavailable) {
-      MBox.show(SEC4.welcome_title, SEC4.welcome_text);
-    } else {
-      MBox.show(STR.midictrl.title_error, message, { type: 'error' });;
+  const midi = new MIDI(
+    'Faderfox EC4',
+    sysexHandler,
+    (midiavailable, message) => {
+      if (midiavailable) {
+        MBox.show(SEC4.welcome_title, SEC4.welcome_text);
+      } else {
+        MBox.show(STR.midictrl.title_error, message, { type: 'error' });
+      }
     }
-  });
+  );
 
   function sendData() {
     MBox.show(SEC4.title_send, SEC4.msg_send, {
@@ -1139,4 +1135,57 @@ function buildUI() {
             </section>`;
     DOM.addHTML('#ctrlcontainer', 'beforeend', html);
   }
+
+  function showMerge(data) {
+    return new Promise((resolve, reject) => {
+      let html = `<div id="merge"><p>Please select the setups and groups to import:</p><div class="mergecontainer">`;
+      for (let s = 0; s < 16; s++) {
+        const setupAddr = MEM.addrSetupNames + s * 4;
+        const sname = P.stringFromPosition(data, setupAddr);
+        html += `<div class="msetup"><span class="msetup" data-selected="0" data-setup="${s}">${sname}:</span>`;
+        for (let g = 0; g < 16; g++) {
+          const groupAddr = MEM.addrGroupNames + s * 64 + g * 4;
+          const gname = P.stringFromPosition(data, groupAddr);
+          html += `<span class="mgroup" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
+        }
+        html += '</div>';
+      }
+      html += `</div><button class="default" data-import="selected">Import selected</button><button data-import="cancel">Cancel</button><button data-import="all">Import *ALL*</button></div>`;
+      DOM.addHTML('body', 'beforeend', html);
+      DOM.on('.mergecontainer span[data-selected]', 'click', (e)=>{
+        const el = e.target;
+        let wholeSetup = !el.getAttribute('data-group');
+        let selected = Math.abs(el.getAttribute('data-selected')-1);
+        el.setAttribute('data-selected', selected);
+        if (wholeSetup) {
+          DOM.all(`.mergecontainer span[data-setup="${el.getAttribute('data-setup')}"]`, (e)=>{
+            e.setAttribute('data-selected', selected);
+          });
+        }
+      });
+      function closeMergeDialog() {
+        DOM.element('#merge').remove();
+      }
+      DOM.on('#merge button', 'click', (e)=>{
+        const action = e.target.getAttribute('data-import');
+        switch(action) {
+          case 'selected':
+            let selectedElements = [];
+            DOM.all('.mergecontainer span[data-selected="1"]', e=>{
+              selectedElements.push({setup: parseInt(e.getAttribute('data-setup')), group: e.getAttribute('data-group')?parseInt(e.getAttribute('data-group')):null});
+            });
+            console.log(selectedElements);
+            if (selectedElements.length==0) {
+              MBox.show('Import', 'Please select at least one setup or group to import!', { hideAfter: 5000 });
+            }
+            break;
+          case 'all':
+          case 'cancel':
+            closeMergeDialog();
+            break;
+        }
+      });
+    });
+  }
+  showMerge(MEM.data).then();
 }
