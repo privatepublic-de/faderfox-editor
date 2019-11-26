@@ -1174,22 +1174,22 @@ function doMerge(sourceData, selectedElements) {
 
 function showMerge(data) {
   return new Promise((resolve, reject) => {
-    let html = `<div id="dim"></div><div id="merge"><div class="content"><p>Data received. Please select the setups and groups to import:</p></div><div class="mergecontainer">`;
+    let html = `<div id="dim"></div><div id="merge"><div class="content"><p>${SEC4.merge_intro}</p></div><div class="mergecontainer">`;
     for (let s = 0; s < 16; s++) {
       const setupAddr = MEM.addrSetupNames + s * 4;
       const sname = P.stringFromPosition(data, setupAddr);
-      html += `<div class="msetup"><span class="msetup" title="Toggle selection of entire setup" data-selected="0" data-setup="${s}">${sname}:</span>`;
+      html += `<div class="msetup"><span class="msetup" title="${SEC4.merge_tooltip_toggle_setup} ${s+1}" data-selected="0" data-setup="${s}">${sname}:</span>`;
       for (let g = 0; g < 16; g++) {
         const groupAddr = MEM.addrGroupNames + s * 64 + g * 4;
         const gname = P.stringFromPosition(data, groupAddr);
-        html += `<span class="mgroup" title="Toggle group selection" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
+        html += `<span class="mgroup" title="${SEC4.merge_tooltip_toggle_group} ${g+1} in setup ${s+1}" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
       }
       html += '</div>';
     }
     html += `</div>
       <div class="content">
-        <button class="default" data-import="selected">Import selected</button>
-        <button data-import="all">Import *ALL*</button>
+        <button class="default" data-import="selected">${SEC4.merge_btn_import}</button>
+        <button data-import="all">${SEC4.merge_btn_import_all}</button>
         <button data-import="cancel">Cancel</button>
       </div>
     </div>`;
@@ -1226,11 +1226,7 @@ function showMerge(data) {
             });
           });
           if (selectedElements.length == 0) {
-            MBox.show(
-              'Import',
-              'Please select at least one setup or group to import!',
-              { hideAfter: 5000 }
-            );
+            MBox.show('Import', SEC4.merge_no_selection, { hideAfter: 5000 });
           } else {
             doMerge(data, selectedElements);
             closeMergeDialog();

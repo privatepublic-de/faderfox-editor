@@ -472,20 +472,21 @@ main section {
 
 #merge {
   position: fixed;
-  top: 150px;
-  left: 100px;
-  right: 100px;
-  background: #ccc linear-gradient(#ccc, #666);
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ccc linear-gradient(#ccc, #aaa);
   padding: 0 10px 10px 10px;
   box-shadow: 0 0 8px #000;
-  max-height: 80%;
+  max-height: 75%;
   overflow: auto;
   border: 2px solid #000;
+  border-radius: 4px;
 }
 
 #merge .content {
   max-width: 700px;
-  margin: 0 auto;
+  margin: 0 auto .5em auto;
   color: #000;
   padding: 0 .75em;
   box-sizing: border-box;
@@ -529,8 +530,8 @@ main section {
 
 .mergecontainer span.msetup {
   padding-right: 6px;
-  background-color: #700;
-  color: #000;
+  background-color: #633;
+  color: #aaa;
 }
 .mergecontainer span.msetup[data-selected="1"] {
   background-color: #c00;
