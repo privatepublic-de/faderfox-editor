@@ -41,6 +41,13 @@ let SEC4 = {
   msg_load: 'Please select a Sysex file with EC4 data to load.',
   msg_loaded: 'Sysex file successfully loaded!',
 
+  merge_intro: 'Data received. Please select the setups and groups to import:',
+  merge_tooltip_toggle_setup: 'Toggle selection of entire setup',
+  merge_tooltip_toggle_group: 'Toggle selection of group',
+  merge_no_selection: 'Please select at least one setup or group to import!',
+  merge_btn_import: 'Import selected',
+  merge_btn_import_all: 'Import *ALL*',
+
   title_copypaste: 'Copy & Paste',
   $msg_copy_setup: 'Current setup {} copied to clipboard.',
   $msg_copy_group: 'Current group {} copied to clipboard.',
