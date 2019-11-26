@@ -472,13 +472,13 @@ main section {
 
 #merge {
   position: fixed;
-  top: 15%;
+  top: 8%;
   left: 50%;
   transform: translateX(-50%);
   background: #ccc linear-gradient(#ccc, #aaa);
   padding: 0 10px 10px 10px;
   box-shadow: 0 0 8px #000;
-  max-height: 75%;
+  max-height: 80%;
   overflow: auto;
   border: 2px solid #000;
   border-radius: 4px;
