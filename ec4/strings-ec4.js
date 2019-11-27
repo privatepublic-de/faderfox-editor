@@ -10,7 +10,8 @@ let SEC4 = {
   `,
   title_data_received: 'Data received',
   title_send: 'Send data to EC4',
-  warning_send: '<p>Warning: Sending the editor data overwrites all setups on the EC4.</p><p>If you want to make a backup copy of your current EC4 setups simply start the &quot;Send all setups&quot; function on the device *now*. After receiving the data, it will be stored as Sysex file in your downloads folder.<p>Then you can continue to send your editor setups to the EC4.</p>',
+  warning_send:
+    '<p>Warning: Sending the editor data overwrites all setups on the EC4.</p><p>If you want to make a backup copy of your current EC4 setups simply start the &quot;Send all setups&quot; function on the device *now*. After receiving the data, it will be stored as Sysex file in your downloads folder.<p>Then you can continue to send your editor setups to the EC4.</p>',
   continue_without_backup: 'Continue without backup',
   msg_send:
     "To send the current editor settings to your EC4 device:\
@@ -41,12 +42,13 @@ let SEC4 = {
   msg_load: 'Please select a Sysex file with EC4 data to load.',
   msg_loaded: 'Sysex file successfully loaded!',
 
-  merge_intro: 'Data received. Please select the setups and groups to import:',
+  merge_intro: 'Data received. Please select the setups and groups to import.',
   merge_tooltip_toggle_setup: 'Toggle selection of entire setup',
   merge_tooltip_toggle_group: 'Toggle selection of group',
   merge_no_selection: 'Please select at least one setup or group to import!',
   merge_btn_import: 'Import selected',
-  merge_btn_import_all: 'Import *ALL*',
+  merge_btn_select_all: 'Select all',
+  merge_btn_select_none: 'Select none',
 
   title_copypaste: 'Copy & Paste',
   $msg_copy_setup: 'Current setup {} copied to clipboard.',
