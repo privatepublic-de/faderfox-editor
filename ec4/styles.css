@@ -513,6 +513,7 @@ main section {
   display: inline-block;
   padding: 3px;
   border: 1px solid #666;
+  border-radius: 4px;
   cursor: pointer;
   color: #777;
   white-space: pre;
