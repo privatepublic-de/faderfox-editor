@@ -1,104 +1,262 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Faderfox EC4 Editor</title>
-    <meta name="description" content="Web-MIDI Editor to configure the Faderfox EC4 controller.">
-    <link rel="stylesheet" href="../lib/base.css?v=1.0">
-    <link rel="stylesheet" href="styles.css?v=1.0">
+    <meta
+      name="description"
+      content="Web-MIDI Editor to configure the Faderfox EC4 controller."
+    />
+    <link rel="stylesheet" href="../lib/base.css?v=1.0" />
+    <link rel="stylesheet" href="styles.css?v=1.0" />
     <script src="../lib/strings.js?v=1.0"></script>
     <script src="strings-ec4.js?v=1.0"></script>
     <script src="../lib/download.js?v=1.0"></script>
     <script src="../lib/base.js?v=1.0"></script>
-    <script src="ec4.js?v=1.0"></script>
-    <script>if (location.protocol!=='https:' && location.protocol!=='file:' && location.hostname!='localhost') {location.href = 'https:' + window.location.href.substring(window.location.protocol.length);}</script>
-</head>
-<body>
-
+    <script src="ec4.js?v=1.1"></script>
+    <script>
+      if (
+        location.protocol !== 'https:' &&
+        location.protocol !== 'file:' &&
+        location.hostname != 'localhost'
+      ) {
+        location.href =
+          'https:' +
+          window.location.href.substring(window.location.protocol.length);
+      }
+    </script>
+  </head>
+  <body>
     <h1>Faderfox EC4 Editor</h1>
     <div id="midisettings">
-        <div class="field">
-            <label for="midiInDeviceId">MIDI Input:</label>
-            <select id="midiInDeviceId" title="Please select the MIDI interface your EC4 is connected to for input." tabindex="-1"><option>(No devices)</option></select>
-        </div>
-        <div class="field" style="margin-left:.5em;">
-            <label for="midiOutDeviceId" tabindex="-1">MIDI Output:</label>
-            <select id="midiOutDeviceId" title="Please select the MIDI interface your EC4 is connected to for output." tabindex="-1"><option>(No devices)</option></select>
-        </div>
-        <div id="tb">
-            <button type="button" id="btnreceive" title="Receive settings from your EC4" tabindex="-1">Receive from EC4</button>
-            <button type="button" id="btntransfer" title="Send editor data to your EC4" tabindex="-1">Send to EC4</button>
-            <button type="button" id="btnfileload" title="Load a Sysex file with EC4 settings" tabindex="-1" style="margin-left:2em">Load file</button>
-            <button type="button" id="btnfilesave" title="Save editor data as Sysex file" tabindex="-1">Save file</button>
-        </div>
+      <div class="field">
+        <label for="midiInDeviceId">MIDI Input:</label>
+        <select
+          id="midiInDeviceId"
+          title="Please select the MIDI interface your EC4 is connected to for input."
+          tabindex="-1"
+          ><option>(No devices)</option></select
+        >
+      </div>
+      <div class="field" style="margin-left: 0.5em;">
+        <label for="midiOutDeviceId" tabindex="-1">MIDI Output:</label>
+        <select
+          id="midiOutDeviceId"
+          title="Please select the MIDI interface your EC4 is connected to for output."
+          tabindex="-1"
+          ><option>(No devices)</option></select
+        >
+      </div>
+      <div id="tb">
+        <button
+          type="button"
+          id="btnreceive"
+          title="Receive settings from your EC4"
+          tabindex="-1"
+        >
+          Receive from EC4
+        </button>
+        <button
+          type="button"
+          id="btntransfer"
+          title="Send editor data to your EC4"
+          tabindex="-1"
+        >
+          Send to EC4
+        </button>
+        <button
+          type="button"
+          id="btnfileload"
+          title="Load a Sysex file with EC4 settings"
+          tabindex="-1"
+          style="margin-left: 2em;"
+        >
+          Load file
+        </button>
+        <button
+          type="button"
+          id="btnfilesave"
+          title="Save editor data as Sysex file"
+          tabindex="-1"
+        >
+          Save file
+        </button>
+      </div>
     </div>
     <div class="content">
-        <main>
-            <div id="preset">
-                <div class="header"><span>Setup</span><span>Group</span></div>
-                <div id="setupsandgroups" title="Select setup, group and edit name."></div>
-                <div class="tools"><a
-                     id="btncopysetup" title="Copy selected setup to clipboard" class="asbutton" tabindex="-1">Copy Setup</a><a
-                     id="btncopygroup" title="Copy selected group to clipboard" class="asbutton" tabindex="-1">Copy Group</a><a
-                     id="btnpastesetup" title="Paste setup from clipboard to selected setup" class="asbutton" tabindex="-1">Paste Setup</a><a
-                     id="btnpastegroup" title="Paste group from clipboard to selected group" class="asbutton" tabindex="-1">Paste Group</a>
-                </div>
-            </div>
-            <div id="oled" class="watchparams typed matrixfont"
-                ><div class="centerline"></div><span class="a">Ctrl:</span><select class="b" data-watch="select-encoder">
-                    <option>01</option><option>02</option><option>03</option><option>04</option>
-                    <option>05</option><option>06</option><option>07</option><option>08</option>
-                    <option>09</option><option>10</option><option>11</option><option>12</option>
-                    <option>13</option><option>14</option><option>15</option><option>16</option>
-                </select><span class="c channel" data-action="edit-channel">Chan :</span><input data-watch="channel" data-action="edit-channel" class="d" type="text" maxlength="2" value=""
-                /><span class="a scale" data-action="edit-scale">Disp:</span><select data-watch="scale" data-action="edit-scale" class="b">
-                    <option>off</option>
-                    <option>127</option>
-                    <option>100</option>
-                    <option>1000</option>
-                    <option> ±63</option>
-                    <option> ±50</option>
-                    <option>±500</option>
-                    <option>ONOF</option>
-                </select><span class="c number number_l" data-action="edit-number">Numb :</span><input data-watch="number" data-action="edit-number" class="d number number_l" type="text" maxlength="3" value=""
-                /><span class="c number number_h">N:</span><input data-watch="number_h" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value="" title="NPRM MSB"
-                /><input data-watch="number" data-action="edit-number" class="d number number_h" type="text" maxlength="3" value="" title="NPRM LSB"
-                /><span class="a type" data-action="edit-type">Type:</span><select data-watch="type" data-action="edit-type" class="b">
-                    <option>CCR1</option>
-                    <option>CCR2</option>
-                    <option>CCab</option>
-                    <option>PrgC</option>
-                    <option>CCAh</option>
-                    <option>PBnd</option>
-                    <option>AftT</option>
-                    <option>Note</option>
-                    <option>NRPN</option>
-                </select><span class="c lower" data-action="edit-lower">Lower:</span><input data-watch="lower" data-action="edit-lower" class="d lower" type="text" maxlength="3" value=""
-                /><span class="a mode" data-action="edit-mode">Mode:</span><select data-watch="mode" data-action="edit-mode" class="b mode">
-                    <option>Acc0</option>
-                    <option>Acc1</option>
-                    <option>Acc2</option>
-                    <option>Acc3</option>
-                </select><span class="c upper" data-action="edit-upper">Upper:</span><input data-watch="upper" data-action="edit-upper" class="d upper" type="text" maxlength="3" value=""
-            /><div id="toallenc" class="asbutton" data-action="copy2all">Copy &quot;<span>XXXX</span>&quot; to all encoders in group</div></div>
-            <div id="ctrlcontainer" class="watchparams" data-mode="nothing">
-                <div id="editnothing" data-action="edit-nothing" title="Hide value fields">&#x2715;</div>
-                <a id="fillnumbers" class="asbutton">Fill &quot;<span>Numbers</span>&quot; with ascending values...</a>
-            </div>
-        </main>
-        <div id="tbbottom">
+      <main>
+        <div id="preset">
+          <div class="header"><span>Setup</span><span>Group</span></div>
+          <div
+            id="setupsandgroups"
+            title="Select setup, group and edit name."
+          ></div>
+          <div class="tools">
+            <a
+              id="btncopysetup"
+              title="Copy selected setup to clipboard"
+              class="asbutton"
+              tabindex="-1"
+              >Copy Setup</a
+            ><a
+              id="btncopygroup"
+              title="Copy selected group to clipboard"
+              class="asbutton"
+              tabindex="-1"
+              >Copy Group</a
+            ><a
+              id="btnpastesetup"
+              title="Paste setup from clipboard to selected setup"
+              class="asbutton"
+              tabindex="-1"
+              >Paste Setup</a
+            ><a
+              id="btnpastegroup"
+              title="Paste group from clipboard to selected group"
+              class="asbutton"
+              tabindex="-1"
+              >Paste Group</a
+            >
+          </div>
         </div>
+        <div id="oled" class="watchparams typed matrixfont">
+          <div class="centerline"></div>
+          <span class="a">Ctrl:</span
+          ><select class="b" data-watch="select-encoder">
+            <option>01</option
+            ><option>02</option
+            ><option>03</option
+            ><option>04</option>
+            <option>05</option
+            ><option>06</option
+            ><option>07</option
+            ><option>08</option>
+            <option>09</option
+            ><option>10</option
+            ><option>11</option
+            ><option>12</option>
+            <option>13</option
+            ><option>14</option
+            ><option>15</option
+            ><option>16</option> </select
+          ><span class="c channel" data-action="edit-channel">Chan :</span
+          ><input
+            data-watch="channel"
+            data-action="edit-channel"
+            class="d"
+            type="text"
+            maxlength="2"
+            value=""
+          /><span class="a scale" data-action="edit-scale">Disp:</span
+          ><select data-watch="scale" data-action="edit-scale" class="b">
+            <option>off</option>
+            <option>127</option>
+            <option>100</option>
+            <option>1000</option>
+            <option> ±63</option>
+            <option> ±50</option>
+            <option>±500</option>
+            <option>ONOF</option> </select
+          ><span class="c number number_l" data-action="edit-number"
+            >Numb :</span
+          ><input
+            data-watch="number"
+            data-action="edit-number"
+            class="d number number_l"
+            type="text"
+            maxlength="3"
+            value=""
+          /><span class="c number number_h">N:</span
+          ><input
+            data-watch="number_h"
+            data-action="edit-number"
+            class="d number number_h"
+            type="text"
+            maxlength="3"
+            value=""
+            title="NPRM MSB"
+          /><input
+            data-watch="number"
+            data-action="edit-number"
+            class="d number number_h"
+            type="text"
+            maxlength="3"
+            value=""
+            title="NPRM LSB"
+          /><span class="a type" data-action="edit-type">Type:</span
+          ><select data-watch="type" data-action="edit-type" class="b">
+            <option>CCR1</option>
+            <option>CCR2</option>
+            <option>CCab</option>
+            <option>PrgC</option>
+            <option>CCAh</option>
+            <option>PBnd</option>
+            <option>AftT</option>
+            <option>Note</option>
+            <option>NRPN</option> </select
+          ><span class="c lower" data-action="edit-lower">Lower:</span
+          ><input
+            data-watch="lower"
+            data-action="edit-lower"
+            class="d lower"
+            type="text"
+            maxlength="3"
+            value=""
+          /><span class="a mode" data-action="edit-mode">Mode:</span
+          ><select data-watch="mode" data-action="edit-mode" class="b mode">
+            <option>Acc0</option>
+            <option>Acc1</option>
+            <option>Acc2</option>
+            <option>Acc3</option> </select
+          ><span class="c upper" data-action="edit-upper">Upper:</span
+          ><input
+            data-watch="upper"
+            data-action="edit-upper"
+            class="d upper"
+            type="text"
+            maxlength="3"
+            value=""
+          />
+          <div id="toallenc" class="asbutton" data-action="copy2all">
+            Copy &quot;<span>XXXX</span>&quot; to all encoders in group
+          </div>
+        </div>
+        <div id="ctrlcontainer" class="watchparams" data-mode="nothing">
+          <div
+            id="editnothing"
+            data-action="edit-nothing"
+            title="Hide value fields"
+          >
+            &#x2715;
+          </div>
+          <a id="fillnumbers" class="asbutton"
+            >Fill &quot;<span>Numbers</span>&quot; with ascending values...</a
+          >
+        </div>
+      </main>
+      <div id="tbbottom"></div>
     </div>
     <div class="credits">
-        Web-MIDI Editor for the <a href="http://faderfox.de/ec4.html" tabindex="-1">faderfox EC4-MIDI controller</a>.
-        Developed by Peter Witzel (<a href="http://www.privatepublic.de" tabindex="-1">privatepublic.de</a>) in co-operation with Faderfox.
-        Source code available on <a href="https://github.com/privatepublic-de/faderfox-editor" tabindex="-1">github</a>.
-        <p class="privacydeclaration"><b>Complete Privacy:</b> This web application (page) does not track, store or 
-            dispatch any data entered here. Visits, appliance or any other interactions with this page are not tracked.
-            If in doubt, feel free to check the source code.
-        </p>
+      Web-MIDI Editor for the
+      <a href="http://faderfox.de/ec4.html" tabindex="-1"
+        >faderfox EC4-MIDI controller</a
+      >. Developed by Peter Witzel (<a
+        href="http://www.privatepublic.de"
+        tabindex="-1"
+        >privatepublic.de</a
+      >) in co-operation with Faderfox. Source code available on
+      <a
+        href="https://github.com/privatepublic-de/faderfox-editor"
+        tabindex="-1"
+        >github</a
+      >.
+      <p class="privacydeclaration">
+        <b>Complete Privacy:</b> This web application (page) does not track,
+        store or dispatch any data entered here. Visits, appliance or any other
+        interactions with this page are not tracked. If in doubt, feel free to
+        check the source code.
+      </p>
     </div>
-
-</body>
+  </body>
 </html>
