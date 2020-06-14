@@ -35,8 +35,8 @@ const MEM = {
   clipboardDataGroup: null,
   clipboardDataSetup: {
     groupNames: undefined,
-    setupData: undefined
-  }
+    setupData: undefined,
+  },
 };
 
 class Selection {
@@ -115,7 +115,7 @@ const P = {
     lower: 'Lower',
     upper: 'Upper',
     mode: 'Mode',
-    scale: 'Display'
+    scale: 'Display',
   },
 
   _dataFormat: {
@@ -131,19 +131,19 @@ const P = {
       lsb: 6,
       min: 0,
       max: 3,
-      default: 3
+      default: 3,
     },
     scale: {
       pos: 80,
       mask: parseInt('00111111', 2),
       min: 0,
       max: 7,
-      default: 1
+      default: 1,
     },
-    name: { pos: 128 }
+    name: { pos: 128 },
   },
 
-  get: function(selection, encoder, type) {
+  get: function (selection, encoder, type) {
     const setup = selection.setup;
     const group = selection.group;
     if (type === 'select-encoder') {
@@ -177,7 +177,7 @@ const P = {
       }
     }
   },
-  set: function(selection, encoder, type, value) {
+  set: function (selection, encoder, type, value) {
     const setup = selection.setup;
     const group = selection.group;
     const spec = P._dataFormat[type];
@@ -214,7 +214,7 @@ const P = {
       isDirty = isDirty | (MEM.data[addr] != oldValue);
     }
   },
-  setSetupName: function(setupNumber, name) {
+  setSetupName: function (setupNumber, name) {
     while (name.length < 4) {
       name += ' ';
     }
@@ -223,7 +223,7 @@ const P = {
       MEM.data[addr + i] = name.charCodeAt(i);
     }
   },
-  setGroupName: function(setupNumber, groupNumber, name) {
+  setGroupName: function (setupNumber, groupNumber, name) {
     while (name.length < 4) {
       name += ' ';
     }
@@ -232,19 +232,19 @@ const P = {
       MEM.data[addr + i] = name.charCodeAt(i);
     }
   },
-  getGroupName: function(setupNumber, groupNumber) {
+  getGroupName: function (setupNumber, groupNumber) {
     return P.stringFromPosition(
       MEM.data,
       MEM.addrGroupNames + setupNumber * 64 + groupNumber * 4
     );
   },
-  getSetupName: function(setupNumber) {
+  getSetupName: function (setupNumber) {
     return P.stringFromPosition(MEM.data, MEM.addrSetupNames + setupNumber * 4);
   },
-  stringFromPosition: function(data, position) {
+  stringFromPosition: function (data, position) {
     const characters = data.subarray(position, position + 4);
     return String.fromCharCode(...characters);
-  }
+  },
 };
 
 function initialiseValues() {
@@ -340,7 +340,7 @@ class InputHandler {
       P.setGroupName(numbers[0], numbers[1], element.value);
     } else {
       const encid = this.findReferencedEncoder(element);
-      DOM.all(`.watchparams *[data-watch=${what}]`, el => {
+      DOM.all(`.watchparams *[data-watch=${what}]`, (el) => {
         let eid = this.findReferencedEncoder(el);
         if (eid === encid) {
           el.value = element.value;
@@ -355,14 +355,17 @@ class InputHandler {
           : element.value;
       P.set(this.selection, encid, what, storeVal);
       if (what === P.type) {
-        if (P.get(this.selection, encid, P.number) > 31) {
+        if (
+          P.get(this.selection, encid, P.number) > 31 &&
+          P.get(this.selection, encid, P.type) == 4
+        ) {
           P.set(this.selection, encid, P.number, 31);
           reloadValues = true;
         }
         if (encid === this.selection.encoder) {
           DOM.element('#oled').setAttribute('data-type', storeVal);
         }
-        DOM.all('#ctrlcontainer .enc', el => {
+        DOM.all('#ctrlcontainer .enc', (el) => {
           const eid = this.findReferencedEncoder(el);
           const type = P.get(this.selection, eid, P.type);
           el.setAttribute('data-type', type);
@@ -382,8 +385,8 @@ class InputHandler {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const selection = new Selection(selection => {
+document.addEventListener('DOMContentLoaded', function () {
+  const selection = new Selection((selection) => {
     // console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
     DOM.removeClass('#ctrlcontainer .enc', 'selected');
     DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, 'selected');
@@ -399,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const req = new XMLHttpRequest();
   req.open('GET', 'factory-preset.syx', true);
   req.responseType = 'arraybuffer';
-  req.onload = function(oEvent) {
+  req.onload = function (oEvent) {
     const data = req.response;
     if (data) {
       try {
@@ -416,12 +419,13 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.removeClass('#browser li', 'selected');
     DOM.addClass(`#browser > li:nth-child(${selection.setup + 1})`, 'selected');
     DOM.addClass(
-      `#browser > li:nth-child(${selection.setup +
-        1}) li:nth-child(${selection.group + 1})`,
+      `#browser > li:nth-child(${selection.setup + 1}) li:nth-child(${
+        selection.group + 1
+      })`,
       'selected'
     );
 
-    DOM.all('.watchparams *[data-watch]', el => {
+    DOM.all('.watchparams *[data-watch]', (el) => {
       const what = el.getAttribute('data-watch');
       const encoderId = inputhandler.findReferencedEncoder(el);
       const value = P.get(selection, encoderId, what);
@@ -441,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
       'data-type',
       P.get(selection, selection.encoder, P.type)
     );
-    DOM.all('#ctrlcontainer .enc', el => {
+    DOM.all('#ctrlcontainer .enc', (el) => {
       const eid = inputhandler.findReferencedEncoder(el);
       const type = P.get(selection, eid, P.type);
       el.setAttribute('data-type', type);
@@ -573,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
     e.stopPropagation();
   }
 
-  DOM.all('*[data-action]', e => {
+  DOM.all('*[data-action]', (e) => {
     e.addEventListener('click', actionHandler);
   });
 
@@ -612,17 +616,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  DOM.all('*[data-watch]', element => {
+  DOM.all('*[data-watch]', (element) => {
     const what = element.getAttribute('data-watch');
     switch (element.tagName) {
       case 'SELECT':
-        element.addEventListener('change', ev => {
+        element.addEventListener('change', (ev) => {
           watchHandler(ev);
           if (inputhandler.distributeValue(ev.target, what)) {
             syncValues();
           }
         });
-        element.addEventListener('focus', ev => {
+        element.addEventListener('focus', (ev) => {
           selection.lastFocused = what;
           selectEncoder(ev);
         });
@@ -632,14 +636,14 @@ document.addEventListener('DOMContentLoaded', function() {
         element.addEventListener('keyup', () => {
           inputhandler.distributeValue(event.target, what);
         });
-        element.addEventListener('focus', ev => {
+        element.addEventListener('focus', (ev) => {
           selection.lastFocused = what;
           element.select();
           selectEncoder(ev);
         });
         break;
     }
-    element.addEventListener('blur', ev => {
+    element.addEventListener('blur', (ev) => {
       inputhandler.checkValue(element, what);
       inputhandler.distributeValue(element, what);
     });
@@ -663,7 +667,7 @@ document.addEventListener('DOMContentLoaded', function() {
       0x10,
       0x44,
       0x20,
-      0x14
+      0x14,
     ];
     const pages = MEM.data.length / 64;
     for (let page = 0; page < pages; page++) {
@@ -691,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const result = new Uint8Array(50240);
     sysex.parseSysexData(
       sysexdata,
-      chunk => {},
+      (chunk) => {},
       (addr, pagedata) => {
         result.set(pagedata, addr - MEM.dataOffset);
       }
@@ -706,7 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
       syncValues();
       isDirty = false;
     } else {
-      showMerge(parseSysex(data)).then(v => {
+      showMerge(parseSysex(data)).then((v) => {
         syncValues();
       });
     }
@@ -763,52 +767,52 @@ document.addEventListener('DOMContentLoaded', function() {
   function sendData() {
     MBox.show(SEC4.title_send, SEC4.msg_send, {
       buttonLabel: 'Send',
-      confirmCallback: function() {
+      confirmCallback: function () {
         MBox.hide();
         let data = generateSysexData();
         midi.sendSysex(data, 50000);
-      }
+      },
     });
   }
 
-  DOM.on('#btntransfer', 'click', function() {
+  DOM.on('#btntransfer', 'click', function () {
     if (midi.hasOutput()) {
       SYSEX_BACKUP_MODE = true;
       MBox.show(SEC4.title_send, SEC4.warning_send, {
         buttonLabel: SEC4.continue_without_backup,
-        confirmCallback: function() {
+        confirmCallback: function () {
           SYSEX_BACKUP_MODE = false;
           MBox.hide();
           sendData();
         },
-        cancelCallback: function() {
+        cancelCallback: function () {
           SYSEX_BACKUP_MODE = false;
-        }
+        },
       });
     } else {
       MBox.show(STR.midictrl.title_error, STR.midictrl.nooutputs, {
-        type: 'error'
+        type: 'error',
       });
     }
   });
-  DOM.on('#btnreceive', 'click', function() {
+  DOM.on('#btnreceive', 'click', function () {
     if (midi.hasInput()) {
       MBox.show(SEC4.title_receive, SEC4.msg_receive);
     } else {
       MBox.show(STR.midictrl.title_error, STR.midictrl.noinputs, {
-        type: 'error'
+        type: 'error',
       });
     }
   });
 
-  DOM.on('#btnfilesave', 'click', function() {
+  DOM.on('#btnfilesave', 'click', function () {
     MBox.show(
       SEC4.title_save,
       SEC4.msg_save +
         '<br/><br/><div class="field"><label>Filename:</label><input name="filename" type="text" size="12" value="" placeholder="filename" /><b>.syx</b></div>',
       {
         buttonLabel: 'Save File',
-        confirmCallback: function() {
+        confirmCallback: function () {
           let filename = DOM.element('#mbox input[name=filename]').value;
           if (filename && filename !== '') {
             download(
@@ -818,21 +822,21 @@ document.addEventListener('DOMContentLoaded', function() {
             );
           }
           MBox.hide();
-        }
+        },
       }
     );
   });
 
-  DOM.on('#btnfileload', 'click', function() {
+  DOM.on('#btnfileload', 'click', function () {
     MBox.show(
       SEC4.title_load,
       SEC4.msg_load + '<br/><br/><input type="file" name="file" />',
       {
-        attachHandlers: function(boxelement) {
-          DOM.attachInside(boxelement, 'input[type=file]', 'change', function(
+        attachHandlers: function (boxelement) {
+          DOM.attachInside(boxelement, 'input[type=file]', 'change', function (
             evt
           ) {
-            sysex.readFile(evt.target, function(data) {
+            sysex.readFile(evt.target, function (data) {
               if (data) {
                 MBox.hide();
                 loadSysexData(data);
@@ -843,12 +847,12 @@ document.addEventListener('DOMContentLoaded', function() {
               }
             });
           });
-        }
+        },
       }
     );
   });
 
-  DOM.on('#fillnumbers', 'click', function(e) {
+  DOM.on('#fillnumbers', 'click', function (e) {
     const what = DOM.ancestorAttribute(e.target, 'data-mode');
     const startValue = P.get(selection, 0, what);
     MBox.show(
@@ -856,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
       STR.apply(SEC4.$msg_fillnumbers, fillLabel, startValue),
       {
         buttonLabel: 'Fill numbers',
-        confirmCallback: function() {
+        confirmCallback: function () {
           for (let i = 1; i < 16; i++) {
             let value = startValue + i;
             switch (what) {
@@ -880,7 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           syncValues();
           MBox.hide();
-        }
+        },
       }
     );
   });
@@ -933,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (what === 'group') {
       if (!MEM.clipboardDataGroup) {
         MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, {
-          hideAfter: 5000
+          hideAfter: 5000,
         });
       } else {
         MBox.show(
@@ -946,7 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
             )}&quot;)`
           ),
           {
-            confirmCallback: function() {
+            confirmCallback: function () {
               const addr =
                 MEM.addrPresets +
                 (selection.setup * 16 + selection.group) * MEM.lengthGroup;
@@ -956,9 +960,9 @@ document.addEventListener('DOMContentLoaded', function() {
               syncValues();
               MBox.hide();
               MBox.show(SEC4.title_copypaste, SEC4.msg_pasted, {
-                hideAfter: 5000
+                hideAfter: 5000,
               });
-            }
+            },
           }
         );
       }
@@ -968,7 +972,7 @@ document.addEventListener('DOMContentLoaded', function() {
         !MEM.clipboardDataSetup.groupNames
       ) {
         MBox.show(SEC4.title_copypaste, SEC4.msg_clipboard_empty, {
-          hideAfter: 5000
+          hideAfter: 5000,
         });
       } else {
         MBox.show(
@@ -980,7 +984,7 @@ document.addEventListener('DOMContentLoaded', function() {
             )}&quot;)`
           ),
           {
-            confirmCallback: function() {
+            confirmCallback: function () {
               const addr = MEM.addrPresets + selection.setup * MEM.lengthSetup;
               for (let i = 0; i < MEM.lengthSetup; i++) {
                 MEM.data[addr + i] = MEM.clipboardDataSetup.setupData[i];
@@ -992,28 +996,28 @@ document.addEventListener('DOMContentLoaded', function() {
               syncValues();
               MBox.hide();
               MBox.show(SEC4.title_copypaste, SEC4.msg_pasted, {
-                hideAfter: 5000
+                hideAfter: 5000,
               });
-            }
+            },
           }
         );
       }
     }
   }
-  DOM.on('#btncopygroup', 'click', function() {
+  DOM.on('#btncopygroup', 'click', function () {
     copyToClipboard('group');
   });
-  DOM.on('#btnpastegroup', 'click', function() {
+  DOM.on('#btnpastegroup', 'click', function () {
     pasteFromClipboard('group');
   });
-  DOM.on('#btncopysetup', 'click', function() {
+  DOM.on('#btncopysetup', 'click', function () {
     copyToClipboard('setup');
   });
-  DOM.on('#btnpastesetup', 'click', function() {
+  DOM.on('#btnpastesetup', 'click', function () {
     pasteFromClipboard('setup');
   });
 
-  window.addEventListener('beforeunload', function(e) {
+  window.addEventListener('beforeunload', function (e) {
     if (isDirty) {
       e.preventDefault();
       e.returnValue = '';
@@ -1082,35 +1086,42 @@ function buildUI() {
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
                     <div class="knob"></div>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 +
-      i}" title="Edit name of encoder"/></div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${
+      200 + i
+    }" title="Edit name of encoder"/></div>
                     <div class="v">
                         <div class="number">
                             <div class="standard"><label>${
                               P.labels.number
-                            }</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 +
-      i}"/></div>
+                            }</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }"/></div>
                             <div class="hi-lo"><label>${
                               P.labels.number_nrpn
                             }</label>
-                                <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216 +
-                                  i}" />
-                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 +
-                                  i}" />
+                                <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${
+                                  216 + i
+                                }" />
+                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
+                                  216 + i
+                                }" />
                             </div>
                         </div>
                         <div class="channel"><label>${
                           P.labels.channel
-                        }</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216 +
-      i}" /></div>
+                        }</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
                         <div class="lower"><label>${
                           P.labels.lower
-                        }</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${216 +
-      i}" /></div>
+                        }</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
                         <div class="upper"><label>${
                           P.labels.upper
-                        }</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${216 +
-      i}" /></div>
+                        }</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
                         <div class="scale"><label>${P.labels.scale}</label>
                             <select data-watch="scale" tabindex="${216 + i}">
                                 <option>display off</option>
@@ -1152,7 +1163,7 @@ function buildUI() {
 }
 
 function doMerge(sourceData, selectedElements) {
-  selectedElements.forEach(element => {
+  selectedElements.forEach((element) => {
     const { group, setup } = element;
     if (group !== null) {
       const addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup;
@@ -1188,8 +1199,9 @@ function showMerge(data) {
         const gname = P.stringFromPosition(data, groupAddr);
         html += `<span class="mgroup" title="${
           SEC4.merge_tooltip_toggle_group
-        } ${g + 1} in setup ${s +
-          1}" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
+        } ${g + 1} in setup ${
+          s + 1
+        }" data-selected="0" data-setup="${s}" data-group="${g}">${gname}</span>`;
       }
       html += '</div>';
     }
@@ -1200,7 +1212,7 @@ function showMerge(data) {
       </div>
     </div>`;
     DOM.addHTML('body', 'beforeend', html);
-    DOM.on('.mergecontainer span[data-selected]', 'click', e => {
+    DOM.on('.mergecontainer span[data-selected]', 'click', (e) => {
       const el = e.target;
       let wholeSetup = !el.getAttribute('data-group');
       let selected = Math.abs(el.getAttribute('data-selected') - 1);
@@ -1208,7 +1220,7 @@ function showMerge(data) {
       if (wholeSetup) {
         DOM.all(
           `.mergecontainer span[data-setup="${el.getAttribute('data-setup')}"]`,
-          e => {
+          (e) => {
             e.setAttribute('data-selected', selected);
           }
         );
@@ -1218,17 +1230,17 @@ function showMerge(data) {
       DOM.element('#merge').remove();
       DOM.element('#dim').remove();
     }
-    DOM.on('#merge button', 'click', e => {
+    DOM.on('#merge button', 'click', (e) => {
       const action = e.target.getAttribute('data-import');
       switch (action) {
         case 'selected':
           let selectedElements = [];
-          DOM.all('.mergecontainer span[data-selected="1"]', e => {
+          DOM.all('.mergecontainer span[data-selected="1"]', (e) => {
             selectedElements.push({
               setup: parseInt(e.getAttribute('data-setup')),
               group: e.getAttribute('data-group')
                 ? parseInt(e.getAttribute('data-group'))
-                : null
+                : null,
             });
           });
           if (selectedElements.length == 0) {
@@ -1240,12 +1252,12 @@ function showMerge(data) {
           }
           break;
         case 'select-all':
-          DOM.all('.mergecontainer span[data-selected]', e => {
+          DOM.all('.mergecontainer span[data-selected]', (e) => {
             e.setAttribute('data-selected', 1);
           });
           break;
         case 'select-none':
-          DOM.all('.mergecontainer span[data-selected]', e => {
+          DOM.all('.mergecontainer span[data-selected]', (e) => {
             e.setAttribute('data-selected', 0);
           });
           break;
