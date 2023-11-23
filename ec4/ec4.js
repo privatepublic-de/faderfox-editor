@@ -24,26 +24,20 @@ SOFTWARE.
 'use strict';
 let isDirty = false;
 
-const MEMORY_SIZE = 0xf500;
-const MEMORY_OFFSET = 0x0b00;
-
 const MEM = {
-  data: new Uint8Array(MEMORY_SIZE),
+  data: new Uint8Array(50240),
   lengthGroup: 192,
   lengthSetup: 192 * 16,
-  addrKey1: 0x0b00 - MEMORY_OFFSET,
-  addrSetupNames: 0x1bc0 - MEMORY_OFFSET,
-  addrGroupNames: 0x1c00 - MEMORY_OFFSET,
-  addrPresets: 0x2000 - MEMORY_OFFSET,
-  addrKey2: 0xe000 - MEMORY_OFFSET,
+  dataOffset: 0x1bc0,
+  addrSetupNames: 0,
+  addrGroupNames: 0x1c00 - 0x1bc0,
+  addrPresets: 0x2000 - 0x1bc0,
   clipboardDataGroup: null,
   clipboardDataSetup: {
     groupNames: undefined,
     setupData: undefined,
   },
 };
-
-const FACTORY_PRESET_PATH = 'test-dump-v2.syx';//'factory-preset.syx';
 
 class Selection {
   constructor(updatecallback) {
@@ -405,23 +399,18 @@ document.addEventListener('DOMContentLoaded', function () {
   let fillLabel = '';
 
   // read factory preset
-  console.log('Reading preset: ', FACTORY_PRESET_PATH);
   const req = new XMLHttpRequest();
-  req.open('GET', FACTORY_PRESET_PATH, true);
+  req.open('GET', 'factory-preset.syx', true);
   req.responseType = 'arraybuffer';
   req.onload = function (oEvent) {
     const data = req.response;
     if (data) {
       try {
-        console.log('Parsing preset: ', FACTORY_PRESET_PATH);
         loadSysexData(new Uint8Array(data), true);
-        console.log('Successfully parsed preset.');
       } catch (e) {
         console.log('Error reading factory preset', e);
         initialiseValues();
       }
-    } else {
-      console.log('No preset data received!', FACTORY_PRESET_PATH);
     }
   };
   req.send();
@@ -683,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const pages = MEM.data.length / 64;
     for (let page = 0; page < pages; page++) {
       const pos = page * 64;
-      const addr = pos + MEMORY_OFFSET;
+      const addr = pos + MEM.dataOffset;
       dataout.push(0x49, ...sysex.hiloNibbles(addr >> 8));
       dataout.push(0x4a, ...sysex.hiloNibbles(addr & 0xff));
       let crc = 0;
@@ -703,12 +692,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function parseSysex(sysexdata) {
-    const result = new Uint8Array(MEMORY_SIZE);
+    const result = new Uint8Array(50240);
     sysex.parseSysexData(
       sysexdata,
       (chunk) => {},
       (addr, pagedata) => {
-        result.set(pagedata, addr - MEMORY_OFFSET);
+        result.set(pagedata, addr - MEM.dataOffset);
       }
     );
     return result;
