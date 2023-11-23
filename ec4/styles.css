@@ -546,3 +546,36 @@ main section {
 #merge button.default {
   font-weight: bold;
 }
+
+#modeselect {
+  display: flex;
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  margin-left: -100px;
+  width: 200px;
+  /* height: 130px; */
+  box-shadow: 0 0 10px #222;
+  /* color: #feff5f; */
+  background: linear-gradient(8deg, #000, #222, #333);
+  /* line-height: 28px; */
+  box-sizing: border-box;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  padding: 5px 5px 5px 9px;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#modeselect span {
+  width: 100%;
+  text-align: center;
+}
+
+#modeselect .selected {
+  width: 100%;
+  text-align: center;
+  background-color: #feff5f;
+  color: black;
+}
