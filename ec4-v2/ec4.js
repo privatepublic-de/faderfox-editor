@@ -111,6 +111,7 @@ const P = {
   mode: 'mode',
   scale: 'scale',
   name: 'name',
+  link: 'link',
 
   labels: {
     type: 'Type',
@@ -127,8 +128,13 @@ const P = {
   _dataFormat: {
     type: { pos: 0, mask: 0xf0, lsb: 4, min: 0, max: 8, default: 2 },
     channel: { pos: 0, mask: 0x0f },
-    number: { pos: 16, mask: 0xff },
+    number: { pos: 16, mask: 0x7f },
     number_h: { pos: 32, mask: 0xff },
+    link: {
+      pos: 16,
+      mask: 0x80,
+      lsb: 7,
+    },
     lower: { pos: 48, mask: 0xff },
     upper: { pos: 64, mask: 0xff },
     mode: {
@@ -136,14 +142,14 @@ const P = {
       mask: parseInt('11000000', 2),
       lsb: 6,
       min: 0,
-      max: 3,
+      max: 9,
       default: 3,
     },
     scale: {
       pos: 80,
       mask: parseInt('00111111', 2),
       min: 0,
-      max: 7,
+      max: 8,
       default: 1,
     },
     name: { pos: 128 },
@@ -270,6 +276,7 @@ function initialiseValues() {
         P.set(selection, encoder, P.type, 2);
         P.set(selection, encoder, P.mode, 3);
         P.set(selection, encoder, P.upper, 127);
+        P.set(selection, encoder, P.link, 0);
       }
     }
   }
@@ -355,10 +362,18 @@ class InputHandler {
           }
         }
       });
-      let storeVal =
-        typeof element.selectedIndex !== 'undefined'
-          ? element.selectedIndex
-          : element.value;
+      let storeVal;
+      if (typeof element.selectedIndex !== 'undefined') {
+        storeVal = element.selectedIndex;
+      } else if (element.type == 'checkbox') {
+        storeVal = element.checked?1:0;
+      } else {
+        storeVal = element.value;
+      }
+      // let storeVal =
+      //   typeof element.selectedIndex !== 'undefined'
+      //     ? element.selectedIndex
+      //     : element.value;
       P.set(this.selection, encid, what, storeVal);
       if (what === P.type) {
         if (
@@ -402,6 +417,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 183710 });
   let SYSEX_BACKUP_MODE = false;
   buildUI();
+  DOM.on('#modeselect span', 'click', (e) => {
+    const el = e.target;
+    console.log('Clicked', el.getAttribute('id'), e);
+    DOM.element('#contentcontainer').setAttribute('data-mode', el.getAttribute('id'));
+  });
   let fillLabel = '';
 
   // read factory preset
@@ -444,6 +464,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
       // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
+      if (el.type=='checkbox') {
+        el.checked = value!=0;
+        console.log('checkbox', el.checked, value);
+      }
       if (typeof el.selectedIndex !== 'undefined') {
         el.selectedIndex = value;
       } else {
@@ -653,6 +677,12 @@ document.addEventListener('DOMContentLoaded', function () {
           selectEncoder(ev);
         });
         break;
+    }
+    if (element.type == 'checkbox') {
+      element.addEventListener('change', (ev) => {
+        inputhandler.checkValue(element, what);
+        inputhandler.distributeValue(element, what);
+      });  
     }
     element.addEventListener('blur', (ev) => {
       inputhandler.checkValue(element, what);
@@ -1143,6 +1173,7 @@ function buildUI() {
                                 <option>-50...+50</option>
                                 <option>-500...+500</option>
                                 <option>ON / OFF</option>
+                                <option>0...9999</option>
                             </select>
                         </div>
                         <div class="type"><label>${P.labels.type}</label>
@@ -1160,13 +1191,20 @@ function buildUI() {
                         </div>
                         <div class="mode"><label>${P.labels.mode}</label>
                             <select data-watch="mode" tabindex="${216 + i}">
-                                <option>no acceleration</option>
-                                <option>low acceleration</option>
-                                <option>mid acceleration</option>
-                                <option>max acceleration</option>
+                              <option>div. by 8</option>
+                              <option>div. by 4</option>
+                              <option>div. by 2</option>
+                              <option>no acceleration</option>
+                              <option>low acceleration</option>
+                              <option>middle acceleration</option>
+                              <option>max acceleration</option>
+                              <option>large step 2</option>
+                              <option>large step 4</option>
+                              <option>large step 6</option>
                             </select>
                         </div>
                     </div>
+                    <div class="link matrixfont" title="Link this controller to next"><input type="checkbox" id="linkenc${i}" data-watch="link" data-action="edit-link"/><label for="linkenc${i}">&gt;</label></div>
                 </div>
             </section>`;
     DOM.addHTML('#ctrlcontainer', 'beforeend', html);

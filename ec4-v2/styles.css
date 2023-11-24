@@ -48,6 +48,14 @@ select[data-watch='select-encoder'] option {
   box-sizing: border-box;
   border: 2px solid #ddd;
   border-radius: 6px;
+  /* padding: 5px 5px 5px 9px; */
+}
+
+.modecontainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   padding: 5px 5px 5px 9px;
 }
 
@@ -246,7 +254,7 @@ main section {
 .enc .knob {
   position: absolute;
   left: 50%;
-  top: 65%;
+  top: 70px;
   width: 64px;
   height: 64px;
   margin-left: -32px;
@@ -261,7 +269,7 @@ main section {
   position: absolute;
   right: 0;
   left: 0;
-  top: 15%;
+  top:12px;
   margin: 0 5px;
   text-align: center;
 }
@@ -270,7 +278,7 @@ main section {
   position: absolute;
   right: 0;
   left: 0;
-  top: 51%;
+  top: 45px;
   text-align: center;
   margin: 0 5px;
 }
@@ -289,15 +297,15 @@ main section {
   width: 40%;
   text-align: right;
   padding: 2px 5px 0 5px;
-  color: #000;
-  background: #ccc;
+  color: #feff5f;
+  background: #525322;
   font-size: 18px;
   box-shadow: inset 2px 2px 2px #000;
   border: none;
 }
 
 .enc .v label {
-  color: #bbb;
+  color: #fff;
   font-size: 0.85em;
   margin-bottom: 4px;
   display: block;
@@ -306,13 +314,14 @@ main section {
 
 .enc select {
   width: 100%;
-  color: #000;
-  background: #ccc;
+  color: #feff5f;
+  background: #525322;
   font-size: 16px;
   box-shadow: inset 2px 2px 2px #000;
   border: none;
   border-radius: 0;
   padding: 4px 0 2px 0;
+  text-align: center;
 }
 
 .enc .mode,
@@ -321,8 +330,13 @@ main section {
 .enc .channel,
 .enc .number,
 .enc .lower,
-.enc .upper {
+.enc .upper,
+.enc .link {
   display: none;
+}
+
+.enc.selected .link {
+  display: block;
 }
 
 *[data-mode='mode'] .enc .mode,
@@ -331,7 +345,8 @@ main section {
 *[data-mode='channel'] .enc .channel,
 *[data-mode='number'] .enc .number,
 *[data-mode='lower'] .enc .lower,
-*[data-mode='upper'] .enc .upper {
+*[data-mode='upper'] .enc .upper,
+*[data-mode='link'] .enc .link {
   display: block;
 }
 
@@ -571,11 +586,72 @@ main section {
 #modeselect span {
   width: 100%;
   text-align: center;
+  cursor: pointer;
 }
 
-#modeselect .selected {
+#contentcontainer[data-mode='modepush'] #modeselect #modepush,
+#contentcontainer[data-mode='modeturn'] #modeselect #modeturn {
   width: 100%;
   text-align: center;
   background-color: #feff5f;
   color: black;
 }
+
+#turn {
+  display: block;
+}
+
+#push {
+  display: none;
+}
+
+#contentcontainer[data-mode='modepush'] #turn {
+  display: none;
+}
+#contentcontainer[data-mode='modepush'] #push {
+  display: block;
+}
+
+#contentcontainer[data-mode='modeturn'] #turn {
+  display: block;
+}
+#contentcontainer[data-mode='modeturn'] #push {
+  display: none;
+}
+
+
+.enc .link {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-right: 0;
+  color: #888;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.enc .link:hover {
+  background: #888;
+  color: #ddd;
+}
+
+#enc15.enc .link {
+  display: none;
+}
+
+
+input[type='checkbox'][data-watch='link'] {
+  accent-color: #feff5f;
+  display: none;
+} 
+
+input[type='checkbox'][data-watch='link']+label {
+  cursor: pointer;
+}
+
+input[type='checkbox'][data-watch='link']:checked+label {
+  background-color: #feff5f;
+  color: #000;
+  cursor: pointer;
+} 
+
