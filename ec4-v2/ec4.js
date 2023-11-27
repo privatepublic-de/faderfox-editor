@@ -460,6 +460,23 @@ class InputHandler {
           el.setAttribute('data-type', type);
         });
       }
+      if (what === P.pb_type) {
+        // if (
+        //   P.get(this.selection, encid, P.number) > 31 &&
+        //   P.get(this.selection, encid, P.type) == 4
+        // ) {
+        //   P.set(this.selection, encid, P.number, 31);
+        //   reloadValues = true;
+        // }
+        if (encid === this.selection.encoder) {
+          DOM.element('#oled').setAttribute('data-pb_type', storeVal);
+        }
+        DOM.all('#ctrlcontainer .enc', (el) => {
+          const eid = this.findReferencedEncoder(el);
+          const type = P.get(this.selection, eid, P.type);
+          el.setAttribute('data-pb_type', type);
+        });
+      }
     }
     return reloadValues;
   }

@@ -655,3 +655,74 @@ input[type='checkbox'][data-watch='link']:checked+label {
   cursor: pointer;
 } 
 
+
+#oled[data-type='4'] #turn .lower,
+#oled[data-type='4'] #turn .upper {
+  visibility: hidden;
+}
+
+
+#oled[data-pb_type='0'] #push .pb_display,
+#oled[data-pb_type='0'] #push .pb_mode,
+#oled[data-pb_type='0'] #push .pb_channel,
+#oled[data-pb_type='0'] #push .pb_number,
+#oled[data-pb_type='0'] #push .pb_lower,
+#oled[data-pb_type='0'] #push .pb_upper {
+  visibility: hidden;
+}
+
+#oled[data-pb_type='8'] #push .pb_mode,
+#oled[data-pb_type='8'] #push .pb_channel,
+#oled[data-pb_type='8'] #push .pb_number,
+#oled[data-pb_type='8'] #push .pb_lower,
+#oled[data-pb_type='8'] #push .pb_upper,
+
+#oled[data-pb_type='9'] #push .pb_mode,
+#oled[data-pb_type='9'] #push .pb_channel,
+#oled[data-pb_type='9'] #push .pb_number,
+#oled[data-pb_type='9'] #push .pb_lower,
+#oled[data-pb_type='9'] #push .pb_upper,
+
+#oled[data-pb_type='10'] #push .pb_mode,
+#oled[data-pb_type='10'] #push .pb_channel,
+#oled[data-pb_type='10'] #push .pb_number,
+#oled[data-pb_type='10'] #push .pb_lower,
+#oled[data-pb_type='10'] #push .pb_upper, 
+
+#oled[data-pb_type='11'] #push .pb_mode,
+#oled[data-pb_type='11'] #push .pb_channel,
+#oled[data-pb_type='11'] #push .pb_number,
+#oled[data-pb_type='11'] #push .pb_lower,
+#oled[data-pb_type='11'] #push .pb_upper, 
+
+#oled[data-pb_type='12'] #push .pb_mode,
+#oled[data-pb_type='12'] #push .pb_channel,
+#oled[data-pb_type='12'] #push .pb_number,
+#oled[data-pb_type='12'] #push .pb_lower,
+#oled[data-pb_type='12'] #push .pb_upper {
+  visibility: hidden;
+}
+
+#oled[data-pb_type='6'] #push .pb_mode,
+#oled[data-pb_type='6'] #push .pb_number,
+#oled[data-pb_type='6'] #push .pb_lower,
+#oled[data-pb_type='6'] #push .pb_upper,
+
+#oled[data-pb_type='7'] #push .pb_mode,
+#oled[data-pb_type='7'] #push .pb_number,
+#oled[data-pb_type='7'] #push .pb_lower,
+#oled[data-pb_type='7'] #push .pb_upper {
+  visibility: hidden;
+}
+
+span.pb_channel.pb_group,
+span.pb_channel.pb_set,
+#oled[data-pb_type='6'] span.pb_channel,
+#oled[data-pb_type='7'] span.pb_channel {
+  display: none;
+}
+
+#oled[data-pb_type='6'] span.pb_channel.pb_group,
+#oled[data-pb_type='7'] span.pb_channel.pb_set {
+  display: inline-block;
+}
