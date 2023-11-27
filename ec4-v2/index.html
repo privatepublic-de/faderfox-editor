@@ -122,8 +122,8 @@
         </div>
         <div id="modeselect" title="Select encoder function to edit: Turn or push button"><span id="modeturn">Turn</span><span id="modepush">Push</span></div>
         <div id="oled" class="oled watchparams typed matrixfont">
+          <div class="centerline"></div>
           <div id="turn" class="modecontainer">
-            <div class="centerline"></div>
             <span class="a">Ctrl:</span
             ><select class="b" data-watch="select-encoder">
               <option>EC01</option
@@ -227,12 +227,88 @@
               maxlength="3"
               value=""
             />
-            <div id="toallenc" class="asbutton" data-action="copy2all">
-              Copy &quot;<span>XXXX</span>&quot; to all encoders in group
-            </div>
           </div>
           <div id="push" class="modecontainer">
-            not yet implemented
+            <span class="a">Ctrl:</span
+              ><select class="b" data-watch="select-encoder">
+                <option>PB01</option
+                ><option>PB02</option
+                ><option>PB03</option
+                ><option>PB04</option>
+                <option>PB05</option
+                ><option>PB06</option
+                ><option>PB07</option
+                ><option>PB08</option>
+                <option>PB09</option
+                ><option>PB10</option
+                ><option>PB11</option
+                ><option>PB12</option>
+                <option>PB13</option
+                ><option>PB14</option
+                ><option>PB15</option
+                ><option>PB16</option> </select
+              ><span class="c pb_channel" data-action="edit-pb_channel">Chan :</span
+              ><input
+                data-watch="pb_channel"
+                data-action="edit-pb_channel"
+                class="d"
+                type="text"
+                maxlength="2"
+                value=""
+              /><span class="a pb_display" data-action="edit-pb_display">Disp:</span
+              ><select data-watch="pb_display" data-action="edit-pb_display" class="b">
+                <option>Off</option>
+                <option>On</option>
+                </select
+              ><span class="c pb_number" data-action="edit-pb_number"
+                >Numb :</span
+              ><input
+                data-watch="pb_number"
+                data-action="edit-pb_number"
+                class="d pb_number"
+                type="text"
+                maxlength="3"
+                value=""
+              /><span class="a pb_type" data-action="edit-type">Type:</span
+              ><select data-watch="pb_type" data-action="edit-pb_type" class="b">
+                <option>Off</option>
+                <option>Note</option>
+                <option>CC</option>
+                <option>PrgC</option>
+                <option>PBnd</option>
+                <option>AftT</option>
+                <option>Grp</option>
+                <option>Set</option>
+                <option>Acc0</option>
+                <option>Acc3</option>
+                <option>LSp6</option>
+                <option>Min</option>
+                <option>Max</option> </select
+              ><span class="c pb_lower" data-action="edit-pb_lower">Lower:</span
+              ><input
+                data-watch="pb_lower"
+                data-action="edit-pb_lower"
+                class="d pb_lower"
+                type="text"
+                maxlength="3"
+                value=""
+              /><span class="a pb_mode" data-action="edit-pb_mode">Mode:</span
+              ><select data-watch="pb_mode" data-action="edit-pb_mode" class="b pb_mode">
+                <option>Key</option>
+                <option>Togl</option>
+              </select
+              ><span class="c pb_upper" data-action="edit-pb_upper">Upper:</span
+              ><input
+                data-watch="pb_upper"
+                data-action="edit-pb_upper"
+                class="d pb_upper"
+                type="text"
+                maxlength="3"
+                value=""
+              />
+          </div>
+          <div id="toallenc" class="asbutton" data-action="copy2all">
+            Copy &quot;<span>XXXX</span>&quot; to all encoders in group
           </div>
         </div>
         <div id="ctrlcontainer" class="watchparams" data-mode="nothing">

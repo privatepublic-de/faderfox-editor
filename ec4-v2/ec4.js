@@ -112,6 +112,14 @@ const P = {
   scale: 'scale',
   name: 'name',
   link: 'link',
+  pb_channel: 'pb_channel',
+  pb_display: 'pb_display',
+  pb_type: 'pb_type',
+  pb_mode: 'pb_mode',
+  pb_number: 'pb_number',
+  pb_lower: 'pb_lower',
+  pb_upper: 'pb_upper',
+  pb_link: 'pb_link',
 
   labels: {
     type: 'Type',
@@ -123,6 +131,13 @@ const P = {
     upper: 'Upper',
     mode: 'Mode',
     scale: 'Display',
+    pb_channel: 'Channel',
+    pb_display: 'Display',
+    pb_type: 'Type',
+    pb_mode: 'Mode',
+    pb_number: 'Number/Note',
+    pb_lower: 'Lower',
+    pb_upper: 'Upper',
   },
 
   _dataFormat: {
@@ -153,25 +168,80 @@ const P = {
       default: 1,
     },
     name: { pos: 128 },
+    pb_mode: {
+      pos: 0,
+      mask: 0x80,
+      lsb: 7,
+      memstart: MEM.addrKey1,
+      grouplen: 16,
+    },
+    pb_number: {
+      pos: 0,
+      mask: 0x7f,
+      memstart: MEM.addrKey1,
+      grouplen: 16,
+    },
+    pb_type: {
+      pos: 112,
+      mask: 0xf0,
+      lsb: 4,
+    },
+    pb_channel: {
+      pos: 112,
+      mask: 0x0f,
+    },
+    pb_display: {
+      memstart: MEM.addrKey2,
+      pos: 0,
+      grouplen: 32,
+      mask: 0x80,
+      lsb: 7,
+    },
+    pb_lower: {
+      memstart: MEM.addrKey2,
+      pos: 0,
+      mask: 0x7f,
+      grouplen: 32,
+    },
+    pb_link: {
+      memstart: MEM.addrKey2,
+      pos: 16,
+      grouplen: 32,
+      mask: 0x80,
+      lsb: 7,
+    },
+    pb_upper: {
+      memstart: MEM.addrKey2,
+      pos: 16,
+      mask: 0x7f,
+      grouplen: 32,
+    },
+  },
+
+  _getMemAddr: function(spec, selection) {
+    let startAddr = 'memstart' in spec ? spec.memstart : MEM.addrPresets;
+    let lengthGroup = 'grouplen' in spec ? spec.grouplen : MEM.lengthGroup;
+    return startAddr + (selection.setup * 16 + selection.group) * lengthGroup + spec.pos;
   },
 
   get: function (selection, encoder, type) {
-    const setup = selection.setup;
-    const group = selection.group;
     if (type === 'select-encoder') {
       return;
     }
+    
     const spec = P._dataFormat[type];
     if (!spec) {
       console.log('Get unknown parameter type: ' + type);
       return;
     }
-    let addr =
-      MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+    let addr = P._getMemAddr(spec, selection);
+      // MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+
     if (type === P.name) {
       addr += encoder * 4;
       return P.stringFromPosition(MEM.data, addr);
     } else {
+      const startaddr = addr;
       addr += encoder;
       const shift = spec.lsb || 0;
       if (spec.mask != 0xff) {
@@ -182,7 +252,7 @@ const P = {
             val = spec.default;
           }
         }
-        if (type === P.channel) val++;
+        if (type === P.channel || type === P.pb_channel) val++;
         return val;
       } else {
         return MEM.data[addr];
@@ -190,15 +260,13 @@ const P = {
     }
   },
   set: function (selection, encoder, type, value) {
-    const setup = selection.setup;
-    const group = selection.group;
     const spec = P._dataFormat[type];
     if (!spec) {
       console.log('Set unknown parameter type: ' + type);
       return;
     }
-    let addr =
-      MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+    let addr = P._getMemAddr(spec, selection);
+      // MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
     if (type === P.name) {
       addr += encoder * 4;
       while (value.length < 4) {
@@ -213,7 +281,7 @@ const P = {
       addr += encoder;
       const oldValue = MEM.data[addr];
       value = parseInt(value);
-      if (type === P.channel) value--;
+      if (type === P.channel || type === P.pb_channel) value--;
       const shift = spec.lsb || 0;
       if (spec.mask != 0xff) {
         const invMask = 0xff ^ spec.mask;
@@ -414,12 +482,11 @@ document.addEventListener('DOMContentLoaded', function () {
     syncValues();
   });
   const inputhandler = new InputHandler(selection);
-  const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 183710 });
+  const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 213662 });
   let SYSEX_BACKUP_MODE = false;
   buildUI();
   DOM.on('#modeselect span', 'click', (e) => {
     const el = e.target;
-    console.log('Clicked', el.getAttribute('id'), e);
     DOM.element('#contentcontainer').setAttribute('data-mode', el.getAttribute('id'));
   });
   let fillLabel = '';
@@ -466,7 +533,6 @@ document.addEventListener('DOMContentLoaded', function () {
       // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
       if (el.type=='checkbox') {
         el.checked = value!=0;
-        console.log('checkbox', el.checked, value);
       }
       if (typeof el.selectedIndex !== 'undefined') {
         el.selectedIndex = value;
@@ -522,9 +588,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // console.log(`selectedId ${selectedId}`);
     if (selectedId > -1) {
       selection.encoder = selectedId;
-      DOM.element(
-        '#oled *[data-watch=select-encoder]'
-      ).selectedIndex = selectedId;
+      DOM.all(
+        '#oled *[data-watch=select-encoder]',
+        (el)=>{el.selectedIndex = selectedId}
+      );
     }
   }
 
@@ -739,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function () {
       (chunk) => {},
       (addr, pagedata) => {
         result.set(pagedata, addr - MEMORY_OFFSET);
+        // console.log(addr - MEMORY_OFFSET, pagedata);        
       }
     );
     return result;
