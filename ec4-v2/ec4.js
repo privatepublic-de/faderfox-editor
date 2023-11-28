@@ -505,6 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
   DOM.on('#modeselect span', 'click', (e) => {
     const el = e.target;
     DOM.element('#contentcontainer').setAttribute('data-mode', el.getAttribute('id'));
+    DOM.element('#editnothing').click();
   });
   let fillLabel = '';
 
@@ -1212,42 +1213,18 @@ function buildUI() {
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
                     <div class="knob"></div>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${
-      200 + i
-    }" title="Edit name of encoder"/></div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 + i}" title="Edit name of encoder"/></div>
                     <div class="v">
                         <div class="number">
-                            <div class="standard"><label>${
-                              P.labels.number
-                            }</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
-      216 + i
-    }"/></div>
-                            <div class="hi-lo"><label>${
-                              P.labels.number_nrpn
-                            }</label>
-                                <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${
-                                  216 + i
-                                }" />
-                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
-                                  216 + i
-                                }" />
+                            <div class="standard"><label>${P.labels.number}</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/></div>
+                            <div class="hi-lo"><label>${P.labels.number_nrpn}</label>
+                                <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
+                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
                             </div>
                         </div>
-                        <div class="channel"><label>${
-                          P.labels.channel
-                        }</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${
-      216 + i
-    }" /></div>
-                        <div class="lower"><label>${
-                          P.labels.lower
-                        }</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${
-      216 + i
-    }" /></div>
-                        <div class="upper"><label>${
-                          P.labels.upper
-                        }</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${
-      216 + i
-    }" /></div>
+                        <div class="channel"><label>${P.labels.channel}</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216 + i}" /></div>
+                        <div class="lower"><label>${P.labels.lower}</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
+                        <div class="upper"><label>${P.labels.upper}</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
                         <div class="scale"><label>${P.labels.scale}</label>
                             <select data-watch="scale" tabindex="${216 + i}">
                                 <option>display off</option>
@@ -1288,8 +1265,46 @@ function buildUI() {
                               <option>large step 6</option>
                             </select>
                         </div>
+                        <div class="pb_channel"><label>${P.labels.channel}</label><input data-watch="pb_channel" maxlength="2" type="text" value="0" tabindex="${216 + i}" /></div>
+                        <div class="pb_display"><label>${P.labels.pb_display}</label>
+                            <select data-watch="pb_display" tabindex="${216 + i}">
+                                <option>Off</option>
+                                <option>On</option>
+                            </select>
+                        </div>
+                        <div class="pb_number">
+                            <label>${P.labels.pb_number}</label><input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                        </div>
+                        <div class="pb_type">
+                          <label>${P.labels.pb_type}</label>
+                          <select data-watch="pb_type" class="b">
+                            <option>Off</option>
+                            <option>Note</option>
+                            <option>CC</option>
+                            <option>PrgC</option>
+                            <option>PBnd</option>
+                            <option>AftT</option>
+                            <option>Grp</option>
+                            <option>Set</option>
+                            <option>Acc0</option>
+                            <option>Acc3</option>
+                            <option>LSp6</option>
+                            <option>Min</option>
+                            <option>Max</option>
+                          </select>
+                        </div>
+                        <div class="pb_mode">
+                          <label>${P.labels.pb_mode}</label>
+                          <select data-watch="pb_mode">
+                            <option>Key</option>
+                            <option>Togl</option>
+                          </select>
+                        </div>
+                        <div class="pb_lower"><label>${P.labels.pb_lower}</label><input data-watch="pb_lower" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
+                        <div class="pb_upper"><label>${P.labels.pb_upper}</label><input data-watch="pb_upper" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
                     </div>
-                    <div class="link matrixfont" title="Link this controller to next"><input type="checkbox" id="linkenc${i}" data-watch="link" data-action="edit-link"/><label for="linkenc${i}">&gt;</label></div>
+                    <div class="link turn matrixfont" title="Link this encoder to next"><input type="checkbox" id="linkenc${i}" data-watch="link" data-action="edit-link"/><label for="linkenc${i}">&gt;</label></div>
+                    <div class="link push matrixfont" title="Link this push button to next"><input type="checkbox" id="linkpb${i}" data-watch="pb_link" data-action="edit-pb_link"/><label for="linkpb${i}">&gt;</label></div>
                 </div>
             </section>`;
     DOM.addHTML('#ctrlcontainer', 'beforeend', html);
