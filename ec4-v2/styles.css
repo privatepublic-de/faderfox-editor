@@ -59,6 +59,17 @@ select[data-watch='select-encoder'] option {
   padding: 5px 5px 5px 9px;
 }
 
+.tapicon {
+  position: absolute;
+  bottom: 0;
+  left: 40%;
+  display: none;
+}
+#contentcontainer[data-mode='modepush'] .selected .tapicon {
+  display: block;
+}
+
+
 .oled .centerline {
   position: absolute;
   left: 50%;
@@ -112,7 +123,7 @@ select[data-watch='select-encoder'] option {
   width: 25%;
 }
 .oled .d {
-  width: 15%;
+  width: 19%;
 }
 .oled .c.number_h {
   width: 13%;
@@ -297,11 +308,13 @@ main section {
   width: 40%;
   text-align: right;
   padding: 2px 5px 0 5px;
-  color: #feff5f;
-  background: #525322;
+  color: #ffffff;
+  background: transparent;
   font-size: 18px;
-  box-shadow: inset 2px 2px 2px #000;
+  /* box-shadow: inset 1px 1px 2px #333; */
   border: none;
+  border-bottom: 1px solid #fff;
+  vertical-align: bottom;
 }
 
 .enc .v label {
@@ -314,14 +327,21 @@ main section {
 
 .enc select {
   width: 100%;
-  color: #feff5f;
-  background: #525322;
+  color: #ffffff;
+  background: transparent;
   font-size: 16px;
-  box-shadow: inset 2px 2px 2px #000;
+  /* box-shadow: inset 1px 1px 2px #333; */
   border: none;
+  border-bottom: 1px solid #fff;
   border-radius: 0;
   padding: 4px 0 2px 0;
   text-align: center;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+.enc .inputs {
+  /* background: #000; */
 }
 
 .enc .mode,
@@ -379,6 +399,35 @@ main section {
   width: 30%;
   display: inline-block;
 }
+
+.enc .note input,
+.enc .pb_note input {
+  width: 30%;
+  display: inline-block;
+}
+.enc .note select,
+.enc .pb_note select {
+  width: 50%;
+  display: inline-block;
+}
+
+
+
+.enc .note,
+.enc .pb_note {
+  display: none;
+}
+
+.enc[data-type='7'] .note,
+.enc[data-pb_type='1'] .pb_note {
+  display: block;
+}
+
+.enc[data-type='7'] .standard,
+.enc[data-pb_type='1'] .pb_standard {
+  display: none;
+}
+
 
 #preset {
   position: absolute;

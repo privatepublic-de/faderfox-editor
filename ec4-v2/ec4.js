@@ -135,7 +135,7 @@ const P = {
     pb_display: 'Display',
     pb_type: 'Type',
     pb_mode: 'Mode',
-    pb_number: 'Number/Note',
+    pb_number: 'Number',
     pb_lower: 'Lower',
     pb_upper: 'Upper',
   },
@@ -260,6 +260,7 @@ const P = {
     }
   },
   set: function (selection, encoder, type, value) {
+    console.log(type, value);
     const spec = P._dataFormat[type];
     if (!spec) {
       console.log('Set unknown parameter type: ' + type);
@@ -421,15 +422,6 @@ class InputHandler {
       P.setGroupName(numbers[0], numbers[1], element.value);
     } else {
       const encid = this.findReferencedEncoder(element);
-      DOM.all(`.watchparams *[data-watch=${what}]`, (el) => {
-        let eid = this.findReferencedEncoder(el);
-        if (eid === encid) {
-          el.value = element.value;
-          if (typeof element.selectedIndex !== 'undefined') {
-            el.selectedIndex = element.selectedIndex;
-          }
-        }
-      });
       let storeVal;
       if (typeof element.selectedIndex !== 'undefined') {
         storeVal = element.selectedIndex;
@@ -438,7 +430,19 @@ class InputHandler {
       } else {
         storeVal = element.value;
       }
-      // let storeVal =
+      DOM.all(`.watchparams *[data-watch=${what}]`, (el) => {
+        let eid = this.findReferencedEncoder(el);
+        if (eid === encid) {
+          const val = (typeof element.selectedIndex !== 'undefined') ? element.selectedIndex : element.value;
+          if (typeof el.selectedIndex !== 'undefined') {
+            el.selectedIndex = val;
+          } else {
+            el.value = val;
+          }
+        }
+      });
+      
+            // let storeVal =
       //   typeof element.selectedIndex !== 'undefined'
       //     ? element.selectedIndex
       //     : element.value;
@@ -492,6 +496,13 @@ class InputHandler {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  let notenumberoptions = '';
+  for (let i=0;i<128;i++) {
+    notenumberoptions += `<option>${note2String(i)}</option>`;
+  }
+  DOM.all('select[data-notenumbers]').forEach((e)=>{
+    DOM.addHTML(e, 'beforeEnd', notenumberoptions);
+  }); 
   const selection = new Selection((selection) => {
     // console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
     DOM.removeClass('#ctrlcontainer .enc', 'selected');
@@ -502,11 +513,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 213662 });
   let SYSEX_BACKUP_MODE = false;
   buildUI();
-  DOM.on('#modeselect span', 'click', (e) => {
-    const el = e.target;
-    DOM.element('#contentcontainer').setAttribute('data-mode', el.getAttribute('id'));
-    DOM.element('#editnothing').click();
-  });
   let fillLabel = '';
 
   // read factory preset
@@ -545,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const what = el.getAttribute('data-watch');
       const encoderId = inputhandler.findReferencedEncoder(el);
       const value = P.get(selection, encoderId, what);
-      if (typeof value === 'undefined') {
+            if (typeof value === 'undefined') {
         return;
       }
       // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
@@ -564,10 +570,16 @@ document.addEventListener('DOMContentLoaded', function () {
       'data-type',
       P.get(selection, selection.encoder, P.type)
     );
+    DOM.element('#oled').setAttribute(
+      'data-pb_type',
+      P.get(selection, selection.encoder, P.pb_type)
+    );
     DOM.all('#ctrlcontainer .enc', (el) => {
       const eid = inputhandler.findReferencedEncoder(el);
-      const type = P.get(selection, eid, P.type);
+      let type = P.get(selection, eid, P.type);
       el.setAttribute('data-type', type);
+      type = P.get(selection, eid, P.pb_type);
+      el.setAttribute('data-pb_type', type);
     });
     for (let i = 0; i < 16; i++) {
       const setupAddr = MEM.addrSetupNames + i * 4;
@@ -692,6 +704,14 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
         syncValues();
+        break;
+      case 'mode-turn':
+        DOM.element('#contentcontainer').setAttribute('data-mode', 'modeturn');
+        DOM.element('#editnothing').click();
+        break;
+      case 'mode-push':
+        DOM.element('#contentcontainer').setAttribute('data-mode', 'modepush');
+        DOM.element('#editnothing').click();
         break;
     }
     e.stopPropagation();
@@ -1205,7 +1225,10 @@ function buildUI() {
     setupList.appendChild(setupItem);
   }
   DOM.element('#setupsandgroups').prepend(setupList);
-
+  let notenumberoptions = '';
+  for (let i=0;i<128;i++) {
+    notenumberoptions += `<option>${note2String(i)}</option>`;
+  }
   // build encoders
   for (let i = 0; i < 16; i++) {
     const twodig = (i < 9 ? '0' : '') + (i + 1);
@@ -1213,13 +1236,25 @@ function buildUI() {
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
                     <div class="knob"></div>
+                    <img src="tap-svgrepo-com.svg" width="26px" class="tapicon" title="Push button mode"/>
                     <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 + i}" title="Edit name of encoder"/></div>
                     <div class="v">
                         <div class="number">
                             <div class="standard"><label>${P.labels.number}</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/></div>
                             <div class="hi-lo"><label>${P.labels.number_nrpn}</label>
-                                <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
-                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
+                              <div class="inputs">
+                                  <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
+                                  <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
+                              </div>
+                            </div>
+                            <div class="note">
+                              <label>${P.labels.number}</label>
+                              <div class="inputs">
+                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                                <select data-watch="number" tabindex="${216 + i}">
+                                  ${notenumberoptions}
+                                </select>
+                              </div>
                             </div>
                         </div>
                         <div class="channel"><label>${P.labels.channel}</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216 + i}" /></div>
@@ -1273,7 +1308,16 @@ function buildUI() {
                             </select>
                         </div>
                         <div class="pb_number">
-                            <label>${P.labels.pb_number}</label><input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                            <label>${P.labels.pb_number}</label>
+                            <div class="pb_standard inputs">
+                              <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                            </div>
+                            <div class="pb_note inputs">
+                              <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                              <select data-watch="pb_number" tabindex="${216 + i}">
+                                ${notenumberoptions}
+                              </select>
+                            </div>
                         </div>
                         <div class="pb_type">
                           <label>${P.labels.pb_type}</label>
@@ -1417,4 +1461,19 @@ function showMerge(data) {
       }
     });
   });
+}
+
+const notenames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+function note2String(n) {
+  let name = notenames[n%12];
+  let octave = parseInt(n / 12) - 2;
+  return name+octave;
+}
+
+function parseNoteString(s) {
+  const parts = s.match(/([CDEFGABcdefgab]#?)(-?\d)/);
+  const notenum = notenames.indexOf(parts[1].toUpperCase())
+  const octave = parseInt(parts[2]);
+  return (octave+2)*12 + notenum;
 }
