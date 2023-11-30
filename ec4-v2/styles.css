@@ -310,16 +310,17 @@ main section {
   padding: 2px 5px 0 5px;
   color: #ffffff;
   background: transparent;
-  font-size: 18px;
+  font-size: 15px;
   /* box-shadow: inset 1px 1px 2px #333; */
   border: none;
   border-bottom: 1px solid #fff;
   vertical-align: bottom;
+  text-align: center;
 }
 
 .enc .v label {
   color: #fff;
-  font-size: 0.85em;
+  font-size: 14px;
   margin-bottom: 4px;
   display: block;
   text-transform: uppercase;
@@ -329,7 +330,7 @@ main section {
   width: 100%;
   color: #ffffff;
   background: transparent;
-  font-size: 16px;
+  font-size: 14px;
   /* box-shadow: inset 1px 1px 2px #333; */
   border: none;
   border-bottom: 1px solid #fff;
