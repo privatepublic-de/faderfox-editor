@@ -59,13 +59,17 @@ select[data-watch='select-encoder'] option {
   padding: 5px 5px 5px 9px;
 }
 
-.tapicon {
+.tapicon, .rotateicon {
   position: absolute;
   bottom: 0;
   left: 40%;
   display: none;
 }
 #contentcontainer[data-mode='modepush'] .selected .tapicon {
+  display: block;
+}
+
+#contentcontainer[data-mode='modeturn'] .selected .rotateicon {
   display: block;
 }
 
@@ -348,7 +352,6 @@ main section {
 .enc .number,
 .enc .lower,
 .enc .upper,
-.enc .link,
 .enc .pb_display,
 .enc .pb_channel,
 .enc .pb_number,
@@ -357,10 +360,6 @@ main section {
 .enc .pb_lower,
 .enc .pb_upper  {
   display: none;
-}
-
-.enc.selected .link {
-  display: block;
 }
 
 *[data-mode='mode'] .enc .mode,
