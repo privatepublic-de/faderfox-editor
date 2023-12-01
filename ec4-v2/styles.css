@@ -345,6 +345,10 @@ main section {
   vertical-align: bottom;
 }
 
+.enc select option {
+  background-color: #222;
+}
+
 .enc .mode,
 .enc .type,
 .enc .scale,
