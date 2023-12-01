@@ -43,7 +43,7 @@ const MEM = {
   },
 };
 
-const FACTORY_PRESET_PATH = 'test-dump-v2.syx';//'factory-preset.syx';
+const FACTORY_PRESET_PATH = 'factory-preset.syx';
 
 class Selection {
   constructor(updatecallback) {
@@ -155,15 +155,15 @@ const P = {
     upper: { pos: 64, mask: 0xff },
     mode: {
       pos: 80,
-      mask: parseInt('11000000', 2),
-      lsb: 6,
+      mask: 0xf0,
+      lsb: 4,
       min: 0,
       max: 9,
       default: 3,
     },
     scale: {
       pos: 80,
-      mask: parseInt('00111111', 2),
+      mask: 0x0f,
       min: 0,
       max: 8,
       default: 1,
