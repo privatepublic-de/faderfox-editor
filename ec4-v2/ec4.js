@@ -31,8 +31,8 @@ const MEM = {
   data: new Uint8Array(MEMORY_SIZE),
   lengthGroup: 192,
   lengthSetup: 192 * 16,
-  lengthGroup1: 16,
-  lengthGroup2: 32,
+  lengthGroupKey1: 16,
+  lengthGroupKey2: 32,
   addrKey1: 0x0b00 - MEMORY_OFFSET,
   addrSetupNames: 0x1bc0 - MEMORY_OFFSET,
   addrGroupNames: 0x1c00 - MEMORY_OFFSET,
@@ -176,13 +176,13 @@ const P = {
       mask: 0x80,
       lsb: 7,
       memstart: MEM.addrKey1,
-      grouplen: MEM.lengthGroup1,
+      grouplen: MEM.lengthGroupKey1,
     },
     pb_number: {
       pos: 0,
       mask: 0x7f,
       memstart: MEM.addrKey1,
-      grouplen: MEM.lengthGroup1,
+      grouplen: MEM.lengthGroupKey1,
     },
     pb_type: {
       pos: 112,
@@ -196,7 +196,7 @@ const P = {
     pb_display: {
       memstart: MEM.addrKey2,
       pos: 0,
-      grouplen: MEM.lengthGroup2,
+      grouplen: MEM.lengthGroupKey2,
       mask: 0x80,
       lsb: 7,
     },
@@ -204,12 +204,12 @@ const P = {
       memstart: MEM.addrKey2,
       pos: 0,
       mask: 0x7f,
-      grouplen: MEM.lengthGroup2,
+      grouplen: MEM.lengthGroupKey2,
     },
     pb_link: {
       memstart: MEM.addrKey2,
       pos: 16,
-      grouplen: MEM.lengthGroup2,
+      grouplen: MEM.lengthGroupKey2,
       mask: 0x80,
       lsb: 7,
     },
@@ -1359,31 +1359,27 @@ function buildUI() {
   }
 }
 
+function memcpy(sourceData, addr, length) {
+  for (let i = 0; i < length; i++) {
+    MEM.data[addr + i] = sourceData[addr + i];
+  }
+}
+
 function doMerge(sourceData, selectedElements) {
   selectedElements.forEach((element) => {
     const { group, setup } = element;
     if (group !== null) {
       const addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup;
-      for (let i = 0; i < MEM.lengthGroup; i++) {
-        MEM.data[addr + i] = sourceData[addr + i];
-      }
-      const addr1 = MEM.addrKey1 + (setup * 16 + group) * MEM.lengthGroup1;
-      for (let i = 0; i < MEM.lengthGroup1; i++) {
-        MEM.data[addr1 + i] = sourceData[addr1 + i];
-      }
-      const addr2 = MEM.addrKey2 + (setup * 16 + group) * MEM.lengthGroup2;
-      for (let i = 0; i < MEM.lengthGroup2; i++) {
-        MEM.data[addr2 + i] = sourceData[addr2 + i];
-      }
+      memcpy(sourceData, addr, MEM.lengthGroup);
+      const addr1 = MEM.addrKey1 + (setup * 16 + group) * MEM.lengthGroupKey1;
+      memcpy(sourceData, addr1, MEM.lengthGroupKey1);
+      const addr2 = MEM.addrKey2 + (setup * 16 + group) * MEM.lengthGroupKey2;
+      memcpy(sourceData, addr2, MEM.lengthGroupKey2);
       const nameAddr = MEM.addrGroupNames + setup * 64 + group * 4;
-      for (let i = 0; i < 4; i++) {
-        MEM.data[nameAddr + i] = sourceData[nameAddr + i];
-      }
+      memcpy(sourceData, nameAddr, 4);
     } else {
       const nameAddr = MEM.addrSetupNames + setup * 4;
-      for (let i = 0; i < 4; i++) {
-        MEM.data[nameAddr + i] = sourceData[nameAddr + i];
-      }
+      memcpy(sourceData, nameAddr, 4);
     }
   });
 }
