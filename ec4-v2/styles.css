@@ -313,7 +313,7 @@ main section {
   font-size: 15px;
   /* box-shadow: inset 1px 1px 2px #333; */
   border: none;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid #aaa;
   vertical-align: bottom;
   text-align: center;
 }
@@ -333,7 +333,7 @@ main section {
   font-size: 14px;
   /* box-shadow: inset 1px 1px 2px #333; */
   border: none;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid #aaa;
   border-radius: 0;
   padding: 4px 0 2px 0;
   text-align: center;
