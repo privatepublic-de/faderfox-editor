@@ -261,7 +261,6 @@ const P = {
     }
   },
   set: function (selection, encoder, type, value) {
-    console.log(type, value);
     const spec = P._dataFormat[type];
     if (!spec) {
       console.log('Set unknown parameter type: ' + type);
@@ -809,10 +808,10 @@ document.addEventListener('DOMContentLoaded', function () {
       0x42,
       0x20,
       0x13,
-      0x43,
+      0x43, // CMD_APP_ID_H 
       0x20,
-      0x10,
-      0x44,
+      0x12, // TODO is this right?
+      0x44, // CMD_APP_ID_L
       0x20,
       0x14,
     ];
