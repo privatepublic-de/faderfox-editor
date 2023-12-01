@@ -864,38 +864,34 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function sysexHandler(data) {
-    if (SYSEX_BACKUP_MODE) {
-      const now = new Date();
-      function twoDigits(v) {
-        return v < 10 ? `0${v}` : String(v);
+    if (data.length>100/* arbitrary number */) {
+      if (SYSEX_BACKUP_MODE) {
+        const now = new Date();
+        function twoDigits(v) {
+          return v < 10 ? `0${v}` : String(v);
+        }
+        let filename = `EC4-backup-${now.getFullYear()}-${twoDigits(
+          now.getMonth() + 1
+        )}-${twoDigits(now.getDate())}-${twoDigits(now.getHours())}-${twoDigits(
+          now.getMinutes()
+        )}.syx`;
+        download(data, filename, 'application/octet-stream');
+        SYSEX_BACKUP_MODE = false;
+        sendData();
+      } else {
+        try {
+          loadSysexData(data);
+        } catch (e) {
+          MBox.show(
+            SEC4.title_data_received,
+            STR.apply(SEC4.$msg_invalid_data, e.message),
+            { hideAfter: 10000, type: 'error' }
+          );
+        }
       }
-      let filename = `EC4-backup-${now.getFullYear()}-${twoDigits(
-        now.getMonth() + 1
-      )}-${twoDigits(now.getDate())}-${twoDigits(now.getHours())}-${twoDigits(
-        now.getMinutes()
-      )}.syx`;
-      download(data, filename, 'application/octet-stream');
-      SYSEX_BACKUP_MODE = false;
-      sendData();
-    } else {
-      try {
-        loadSysexData(data);
-        // MBox.show(SEC4.title_data_received, SEC4.msg_apply, {
-        //   confirmCallback: function() {
-        //     MBox.hide();
-        //     loadSysexData(data);
-        //     MBox.show(SEC4.title_data_received, SEC4.msg_data_applied, {
-        //       hideAfter: 5000
-        //     });
-        //   }
-        // });
-      } catch (e) {
-        MBox.show(
-          SEC4.title_data_received,
-          STR.apply(SEC4.$msg_invalid_data, e.message),
-          { hideAfter: 10000, type: 'error' }
-        );
-      }
+    }
+    else {
+      console.log('Ignoring sysexData due to length', data);
     }
   }
 
