@@ -125,6 +125,7 @@ const P = {
     type: 'Type',
     channel: 'Channel',
     number: 'Number',
+    number_note: 'Numb/Note',
     number_h: 'MSB',
     number_nrpn: '#MSB/LSB',
     lower: 'Lower',
@@ -1236,7 +1237,7 @@ function buildUI() {
             <section>
                 <div id="enc${i}" data-action="select-encoder" data-enc="${i}" class="enc typed">
                     <div class="knob"></div>
-                    <img src="tap-svgrepo-com.svg" width="26px" class="tapicon" title="Push button mode"/>
+                    <img src="tap-svgrepo-com.svg" width="24px" class="tapicon" title="Push button mode"/>
                     <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 + i}" title="Edit name of encoder"/></div>
                     <div class="v">
                         <div class="number">
@@ -1248,7 +1249,7 @@ function buildUI() {
                               </div>
                             </div>
                             <div class="note">
-                              <label>${P.labels.number}</label>
+                              <label>${P.labels.number_note}</label>
                               <div class="inputs">
                                 <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
                                 <select data-watch="number" tabindex="${216 + i}">
@@ -1308,15 +1309,20 @@ function buildUI() {
                             </select>
                         </div>
                         <div class="pb_number">
-                            <label>${P.labels.pb_number}</label>
-                            <div class="pb_standard inputs">
-                              <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                            <div class="pb_standard">
+                              <label>${P.labels.pb_number}</label>
+                              <div class="inputs">
+                                <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                              </div>
                             </div>
-                            <div class="pb_note inputs">
-                              <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
-                              <select data-watch="pb_number" tabindex="${216 + i}">
-                                ${notenumberoptions}
-                              </select>
+                            <div class="pb_note">
+                              <label>${P.labels.number_note}</label>
+                              <div class="inputs">
+                                <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                                <select data-watch="pb_number" tabindex="${216 + i}">
+                                  ${notenumberoptions}
+                                </select>
+                              </div>
                             </div>
                         </div>
                         <div class="pb_type">
