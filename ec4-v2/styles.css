@@ -341,10 +341,6 @@ main section {
   vertical-align: bottom;
 }
 
-.enc .inputs {
-  /* background: #000; */
-}
-
 .enc .mode,
 .enc .type,
 .enc .scale,
