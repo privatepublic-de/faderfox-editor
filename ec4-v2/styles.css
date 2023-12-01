@@ -682,7 +682,7 @@ main section {
   right: 0;
   bottom: 0;
   margin-right: 0;
-  color: #888;
+  color: #666;
   cursor: pointer;
   padding: 0 2px;
   font-size: 14px;
@@ -713,21 +713,27 @@ main section {
 }
 
 .link input[type='checkbox']:checked+label {
-  background-color: #feff5f;
-  color: #000;
+  /* background-color: #feff5f; */
+  color: #feff5f;
   cursor: pointer;
 }
 
-.link input[type='checkbox']:checked+label:hover span {
-  color: #000;
+.link input[type='checkbox']:checked+label span {
+  color: #feff5f;
+  text-decoration: underline;
 }
 
 .link label span {
   font-family: Arial, sans-serif;
   font-size: 9px;
-  color: #888;
+  color: #666;
   position: relative;
   top: -3px;
+}
+
+.selected .link,
+.selected .link label span {
+  color: #888;
 }
 
 #oled[data-type='4'] #turn .lower,
