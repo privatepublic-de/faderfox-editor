@@ -1347,8 +1347,8 @@ function buildUI() {
                         <div class="pb_lower"><label>${P.labels.pb_lower}</label><input data-watch="pb_lower" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
                         <div class="pb_upper"><label>${P.labels.pb_upper}</label><input data-watch="pb_upper" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
                     </div>
-                    <div class="link turn matrixfont" title="Link this encoder to next"><input type="checkbox" id="linkenc${i}" data-watch="link" data-action="edit-link"/><label for="linkenc${i}">&gt;</label></div>
-                    <div class="link push matrixfont" title="Link this push button to next"><input type="checkbox" id="linkpb${i}" data-watch="pb_link" data-action="edit-pb_link"/><label for="linkpb${i}">&gt;</label></div>
+                    <div class="link turn matrixfont" title="Link this encoder to next"><input type="checkbox" id="linkenc${i}" data-watch="link" data-action="edit-link"/><label for="linkenc${i}"><span>Link</span>&gt;</label></div>
+                    <div class="link push matrixfont" title="Link this push button to next"><input type="checkbox" id="linkpb${i}" data-watch="pb_link" data-action="edit-pb_link"/><label for="linkpb${i}"><span>Link</span>&gt;</label></div>
                 </div>
             </section>`;
     DOM.addHTML('#ctrlcontainer', 'beforeend', html);

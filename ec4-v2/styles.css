@@ -690,10 +690,15 @@ main section {
   color: #888;
   cursor: pointer;
   padding: 0 2px;
+  font-size: 14px;
 }
 
-.enc .link:hover {
+.enc .link label:hover {
   background: #888;
+  color: #ddd;
+}
+
+.enc .link label:hover span {
   color: #ddd;
 }
 
@@ -716,7 +721,19 @@ main section {
   background-color: #feff5f;
   color: #000;
   cursor: pointer;
-} 
+}
+
+.link input[type='checkbox']:checked+label:hover span {
+  color: #000;
+}
+
+.link label span {
+  font-family: Arial, sans-serif;
+  font-size: 9px;
+  color: #888;
+  position: relative;
+  top: -3px;
+}
 
 #oled[data-type='4'] #turn .lower,
 #oled[data-type='4'] #turn .upper {
