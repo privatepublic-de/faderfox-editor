@@ -4,7 +4,7 @@ let SEC4 = {
     <li>connect your EC4 via USB</li>
     <li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>
     <li>Select &quot;Send&quot; menu</li>
-    <li>Press and hold &quot;Send all setups&quot; until transfer starts</li>
+    <li>Press and hold &quot;<b><u>Send all setups</u></b>&quot; until transfer starts</li>
     <li>When the transfer is finished, a message appears here and the data can be applied to the editor</li>
     </ul>
   `,
@@ -32,7 +32,7 @@ let SEC4 = {
     "To receive the settings from your EC4 device:\
             <ul><li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>\
             <li>Select &quot;Send&quot; menu</li>\
-            <li>Select &quot;Send all setups&quot; and hold the pressed knob until transfer starts</li>\
+            <li>Select &quot;<b><u>Send all setups</u></b>&quot; and hold the pressed knob until transfer starts</li>\
             <li>You can monitor the transfer progress on the EC4's display.</li></ul>\
             <p>A message will appear here, after the data has been received.</p>",
 
