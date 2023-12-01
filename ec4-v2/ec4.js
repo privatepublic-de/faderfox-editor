@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function () {
     syncValues();
   });
   const inputhandler = new InputHandler(selection);
-  const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 213662 });
+  const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 229340 });
   let SYSEX_BACKUP_MODE = false;
   buildUI();
   let fillLabel = '';
