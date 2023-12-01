@@ -1238,7 +1238,7 @@ function buildUI() {
                     <div class="knob"></div>
                     <img src="tap-svgrepo-com.svg" width="24px" class="tapicon" title="Push button mode (click to toggle)" data-action="mode-turn"/>
                     <img src="rotate-svgrepo-com.svg" width="24px" class="rotateicon" title="Turn mode (click to toggle)" data-action="mode-push"/>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 + i}" title="Edit name of encoder"/></div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 + i}" title="Edit name of encoder/button"/></div>
                     <div class="v">
                         <div class="number">
                             <div class="standard"><label>${P.labels.number}</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/></div>
