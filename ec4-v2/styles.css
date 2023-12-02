@@ -59,7 +59,8 @@ select[data-watch='select-encoder'] option {
   padding: 5px 5px 5px 9px;
 }
 
-.tapicon, .rotateicon {
+.tapicon,
+.rotateicon {
   position: absolute;
   bottom: 0;
   left: 40%;
@@ -72,7 +73,6 @@ select[data-watch='select-encoder'] option {
 #contentcontainer[data-mode='modeturn'] .selected .rotateicon {
   display: block;
 }
-
 
 .oled .centerline {
   position: absolute;
@@ -284,7 +284,7 @@ main section {
   position: absolute;
   right: 0;
   left: 0;
-  top:12px;
+  top: 12px;
   margin: 0 5px;
   text-align: center;
 }
@@ -362,7 +362,7 @@ main section {
 .enc .pb_type,
 .enc .pb_mode,
 .enc .pb_lower,
-.enc .pb_upper  {
+.enc .pb_upper {
   display: none;
 }
 
@@ -411,8 +411,6 @@ main section {
   display: inline-block;
 }
 
-
-
 .enc .note,
 .enc .pb_note {
   display: none;
@@ -427,7 +425,6 @@ main section {
 .enc[data-pb_type='1'] .pb_standard {
   display: none;
 }
-
 
 #preset {
   position: absolute;
@@ -546,7 +543,7 @@ main section {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,.67);
+  background: rgba(0, 0, 0, 0.67);
 }
 
 #merge {
@@ -565,9 +562,9 @@ main section {
 
 #merge .content {
   max-width: 700px;
-  margin: 0 auto .5em auto;
+  margin: 0 auto 0.5em auto;
   color: #000;
-  padding: 0 .75em;
+  padding: 0 0.75em;
   box-sizing: border-box;
   font-size: 0.8em;
 }
@@ -577,7 +574,7 @@ main section {
   font-family: monospace;
   text-align: center;
   width: 700px;
-  margin: 0 auto .5em auto;
+  margin: 0 auto 0.5em auto;
   background: #222;
   padding: 8px 0 2px 0;
 }
@@ -598,7 +595,7 @@ main section {
   white-space: pre;
 }
 
-.mergecontainer span[data-selected="1"] {
+.mergecontainer span[data-selected='1'] {
   background: #feff5f;
   color: #000;
   border-color: #000;
@@ -613,13 +610,13 @@ main section {
   background-color: #633;
   color: #aaa;
 }
-.mergecontainer span.msetup[data-selected="1"] {
+.mergecontainer span.msetup[data-selected='1'] {
   background-color: #c00;
   color: #fff;
 }
 
 #merge button {
-  margin: 0 .75em;
+  margin: 0 0.75em;
 }
 
 #merge button.default {
@@ -680,7 +677,6 @@ main section {
   display: none;
 }
 
-
 .enc .link {
   position: absolute;
   right: 0;
@@ -703,26 +699,26 @@ main section {
 
 #enc15.enc .link,
 *[data-mode='modepush'] .link.turn,
-*[data-mode='modeturn'] .link.push  {
+*[data-mode='modeturn'] .link.push {
   display: none;
 }
 
 .link input[type='checkbox'] {
   accent-color: #feff5f;
   display: none;
-} 
+}
 
-.link input[type='checkbox']+label {
+.link input[type='checkbox'] + label {
   cursor: pointer;
 }
 
-.link input[type='checkbox']:checked+label {
+.link input[type='checkbox']:checked + label {
   /* background-color: #feff5f; */
   color: #feff5f;
   cursor: pointer;
 }
 
-.link input[type='checkbox']:checked+label span {
+.link input[type='checkbox']:checked + label span {
   color: #feff5f;
   text-decoration: underline;
 }
@@ -759,25 +755,21 @@ main section {
 #oled[data-pb_type='8'] #push .pb_number,
 #oled[data-pb_type='8'] #push .pb_lower,
 #oled[data-pb_type='8'] #push .pb_upper,
-
 #oled[data-pb_type='9'] #push .pb_mode,
 #oled[data-pb_type='9'] #push .pb_channel,
 #oled[data-pb_type='9'] #push .pb_number,
 #oled[data-pb_type='9'] #push .pb_lower,
 #oled[data-pb_type='9'] #push .pb_upper,
-
 #oled[data-pb_type='10'] #push .pb_mode,
 #oled[data-pb_type='10'] #push .pb_channel,
 #oled[data-pb_type='10'] #push .pb_number,
 #oled[data-pb_type='10'] #push .pb_lower,
-#oled[data-pb_type='10'] #push .pb_upper, 
-
+#oled[data-pb_type='10'] #push .pb_upper,
 #oled[data-pb_type='11'] #push .pb_mode,
 #oled[data-pb_type='11'] #push .pb_channel,
 #oled[data-pb_type='11'] #push .pb_number,
 #oled[data-pb_type='11'] #push .pb_lower,
-#oled[data-pb_type='11'] #push .pb_upper, 
-
+#oled[data-pb_type='11'] #push .pb_upper,
 #oled[data-pb_type='12'] #push .pb_mode,
 #oled[data-pb_type='12'] #push .pb_channel,
 #oled[data-pb_type='12'] #push .pb_number,
@@ -790,7 +782,6 @@ main section {
 #oled[data-pb_type='6'] #push .pb_number,
 #oled[data-pb_type='6'] #push .pb_lower,
 #oled[data-pb_type='6'] #push .pb_upper,
-
 #oled[data-pb_type='7'] #push .pb_mode,
 #oled[data-pb_type='7'] #push .pb_number,
 #oled[data-pb_type='7'] #push .pb_lower,

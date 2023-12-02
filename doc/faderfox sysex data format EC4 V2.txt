@@ -1,0 +1,420 @@
+FADERFOX SYSEX DATA FORMAT EC4 firmware version 2.00
+all modification in version 2 are gray
+
+there are 5 data areas:
+
+area name:			address hex:
+EEPROM_ADR_SETUP_KEY1	0x0B00	key setup data part 1, 16 setups x 16 groups x 16 controls x 1byte = 4096byte
+					key-mode(1) + key-command(7)
+
+EEPROM_ADR_SETUP_NAMES	0x1BC0	setup names, 16 setups x 4 byte = 64byte
+EEPROM_ADR_GROUP_NAMES	0x1C00	group names, 16 setups x 16 groups x 4byte = 1024byte
+EEPROM_ADR_SETUP_DATA	0x2000	setup data, 16 setups x 16 groups x 16 controls x 12byte = 49152byte 
+					type(4) + channel(4), encoder-link(1) + command(7), command high(7), lower(8), upper(8), 
+					mode(4) + scale(4), upper(4msb) + lower(4msb), key-type(4) + key-channel(4), 4 x name
+
+EEPROM_ADR_SETUP_KEY2	0xE000	key setup data part 1, 16 setups x 16 groups x 16 controls x 2byte = 8192byte 
+					key-disp(1) + key-lower(7), key-link(1) + key-upper(7) 
+
+
+send setup names only by selecting 'all setups' !!! 
+
+---------------------------------------------------------------------------------------------------------------------------
+
+SETUP KEY 1 (64 pages[] a 64 bytes)
+8 pages a 64 byte per setup (256 byte)
+0,25 pages a 64 byte per group (16 byte)
+
+push button mode + command number 1-16:
+[
+group 1:
+01	push button 1 mode (bit 7) + command number (bit 0...6)
+02	push button 2 mode (bit 7) + command number (bit 0...6)
+03	push button 3 mode (bit 7) + command number (bit 0...6)
+.
+.
+16	push button 16 mode (bit 7) + command number (bit 0...6)
+]
+
+group 2 [mode/command number]
+group 3 [mode/command number]
+group 4 [mode/command number]
+group 5 [mode/command number]
+group 6 [mode/command number]
+group 7 [mode/command number]
+group 8 [mode/command number]
+group 9 [mode/command number]
+group 10 [mode/command number]
+group 11 [mode/command number]
+group 12 [mode/command number]
+group 13 [mode/command number]
+group 14 [mode/command number]
+group 15 [mode/command number]
+group 16 [mode/command number]
+
+---------------------------------------------------------------------------------------------------------------------------
+
+SETUP NAMES (1 page[] a 64 bytes):
+
+setup names
+[
+01		setup 1 / character 1
+02		setup 1 / character 2
+03		setup 1 / character 3
+04		setup 1 / character 4
+
+05-08	setup 2
+09-12	setup 3
+13-16	setup 4
+17-20	setup 5
+21-24	setup 6
+25-28	setup 7
+29-32	setup 8
+33-36	setup 9
+37-40	setup 10
+41-44	setup 11
+45-48	setup 12
+49-52	setup 13
+53-56	setup 14
+57-60	setup 15
+61-64	setup 16
+]
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+GROUP NAMES (16 pages[] a 64 bytes):
+
+group names of setups 1
+[
+01		setup 1 / group 1 / character 1
+02		setup 1 / group 1 / character 2
+03		setup 1 / group 1 / character 3
+04		setup 1 / group 1 / character 4
+
+05-08	setup 1 / group 2
+09-12	setup 1 / group 3
+13-16	setup 1 / group 4
+17-20	setup 1 / group 5
+21-24	setup 1 / group 6
+25-28	setup 1 / group 7
+29-32	setup 1 / group 8
+33-36	setup 1 / group 9
+37-40	setup 1 / group 10
+41-44	setup 1 / group 11
+45-48	setup 1 / group 12
+49-52	setup 1 / group 13
+53-56	setup 1 / group 14
+57-60	setup 1 / group 15
+61-64	setup 1 / group 16
+]
+
+group names of setups 2 [...]
+group names of setups 3 [...]
+group names of setups 4 [...]
+group names of setups 5 [...]
+group names of setups 6 [...]
+group names of setups 7 [...]
+group names of setups 8 [...]
+group names of setups 9 [...]
+group names of setups 10 [...]
+group names of setups 11 [...]
+group names of setups 12 [...]
+group names of setups 13 [...]
+group names of setups 14 [...]
+group names of setups 15 [...]
+group names of setups 16 [...]
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+SETUP DATA (768 pages[] a 64 bytes)
+48 pages a 64 byte per setup (3072 byte)
+3 pages a 64 byte per group (192 byte)
+
+
+encoder type/channel encoder 1-16:
+[
+group 1:
+01	encoder 1 type (bit 4..7) + channel (bit 0..3)
+02	encoder 2 type (bit 4..7) + channel (bit 0..3)
+03	encoder 3 type (bit 4..7) + channel (bit 0..3)
+.
+.
+16	encoder 16 type (bit 4..7) + channel (bit 0..3)
+]
+
+encoder link + command number encoder 1-16:
+[
+group 1:
+17	encoder 1 link (bit 7) + encoder 1 command number (bit 0...6)
+18	encoder 1 link (bit 7) + encoder 1 command number (bit 0...6)
+19	encoder 1 link (bit 7) + encoder 1 command number (bit 0...6)
+.
+.
+32	encoder 16 link (bit 7) + encoder 16 command number (bit 0...6)
+]
+
+encoder command high number encoder 1-16:
+[
+group 1:
+33	encoder 1 command high number
+34	encoder 2 command high number
+35	encoder 3 command high number
+.
+.
+48	encoder 16 command high number
+]
+
+encoder lower value encoder 1-16:
+[
+group 1:
+49	encoder 1 lower value
+50	encoder 2 lower value
+51	encoder 3 lower value
+.
+.
+64	encoder 16 lower value
+]
+
+encoder upper value encoder 1-16:
+[
+group 1:
+65	encoder 1 upper value
+66	encoder 2 upper value
+67	encoder 3 upper value
+.
+.
+80	encoder 16 upper value
+]
+
+encoder mode/scale encoder 1-16:
+[
+group 1:
+81	encoder 1 mode (bit 4..7) + scale (bit 0..3)
+82	encoder 2 mode (bit 4..7) + scale (bit 0..3)
+83	encoder 3 mode (bit 4..7) + scale (bit 0..3)
+.
+.
+96	encoder 16 mode (bit 4..7) + scale (bit 0..3)
+]
+
+encoder upper(msb)/lower(msb) 1-16:
+[
+group 1:
+97	encoder 1 upper msb (bit 4...7) + lower msb (bit 0...3)
+98	encoder 2 upper msb (bit 4...7) + lower msb (bit 0...3)
+99	encoder 3 upper msb (bit 4...7) + lower msb (bit 0...3)
+.
+.
+112	encoder 16 upper msb (bit 4...7) + lower msb (bit 0...3)
+]
+
+push button type/channel 1-16:
+[
+group 1:
+113	push button1 type (bit 4..7) + channel (bit 0..3)
+114	push button2 type (bit 4..7) + channel (bit 0..3)
+115	push button3 type (bit 4..7) + channel (bit 0..3)
+.
+.
+128	push button16 type (bit 4..7) + channel (bit 0..3)
+]
+
+encoder names of encoders 1-16
+[
+group 1:
+129		encoder 1 character 1
+130		encoder 1 character 2
+131		encoder 1 character 3
+132		encoder 1 character 4
+
+133-136		encoder 2 character 1-4
+137-140		encoder 3 character 1-4
+141-144		encoder 4 character 1-4
+145-148		encoder 5 character 1-4
+149-152		encoder 6 character 1-4
+153-156		encoder 7 character 1-4
+157-160		encoder 8 character 1-4
+161-164		encoder 9 character 1-4
+165-168		encoder 10 character 1-4
+169-172		encoder 11 character 1-4
+173-176		encoder 12 character 1-4
+177-180		encoder 13 character 1-4
+181-184		encoder 14 character 1-4
+185-188		encoder 15 character 1-4
+189-192		encoder 16 character 1-4
+]
+
+
+group 2 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 3 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 4 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 5 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 6 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 7 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 8 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 9 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 10 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 11 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 12 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 13 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 14 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 15 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+group 16 [types/channels, link/command, command high, lower, upper, mode/scale, upper/lower msb, key type/channel, names]
+
+
+next setup memory for SETUP DATA (all 16 setup memories follow in ascending order)
+
+---------------------------------------------------------------------------------------------------------------------------
+
+SETUP KEY 2 (128 pages[] a 64 bytes)
+8 pages a 64 byte per setup (512 byte)
+0,5 pages a 64 byte per group (32 byte)
+
+push button display + lower value 1-16:
+[
+group 1:
+01	push button 1 display (bit 7) + lower value (bit 0...6)
+02	push button 2 display (bit 7) + lower value (bit 0...6)
+03	push button 3 display (bit 7) + lower value (bit 0...6)
+.
+.
+16	push button 16 display (bit 7) + lower value (bit 0...6)
+]
+
+push button link + upper value 1-16:
+[
+group 1:
+17	push button 1 link (bit 7) + upper value (bit 0...6)
+18	push button 2 link (bit 7) + upper value (bit 0...6)
+19	push button 3 link (bit 7) + upper value (bit 0...6)
+.
+.
+32	push button 16 link (bit 7) + upper value (bit 0...6)
+]
+
+group 2 [display/lower, link/upper]
+group 3 [display/lower, link/upper]
+group 4 [display/lower, link/upper]
+group 5 [display/lower, link/upper]
+group 6 [display/lower, link/upper]
+group 7 [display/lower, link/upper]
+group 8 [display/lower, link/upper]
+group 9 [display/lower, link/upper]
+group 10 [display/lower, link/upper]
+group 11 [display/lower, link/upper]
+group 12 [display/lower, link/upper]
+group 13 [display/lower, link/upper]
+group 14 [display/lower, link/upper]
+group 15 [display/lower, link/upper]
+group 16 [display/lower, link/upper]
+
+
+---------------------------------------------------------------------------------------------------------------------------
+PARAMETER CODES; () = EC4 display, {} = editor
+
+
+name characters: {Name}
+codes		characters
+48...57		0...9 
+65...90		A...Z 
+97...122	a...z
+32		space
+46		.
+47		/
+45		-
+
+encoder display scales: {Display scales}
+0	off (off){display off}
+1	0..127 (127){0...127}
+2	0..100 (100){0...100}
+3	0..1000 (1000){0...1000}
+4	-63..+63 (+-63){-63...+63}
+5	-50..+50 (+-50){-50...+50}
+6	-500..+500 (+-500){-500...+500}
+7	ON/OFF (ONOF){ON / OFF}
+8	9999 (9999){0...9999}
+(all other values will be converted to 1)
+
+encoder types: {Type}
+0	control change relative mode 1 values 1/127 (CCR1){CC Relative 1}
+1	control change relative mode 2 values 63/65 (CCR2){CC Relative 2}
+2	control change absolute mode (CCab){CC absolute}
+3	program change (PrgC){Program change}
+4	control change high resolution mode 14bit (CCAh){CC absolute 14bit}
+5	pitch bend 14 bit (PBnd){Pitch bend}
+6	aftertouch (AftT){Aftertouch}
+7	note (Note){Note}
+7	NRPN (NRPN){NRPN}
+(all other values will be converted to 2)
+
+encoder modes: {Mode}
+0	division by 8 (Div8){division by 8}
+1	division by 3 (Div4){division by 4}
+2	division by 2 (Div2){division by 2}
+3	no acceleration (Acc0){no acceleration}
+4	low acceleration (Acc1){low acceleration}
+5	middle acceleration (Acc2){mid acceleration}
+6	max acceleration (Acc3){max acceleration}
+7	large step 2(LSp2){large step 2}
+8	large step 4(LSp4){large step 4}
+9	large step 6(LSp6){large step 6}
+(all other values will be converted to 3)
+
+channels: {Channel}
+0	channel 1 
+1	channel 2 
+.
+.
+F	channel 16
+
+command number: {Command number}
+0...127 {0...127}
+not used for types: program change, aftertouch and pitch bend (each value possible)
+two values for NRPN, left = command number high{MSB} / right = command number low{LSB}, each 0...127
+
+lower/upper value: {Lower value} {Upper value}
+0...127 {0...127}
+used for: CC, program change, aftertouch, pitchbend/NRPN (only when disp = 127,100,+-63,+-50,onoff) 
+
+lower/upper value: {Lower value} {Upper value}
+0...4094,16383 {0...4094,16383}
+used for: CC highres, pitchbend/NRPN (only when disp = off,1000,+-500,9999) 
+lower value = lower (8bit) + lower msb (4bit) * 256 (value = 0...4094,  value 4095 = max value 16383)
+upper value = upper (8bit) + upper msb (4bit) * 256 (value = 0...4094,  value 4095 = max value 16383)
+
+
+---------------------------------------------------------------------------------------------------------------------------
+RULES
+
+[x] if encoder type = CCR1 or CCR2 then lower/upper = disable
+
+[x] if encoder type = CCAh then number range = 0...31
+else number range = 0...127
+
+[x] if encoder type = NOTE then lower/upper/mode = disable
+
+if encoder (type = CCAh or PBnd or NRPN) and (display = OFF or 1000 or +-500 or 9999) then lower/upper range = 0...1683
+else lower/upper range = 0...127
+
+[x] if encoder type = PrgC or PBnd or AftT then command number = disable
+
+[x] if encoder type = NRPN then command number = MSB/LSB (two values 2 x 7bit)
+else command number = LSB (one value 1 x 7bit)
+
+[x] if push button type = Off then display/mode/channel/number/lower/upper = disable
+
+[x] if push button type = Acc0/Acc3/LSp6/Min/Max then mode/channel/number/lower/upper = disable
+
+[x] if push button type = Grp/Set then mode/number/lower/upper = disable (channel renamed to Group/Setup)
+
+[x] link function is available only for encoder 1…15 and push button 1…15
+ 
+
+
+
+
+
+ 
+

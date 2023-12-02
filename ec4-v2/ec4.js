@@ -221,24 +221,28 @@ const P = {
     },
   },
 
-  _getMemAddr: function(spec, selection) {
+  _getMemAddr: function (spec, selection) {
     let startAddr = 'memstart' in spec ? spec.memstart : MEM.addrPresets;
     let lengthGroup = 'grouplen' in spec ? spec.grouplen : MEM.lengthGroup;
-    return startAddr + (selection.setup * 16 + selection.group) * lengthGroup + spec.pos;
+    return (
+      startAddr +
+      (selection.setup * 16 + selection.group) * lengthGroup +
+      spec.pos
+    );
   },
 
   get: function (selection, encoder, type) {
     if (type === 'select-encoder') {
       return;
     }
-    
+
     const spec = P._dataFormat[type];
     if (!spec) {
       console.log('Get unknown parameter type: ' + type);
       return;
     }
     let addr = P._getMemAddr(spec, selection);
-      // MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+    // MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
 
     if (type === P.name) {
       addr += encoder * 4;
@@ -269,7 +273,7 @@ const P = {
       return;
     }
     let addr = P._getMemAddr(spec, selection);
-      // MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
+    // MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup + spec.pos;
     if (type === P.name) {
       addr += encoder * 4;
       while (value.length < 4) {
@@ -428,14 +432,17 @@ class InputHandler {
       if (typeof element.selectedIndex !== 'undefined') {
         storeVal = element.selectedIndex;
       } else if (element.type == 'checkbox') {
-        storeVal = element.checked?1:0;
+        storeVal = element.checked ? 1 : 0;
       } else {
         storeVal = element.value;
       }
       DOM.all(`.watchparams *[data-watch=${what}]`, (el) => {
         let eid = this.findReferencedEncoder(el);
         if (eid === encid) {
-          const val = (typeof element.selectedIndex !== 'undefined') ? element.selectedIndex : element.value;
+          const val =
+            typeof element.selectedIndex !== 'undefined'
+              ? element.selectedIndex
+              : element.value;
           if (typeof el.selectedIndex !== 'undefined') {
             el.selectedIndex = val;
           } else {
@@ -443,8 +450,8 @@ class InputHandler {
           }
         }
       });
-      
-            // let storeVal =
+
+      // let storeVal =
       //   typeof element.selectedIndex !== 'undefined'
       //     ? element.selectedIndex
       //     : element.value;
@@ -499,12 +506,12 @@ class InputHandler {
 
 document.addEventListener('DOMContentLoaded', function () {
   let notenumberoptions = '';
-  for (let i=0;i<128;i++) {
+  for (let i = 0; i < 128; i++) {
     notenumberoptions += `<option>${note2String(i)}</option>`;
   }
-  DOM.all('select[data-notenumbers]').forEach((e)=>{
+  DOM.all('select[data-notenumbers]').forEach((e) => {
     DOM.addHTML(e, 'beforeEnd', notenumberoptions);
-  }); 
+  });
   const selection = new Selection((selection) => {
     // console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
     DOM.removeClass('#ctrlcontainer .enc', 'selected');
@@ -553,12 +560,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const what = el.getAttribute('data-watch');
       const encoderId = inputhandler.findReferencedEncoder(el);
       const value = P.get(selection, encoderId, what);
-            if (typeof value === 'undefined') {
+      if (typeof value === 'undefined') {
         return;
       }
       // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
-      if (el.type=='checkbox') {
-        el.checked = value!=0;
+      if (el.type == 'checkbox') {
+        el.checked = value != 0;
       }
       if (typeof el.selectedIndex !== 'undefined') {
         el.selectedIndex = value;
@@ -620,10 +627,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // console.log(`selectedId ${selectedId}`);
     if (selectedId > -1) {
       selection.encoder = selectedId;
-      DOM.all(
-        '#oled *[data-watch=select-encoder]',
-        (el)=>{el.selectedIndex = selectedId}
-      );
+      DOM.all('#oled *[data-watch=select-encoder]', (el) => {
+        el.selectedIndex = selectedId;
+      });
     }
   }
 
@@ -789,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function () {
       element.addEventListener('change', (ev) => {
         inputhandler.checkValue(element, what);
         inputhandler.distributeValue(element, what);
-      });  
+      });
     }
     element.addEventListener('blur', (ev) => {
       inputhandler.checkValue(element, what);
@@ -810,7 +816,7 @@ document.addEventListener('DOMContentLoaded', function () {
       0x42,
       0x20,
       0x13,
-      0x43, // CMD_APP_ID_H 
+      0x43, // CMD_APP_ID_H
       0x20,
       0x12, // TODO is this right?
       0x44, // CMD_APP_ID_L
@@ -846,7 +852,7 @@ document.addEventListener('DOMContentLoaded', function () {
       (chunk) => {},
       (addr, pagedata) => {
         result.set(pagedata, addr - MEMORY_OFFSET);
-        // console.log(addr - MEMORY_OFFSET, pagedata);        
+        // console.log(addr - MEMORY_OFFSET, pagedata);
       }
     );
     return result;
@@ -866,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function sysexHandler(data) {
-    if (data.length>100/* arbitrary number */) {
+    if (data.length > 100 /* arbitrary number */) {
       if (SYSEX_BACKUP_MODE) {
         const now = new Date();
         function twoDigits(v) {
@@ -891,8 +897,7 @@ document.addEventListener('DOMContentLoaded', function () {
           );
         }
       }
-    }
-    else {
+    } else {
       console.log('Ignoring sysexData due to length', data);
     }
   }
@@ -978,20 +983,23 @@ document.addEventListener('DOMContentLoaded', function () {
       SEC4.msg_load + '<br/><br/><input type="file" name="file" />',
       {
         attachHandlers: function (boxelement) {
-          DOM.attachInside(boxelement, 'input[type=file]', 'change', function (
-            evt
-          ) {
-            sysex.readFile(evt.target, function (data) {
-              if (data) {
-                MBox.hide();
-                loadSysexData(data);
-                // MBox.hide();
-                // MBox.show(SEC4.title_load, SEC4.msg_loaded, {
-                //   hideAfter: 5000
-                // });
-              }
-            });
-          });
+          DOM.attachInside(
+            boxelement,
+            'input[type=file]',
+            'change',
+            function (evt) {
+              sysex.readFile(evt.target, function (data) {
+                if (data) {
+                  MBox.hide();
+                  loadSysexData(data);
+                  // MBox.hide();
+                  // MBox.show(SEC4.title_load, SEC4.msg_loaded, {
+                  //   hideAfter: 5000
+                  // });
+                }
+              });
+            }
+          );
         },
       }
     );
@@ -1224,7 +1232,7 @@ function buildUI() {
   }
   DOM.element('#setupsandgroups').prepend(setupList);
   let notenumberoptions = '';
-  for (let i=0;i<128;i++) {
+  for (let i = 0; i < 128; i++) {
     notenumberoptions += `<option>${note2String(i)}</option>`;
   }
   // build encoders
@@ -1236,29 +1244,57 @@ function buildUI() {
                     <div class="knob"></div>
                     <img src="tap-svgrepo-com.svg" width="24px" class="tapicon" title="Push button mode (click to toggle)" data-action="mode-turn"/>
                     <img src="rotate-svgrepo-com.svg" width="24px" class="rotateicon" title="Turn mode (click to toggle)" data-action="mode-push"/>
-                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${200 + i}" title="Edit name of encoder/button"/></div>
+                    <div class="n"><input data-watch="name" id="enc_name${i}" class="matrixfont" type="text" maxlength="4" value="EC${twodig}" tabindex="${
+      200 + i
+    }" title="Edit name of encoder/button"/></div>
                     <div class="v">
                         <div class="number">
-                            <div class="standard"><label>${P.labels.number}</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/></div>
-                            <div class="hi-lo"><label>${P.labels.number_nrpn}</label>
+                            <div class="standard"><label>${
+                              P.labels.number
+                            }</label><input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }"/></div>
+                            <div class="hi-lo"><label>${
+                              P.labels.number_nrpn
+                            }</label>
                               <div class="inputs">
-                                  <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
-                                  <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}" />
+                                  <input data-watch="number_h" maxlength="3" type="text" value="0" tabindex="${
+                                    216 + i
+                                  }" />
+                                  <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
+                                    216 + i
+                                  }" />
                               </div>
                             </div>
                             <div class="note">
                               <label>${P.labels.number_note}</label>
                               <div class="inputs">
-                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
-                                <select data-watch="number" tabindex="${216 + i}">
+                                <input data-watch="number" maxlength="3" type="text" value="0" tabindex="${
+                                  216 + i
+                                }"/>
+                                <select data-watch="number" tabindex="${
+                                  216 + i
+                                }">
                                   ${notenumberoptions}
                                 </select>
                               </div>
                             </div>
                         </div>
-                        <div class="channel"><label>${P.labels.channel}</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${216 + i}" /></div>
-                        <div class="lower"><label>${P.labels.lower}</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
-                        <div class="upper"><label>${P.labels.upper}</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
+                        <div class="channel"><label>${
+                          P.labels.channel
+                        }</label><input data-watch="channel" maxlength="2" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
+                        <div class="lower"><label>${
+                          P.labels.lower
+                        }</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
+                        <div class="upper"><label>${
+                          P.labels.upper
+                        }</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
                         <div class="scale"><label>${P.labels.scale}</label>
                             <select data-watch="scale" tabindex="${216 + i}">
                                 <option>display off</option>
@@ -1299,9 +1335,17 @@ function buildUI() {
                               <option>large step 6</option>
                             </select>
                         </div>
-                        <div class="pb_channel"><label>${P.labels.channel}</label><input data-watch="pb_channel" maxlength="2" type="text" value="0" tabindex="${216 + i}" /></div>
-                        <div class="pb_display"><label>${P.labels.pb_display}</label>
-                            <select data-watch="pb_display" tabindex="${216 + i}">
+                        <div class="pb_channel"><label>${
+                          P.labels.channel
+                        }</label><input data-watch="pb_channel" maxlength="2" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
+                        <div class="pb_display"><label>${
+                          P.labels.pb_display
+                        }</label>
+                            <select data-watch="pb_display" tabindex="${
+                              216 + i
+                            }">
                                 <option>Off</option>
                                 <option>On</option>
                             </select>
@@ -1310,14 +1354,20 @@ function buildUI() {
                             <div class="pb_standard">
                               <label>${P.labels.pb_number}</label>
                               <div class="inputs">
-                                <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
+                                <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${
+                                  216 + i
+                                }"/>
                               </div>
                             </div>
                             <div class="pb_note">
                               <label>${P.labels.number_note}</label>
                               <div class="inputs">
-                                <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${216 + i}"/>
-                                <select data-watch="pb_number" tabindex="${216 + i}">
+                                <input data-watch="pb_number" maxlength="3" type="text" value="0" tabindex="${
+                                  216 + i
+                                }"/>
+                                <select data-watch="pb_number" tabindex="${
+                                  216 + i
+                                }">
                                   ${notenumberoptions}
                                 </select>
                               </div>
@@ -1348,8 +1398,16 @@ function buildUI() {
                             <option>Togl</option>
                           </select>
                         </div>
-                        <div class="pb_lower"><label>${P.labels.pb_lower}</label><input data-watch="pb_lower" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
-                        <div class="pb_upper"><label>${P.labels.pb_upper}</label><input data-watch="pb_upper" maxlength="3" type="text" value="0" tabindex="${216 + i}" /></div>
+                        <div class="pb_lower"><label>${
+                          P.labels.pb_lower
+                        }</label><input data-watch="pb_lower" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
+                        <div class="pb_upper"><label>${
+                          P.labels.pb_upper
+                        }</label><input data-watch="pb_upper" maxlength="3" type="text" value="0" tabindex="${
+      216 + i
+    }" /></div>
                     </div>
                     <div class="link turn matrixfont" title="Link this encoder to next"><input type="checkbox" id="linkenc${i}" data-watch="link" data-action="edit-link"/><label for="linkenc${i}"><span>Link</span>&gt;</label></div>
                     <div class="link push matrixfont" title="Link this push button to next"><input type="checkbox" id="linkpb${i}" data-watch="pb_link" data-action="edit-pb_link"/><label for="linkpb${i}"><span>Link</span>&gt;</label></div>
@@ -1471,17 +1529,30 @@ function showMerge(data) {
   });
 }
 
-const notenames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const notenames = [
+  'C',
+  'C#',
+  'D',
+  'D#',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'G#',
+  'A',
+  'A#',
+  'B',
+];
 
 function note2String(n) {
-  let name = notenames[n%12];
+  let name = notenames[n % 12];
   let octave = parseInt(n / 12) - 2;
-  return name+octave;
+  return name + octave;
 }
 
 function parseNoteString(s) {
   const parts = s.match(/([CDEFGABcdefgab]#?)(-?\d)/);
-  const notenum = notenames.indexOf(parts[1].toUpperCase())
+  const notenum = notenames.indexOf(parts[1].toUpperCase());
   const octave = parseInt(parts[2]);
-  return (octave+2)*12 + notenum;
+  return (octave + 2) * 12 + notenum;
 }
