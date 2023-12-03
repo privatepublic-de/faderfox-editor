@@ -546,3 +546,30 @@ main section {
 #merge button.default {
   font-weight: bold;
 }
+
+
+#new-firmware-hint {
+  position: fixed;
+  top: 15%;
+  left: 45%;
+  width: 330px;
+  margin-left: -115px;
+  background-color: #f90;
+  padding: 1em;
+  transform: rotate(3deg);
+  z-index: 5;
+  box-shadow: 0 0 20px #000;
+  color: #000;
+}
+
+#new-firmware-hint a {
+  color: #eee;
+}
+
+#new-firmware-hint a.continue {
+  color: #eee;
+  display: block;
+  background: red;
+  text-decoration: none;
+  text-align: center;
+}
