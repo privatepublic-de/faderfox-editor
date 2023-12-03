@@ -33,6 +33,8 @@ const MEM = {
   lengthSetup: 192 * 16,
   lengthGroupKey1: 16,
   lengthGroupKey2: 32,
+  lengthSetupKey1: 16 * 16,
+  lengthSetupKey2: 32 * 16,
   addrKey1: 0x0b00 - MEMORY_OFFSET,
   addrSetupNames: 0x1bc0 - MEMORY_OFFSET,
   addrGroupNames: 0x1c00 - MEMORY_OFFSET,
@@ -253,20 +255,20 @@ const P = {
       return P.stringFromPosition(MEM.data, addr);
     } else {
       addr += encoder;
-        const shift = spec.lsb || 0;
-        if (spec.mask != 0xff) {
-          let val = MEM.data[addr] & spec.mask;
-          val = val >> shift;
-          if (spec.hasOwnProperty('min')) {
-            if (val < spec.min || val > spec.max) {
-              val = spec.default;
-            }
+      const shift = spec.lsb || 0;
+      if (spec.mask != 0xff) {
+        let val = MEM.data[addr] & spec.mask;
+        val = val >> shift;
+        if (spec.hasOwnProperty('min')) {
+          if (val < spec.min || val > spec.max) {
+            val = spec.default;
           }
-          if (type === P.channel || type === P.pb_channel) val++;
-          return val;
-        } else {
-          return MEM.data[addr];
         }
+        if (type === P.channel || type === P.pb_channel) val++;
+        return val;
+      } else {
+        return MEM.data[addr];
+      }
     }
   },
   set: function (selection, encoder, type, value) {
@@ -605,7 +607,7 @@ document.addEventListener('DOMContentLoaded', function () {
           } else {
             value += P.get(selection, encoderId, P.upper_msb) << 8;
           }
-          if (value>4094) {
+          if (value > 4094) {
             value = 16383;
           }
         } else {
@@ -801,12 +803,15 @@ document.addEventListener('DOMContentLoaded', function () {
       case P.channel:
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
           const add = event.key === 'ArrowUp' ? 1 : -1;
-          if ((what == 'lower' || what == 'upper') && useHighres(selection, encoderId)) {
-            let v = parseInt(event.target.value)+add;
-            if (v>4094 && add==-1) {
+          if (
+            (what == 'lower' || what == 'upper') &&
+            useHighres(selection, encoderId)
+          ) {
+            let v = parseInt(event.target.value) + add;
+            if (v > 4094 && add == -1) {
               v = 4094;
-            } 
-            if (v>4094) {
+            }
+            if (v > 4094) {
               v = 16383;
             }
             event.target.value = v;
@@ -1104,12 +1109,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function copyToClipboard(what) {
     if (what === 'group') {
-      const addr =
+      let addr =
         MEM.addrPresets +
         (selection.setup * 16 + selection.group) * MEM.lengthGroup;
-      MEM.clipboardDataGroup = new Uint8Array(MEM.lengthGroup);
+      MEM.clipboardDataGroup = new Uint8Array(
+        MEM.lengthGroup + MEM.lengthGroupKey1 + MEM.lengthGroupKey2
+      );
       for (let i = 0; i < MEM.lengthGroup; i++) {
         MEM.clipboardDataGroup[i] = MEM.data[addr + i];
+      }
+      addr =
+        MEM.addrKey1 +
+        (selection.setup * 16 + selection.group) * MEM.lengthGroupKey1;
+      for (let i = 0; i < MEM.lengthGroupKey1; i++) {
+        MEM.clipboardDataGroup[i + MEM.lengthGroup] = MEM.data[addr + i];
+      }
+      addr =
+        MEM.addrKey2 +
+        (selection.setup * 16 + selection.group) * MEM.lengthGroupKey2;
+      for (let i = 0; i < MEM.lengthGroupKey2; i++) {
+        MEM.clipboardDataGroup[i + MEM.lengthGroup + MEM.lengthGroupKey1] =
+          MEM.data[addr + i];
       }
       MBox.show(
         SEC4.title_copypaste,
@@ -1124,10 +1144,18 @@ document.addEventListener('DOMContentLoaded', function () {
       );
     } else {
       // whole setup
-      const addr = MEM.addrPresets + selection.setup * MEM.lengthSetup;
-      MEM.clipboardDataSetup.setupData = new Uint8Array(MEM.lengthSetup);
+      let addr = MEM.addrPresets + selection.setup * MEM.lengthSetup;
+      MEM.clipboardDataSetup.setupData = new Uint8Array(MEM.lengthSetup + MEM.lengthSetupKey1 + MEM.lengthSetupKey2);
       for (let i = 0; i < MEM.lengthSetup; i++) {
         MEM.clipboardDataSetup.setupData[i] = MEM.data[addr + i];
+      }
+      addr = MEM.addrKey1 + selection.setup * MEM.lengthSetupKey1;
+      for (let i = 0; i < MEM.lengthSetupKey1; i++) {
+        MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup] = MEM.data[addr + i];
+      }
+      addr = MEM.addrKey2 + selection.setup * MEM.lengthSetupKey2;
+      for (let i = 0; i < MEM.lengthSetupKey2; i++) {
+        MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup + MEM.lengthSetupKey1] = MEM.data[addr + i];
       }
       const addrGNames = MEM.addrGroupNames + selection.setup * 64;
       MEM.clipboardDataSetup.groupNames = new Uint8Array(64);
@@ -1164,11 +1192,23 @@ document.addEventListener('DOMContentLoaded', function () {
           ),
           {
             confirmCallback: function () {
-              const addr =
+              let addr =
                 MEM.addrPresets +
                 (selection.setup * 16 + selection.group) * MEM.lengthGroup;
               for (var i = 0; i < MEM.lengthGroup; i++) {
                 MEM.data[addr + i] = MEM.clipboardDataGroup[i];
+              }
+              addr =
+                MEM.addrKey1 +
+                (selection.setup * 16 + selection.group) * MEM.lengthGroupKey1;
+              for (let i = 0; i < MEM.lengthGroupKey1; i++) {
+                MEM.data[addr + i] = MEM.clipboardDataGroup[i + MEM.lengthGroup];
+              }
+              addr =
+                MEM.addrKey2 +
+                (selection.setup * 16 + selection.group) * MEM.lengthGroupKey2;
+              for (let i = 0; i < MEM.lengthGroupKey2; i++) {
+                MEM.data[addr + i]  = MEM.clipboardDataGroup[i + MEM.lengthGroup + MEM.lengthGroupKey1];
               }
               updateDisplayValues();
               MBox.hide();
@@ -1198,9 +1238,17 @@ document.addEventListener('DOMContentLoaded', function () {
           ),
           {
             confirmCallback: function () {
-              const addr = MEM.addrPresets + selection.setup * MEM.lengthSetup;
+              let addr = MEM.addrPresets + selection.setup * MEM.lengthSetup;
               for (let i = 0; i < MEM.lengthSetup; i++) {
                 MEM.data[addr + i] = MEM.clipboardDataSetup.setupData[i];
+              }
+              addr = MEM.addrKey1 + selection.setup * MEM.lengthSetupKey1;
+              for (let i = 0; i < MEM.lengthSetupKey1; i++) {
+                MEM.data[addr + i] = MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup];
+              }
+              addr = MEM.addrKey2 + selection.setup * MEM.lengthSetupKey2;
+              for (let i = 0; i < MEM.lengthSetupKey2; i++) {
+                MEM.data[addr + i] = MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup + MEM.lengthSetupKey1];
               }
               const addrGNames = MEM.addrGroupNames + selection.setup * 64;
               for (let i = 0; i < 64; i++) {
