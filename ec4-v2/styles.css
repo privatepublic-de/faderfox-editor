@@ -164,6 +164,11 @@ select[data-watch='select-encoder'] option {
   background-color: #660;
 }
 
+.oled[data-highres] input.upper,
+.oled[data-highres] input.lower {
+  font-size: .9em;
+}
+
 .oled .number_h,
 .oled[data-type='8'] .number_l {
   display: none;
@@ -736,10 +741,10 @@ main section {
   color: #888;
 }
 
-#oled[data-type='4'] #turn .lower,
+/* #oled[data-type='4'] #turn .lower,
 #oled[data-type='4'] #turn .upper {
   visibility: hidden;
-}
+} */
 
 #oled[data-pb_type='0'] #push .pb_display,
 #oled[data-pb_type='0'] #push .pb_mode,

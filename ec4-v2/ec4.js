@@ -110,6 +110,8 @@ const P = {
   number_h: 'number_h',
   lower: 'lower',
   upper: 'upper',
+  lower_msb: 'lower_msb',
+  upper_msb: 'upper_msb',
   mode: 'mode',
   scale: 'scale',
   name: 'name',
@@ -155,6 +157,8 @@ const P = {
     },
     lower: { pos: 48, mask: 0xff },
     upper: { pos: 64, mask: 0xff },
+    lower_msb: { pos: 96, mask: 0x0f },
+    upper_msb: { pos: 96, mask: 0xf0, lsb: 4 },
     mode: {
       pos: 80,
       mask: 0xf0,
@@ -248,22 +252,21 @@ const P = {
       addr += encoder * 4;
       return P.stringFromPosition(MEM.data, addr);
     } else {
-      const startaddr = addr;
       addr += encoder;
-      const shift = spec.lsb || 0;
-      if (spec.mask != 0xff) {
-        let val = MEM.data[addr] & spec.mask;
-        val = val >> shift;
-        if (spec.hasOwnProperty('min')) {
-          if (val < spec.min || val > spec.max) {
-            val = spec.default;
+        const shift = spec.lsb || 0;
+        if (spec.mask != 0xff) {
+          let val = MEM.data[addr] & spec.mask;
+          val = val >> shift;
+          if (spec.hasOwnProperty('min')) {
+            if (val < spec.min || val > spec.max) {
+              val = spec.default;
+            }
           }
+          if (type === P.channel || type === P.pb_channel) val++;
+          return val;
+        } else {
+          return MEM.data[addr];
         }
-        if (type === P.channel || type === P.pb_channel) val++;
-        return val;
-      } else {
-        return MEM.data[addr];
-      }
     }
   },
   set: function (selection, encoder, type, value) {
@@ -394,7 +397,7 @@ class InputHandler {
     return allowed;
   }
 
-  checkValue(element, what) {
+  static checkValue(element, what) {
     let value = element.value;
     switch (what) {
       case P.channel:
@@ -411,15 +414,23 @@ class InputHandler {
       case P.number_h:
       case P.lower:
       case P.upper:
-        if (value < 0) value = 0;
-        else if (value > 127) value = 127;
+        if (DOM.ancestorAttribute(element, 'data-highres') == 1) {
+          if (value < 0) {
+            value = 0;
+          } else if (value > 4095) {
+            value = 16383;
+          }
+        } else {
+          if (value < 0) value = 0;
+          else if (value > 127) value = 127;
+        }
         break;
     }
     element.value = value;
   }
 
   distributeValue(element, what) {
-    let reloadValues = false;
+    let updateDisplayValues = false;
     if (what === 'name-setup') {
       const setupNumber = element.getAttribute('data-number');
       P.setSetupName(setupNumber, element.value);
@@ -450,20 +461,50 @@ class InputHandler {
           }
         }
       });
-
-      // let storeVal =
-      //   typeof element.selectedIndex !== 'undefined'
-      //     ? element.selectedIndex
-      //     : element.value;
-      P.set(this.selection, encid, what, storeVal);
-      if (what === P.type) {
-        if (
-          P.get(this.selection, encid, P.number) > 31 &&
-          P.get(this.selection, encid, P.type) == 4
-        ) {
-          P.set(this.selection, encid, P.number, 31);
-          reloadValues = true;
+      if (what == P.lower || what == P.upper) {
+        if (useHighres(this.selection, encid)) {
+          let lsbs = storeVal & 0xff;
+          let msbs = (storeVal & 0xf00) >> 8;
+          P.set(this.selection, encid, what, lsbs);
+          if (what == P.lower) {
+            P.set(this.selection, encid, P.lower_msb, msbs);
+          } else {
+            P.set(this.selection, encid, P.upper_msb, msbs);
+          }
+        } else {
+          P.set(this.selection, encid, what, storeVal);
         }
+      } else {
+        P.set(this.selection, encid, what, storeVal);
+      }
+      if (
+        encid === this.selection.encoder &&
+        useHighres(this.selection, encid)
+      ) {
+        DOM.element('#oled').setAttribute('data-highres', 1);
+      } else {
+        DOM.element('#oled').removeAttribute('data-highres');
+      }
+      DOM.all('#ctrlcontainer .enc', (el) => {
+        const eid = this.findReferencedEncoder(el);
+        if (useHighres(this.selection, eid)) {
+          el.setAttribute('data-highres', 1);
+        } else {
+          el.removeAttribute('data-highres');
+        }
+      });
+      if (what === P.scale) {
+        updateDisplayValues = true;
+      }
+      if (what === P.type) {
+        // if (
+        //   P.get(this.selection, encid, P.number) > 31 &&
+        //   P.get(this.selection, encid, P.type) == 4
+        // ) {
+        //   P.set(this.selection, encid, P.number, 31);
+        //   updateDisplayValues = true;
+        // }
+        updateDisplayValues = true;
         if (encid === this.selection.encoder) {
           DOM.element('#oled').setAttribute('data-type', storeVal);
         }
@@ -474,13 +515,6 @@ class InputHandler {
         });
       }
       if (what === P.pb_type) {
-        // if (
-        //   P.get(this.selection, encid, P.number) > 31 &&
-        //   P.get(this.selection, encid, P.type) == 4
-        // ) {
-        //   P.set(this.selection, encid, P.number, 31);
-        //   reloadValues = true;
-        // }
         if (encid === this.selection.encoder) {
           DOM.element('#oled').setAttribute('data-pb_type', storeVal);
         }
@@ -491,7 +525,7 @@ class InputHandler {
         });
       }
     }
-    return reloadValues;
+    return updateDisplayValues;
   }
 
   findReferencedEncoder(element) {
@@ -516,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // console.log(`>> Selection ${selection.setup}, ${selection.group}, ${selection.encoder}`);
     DOM.removeClass('#ctrlcontainer .enc', 'selected');
     DOM.addClass(`#ctrlcontainer #enc${selection.encoder}`, 'selected');
-    syncValues();
+    updateDisplayValues();
   });
   const inputhandler = new InputHandler(selection);
   const sysex = new Sysex({ deviceId: 0x0b, maxFileSize: 229340 });
@@ -546,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function () {
   };
   req.send();
 
-  function syncValues() {
+  function updateDisplayValues() {
     DOM.removeClass('#browser li', 'selected');
     DOM.addClass(`#browser > li:nth-child(${selection.setup + 1})`, 'selected');
     DOM.addClass(
@@ -559,11 +593,25 @@ document.addEventListener('DOMContentLoaded', function () {
     DOM.all('.watchparams *[data-watch]', (el) => {
       const what = el.getAttribute('data-watch');
       const encoderId = inputhandler.findReferencedEncoder(el);
-      const value = P.get(selection, encoderId, what);
+      let value = P.get(selection, encoderId, what);
       if (typeof value === 'undefined') {
         return;
       }
       // console.log(`${sel.setup}, ${sel.group}, ${encoderId}: ${what} = ${value}`);
+      if (what == 'lower' || what == 'upper') {
+        if (useHighres(selection, encoderId)) {
+          if (what == 'lower') {
+            value += P.get(selection, encoderId, P.lower_msb) << 8;
+          } else {
+            value += P.get(selection, encoderId, P.upper_msb) << 8;
+          }
+          if (value>4094) {
+            value = 16383;
+          }
+        } else {
+          value = P.get(selection, encoderId, what) & 0x7f;
+        }
+      }
       if (el.type == 'checkbox') {
         el.checked = value != 0;
       }
@@ -574,6 +622,7 @@ document.addEventListener('DOMContentLoaded', function () {
           el.value = value;
         }
       }
+      // InputHandler.checkValue(el, what);
     });
     DOM.element('#oled').setAttribute(
       'data-type',
@@ -608,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  syncValues();
+  updateDisplayValues();
 
   function selectEncoder(e) {
     let selectedId = -1;
@@ -711,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function () {
             P.set(selection, i, target, setValue);
           }
         }
-        syncValues();
+        updateDisplayValues();
         break;
       case 'mode-turn':
         DOM.element('#contentcontainer').setAttribute('data-mode', 'modeturn');
@@ -771,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function () {
         element.addEventListener('change', (ev) => {
           watchHandler(ev);
           if (inputhandler.distributeValue(ev.target, what)) {
-            syncValues();
+            updateDisplayValues();
           }
         });
         element.addEventListener('focus', (ev) => {
@@ -781,8 +830,8 @@ document.addEventListener('DOMContentLoaded', function () {
         break;
       case 'INPUT':
         element.addEventListener('keydown', watchHandler);
-        element.addEventListener('keyup', () => {
-          inputhandler.distributeValue(event.target, what);
+        element.addEventListener('keyup', (ev) => {
+          inputhandler.distributeValue(ev.target, what); // TODO watch me!
         });
         element.addEventListener('focus', (ev) => {
           selection.lastFocused = what;
@@ -793,12 +842,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (element.type == 'checkbox') {
       element.addEventListener('change', (ev) => {
-        inputhandler.checkValue(element, what);
+        InputHandler.checkValue(element, what);
         inputhandler.distributeValue(element, what);
       });
     }
     element.addEventListener('blur', (ev) => {
-      inputhandler.checkValue(element, what);
+      InputHandler.checkValue(element, what);
       inputhandler.distributeValue(element, what);
     });
   });
@@ -862,11 +911,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (force) {
       MEM.data.fill(0);
       parseSysex(data).map((v, i) => (MEM.data[i] = v));
-      syncValues();
+      updateDisplayValues();
       isDirty = false;
     } else {
       showMerge(parseSysex(data)).then((v) => {
-        syncValues();
+        updateDisplayValues();
       });
     }
   }
@@ -1035,7 +1084,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             }
           }
-          syncValues();
+          updateDisplayValues();
           MBox.hide();
         },
       }
@@ -1110,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', function () {
               for (var i = 0; i < MEM.lengthGroup; i++) {
                 MEM.data[addr + i] = MEM.clipboardDataGroup[i];
               }
-              syncValues();
+              updateDisplayValues();
               MBox.hide();
               MBox.show(SEC4.title_copypaste, SEC4.msg_pasted, {
                 hideAfter: 5000,
@@ -1146,7 +1195,7 @@ document.addEventListener('DOMContentLoaded', function () {
               for (let i = 0; i < 64; i++) {
                 MEM.data[addrGNames + i] = MEM.clipboardDataSetup.groupNames[i];
               }
-              syncValues();
+              updateDisplayValues();
               MBox.hide();
               MBox.show(SEC4.title_copypaste, SEC4.msg_pasted, {
                 hideAfter: 5000,
@@ -1287,12 +1336,12 @@ function buildUI() {
     }" /></div>
                         <div class="lower"><label>${
                           P.labels.lower
-                        }</label><input data-watch="lower" maxlength="3" type="text" value="0" tabindex="${
+                        }</label><input data-watch="lower" maxlength="4" type="text" value="0" tabindex="${
       216 + i
     }" /></div>
                         <div class="upper"><label>${
                           P.labels.upper
-                        }</label><input data-watch="upper" maxlength="3" type="text" value="0" tabindex="${
+                        }</label><input data-watch="upper" maxlength="4" type="text" value="0" tabindex="${
       216 + i
     }" /></div>
                         <div class="scale"><label>${P.labels.scale}</label>
@@ -1550,9 +1599,11 @@ function note2String(n) {
   return name + octave;
 }
 
-function parseNoteString(s) {
-  const parts = s.match(/([CDEFGABcdefgab]#?)(-?\d)/);
-  const notenum = notenames.indexOf(parts[1].toUpperCase());
-  const octave = parseInt(parts[2]);
-  return (octave + 2) * 12 + notenum;
+function useHighres(selection, encid) {
+  const enc_type = P.get(selection, encid, P.type);
+  const enc_disp = P.get(selection, encid, P.scale);
+  return (
+    (enc_type == 4 || enc_type == 5 || enc_type == 8) &&
+    (enc_disp == 0 || enc_disp == 3 || enc_disp == 6 || enc_disp == 8)
+  );
 }
