@@ -801,8 +801,19 @@ document.addEventListener('DOMContentLoaded', function () {
       case P.channel:
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
           const add = event.key === 'ArrowUp' ? 1 : -1;
-          event.target.value = parseInt(event.target.value) + add;
-          inputhandler.checkValue(event.target, what);
+          if ((what == 'lower' || what == 'upper') && useHighres(selection, encoderId)) {
+            let v = parseInt(event.target.value)+add;
+            if (v>4094 && add==-1) {
+              v = 4094;
+            } 
+            if (v>4094) {
+              v = 16383;
+            }
+            event.target.value = v;
+          } else {
+            event.target.value = parseInt(event.target.value) + add;
+          }
+          InputHandler.checkValue(event.target, what);
           inputhandler.distributeValue(event.target, what);
           return;
         }
