@@ -38,8 +38,8 @@ select[data-watch='select-encoder'] option {
   position: absolute;
   top: 102px;
   left: 50%;
-  margin-left: -150px;
-  width: 300px;
+  margin-left: -160px;
+  width: 320px;
   height: 130px;
   box-shadow: 0 0 10px #222;
   color: #feff5f;
@@ -127,7 +127,7 @@ select[data-watch='select-encoder'] option {
   width: 25%;
 }
 .oled .d {
-  width: 19%;
+  width: 21%;
 }
 .oled .c.number_h {
   width: 13%;
@@ -164,10 +164,10 @@ select[data-watch='select-encoder'] option {
   background-color: #660;
 }
 
-.oled[data-highres] input.upper,
+/* .oled[data-highres] input.upper,
 .oled[data-highres] input.lower {
   font-size: .9em;
-}
+} */
 
 .oled .number_h,
 .oled[data-type='8'] .number_l {
