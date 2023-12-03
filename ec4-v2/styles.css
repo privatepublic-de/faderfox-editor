@@ -76,7 +76,7 @@ select[data-watch='select-encoder'] option {
 
 .oled .centerline {
   position: absolute;
-  left: 50%;
+  left: 51%;
   width: 1px;
   top: 10px;
   bottom: 10px;
