@@ -1,5 +1,5 @@
 let SEC4 = {
-  welcome_title: 'Welcome to the Faderfox EC4 Editor',
+  welcome_title: 'Welcome to the Faderfox EC4 Editor (Firmware 2.x)',
   welcome_text: `Before you start: Consider these steps to avoid loss of setup data on your EC4 by accidentially overwriting it.<ul>
     <li>connect your EC4 via USB</li>
     <li>Enter SETUP mode on your EC4: Press &quot;Func&quot; and select &quot;Setup&quot;</li>
