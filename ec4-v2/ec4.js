@@ -912,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function parseSysex(sysexdata) {
     const result = new Uint8Array(MEMORY_SIZE);
-    sysex.parseSysexData(
+    const version = sysex.parseSysexData(
       sysexdata,
       (chunk) => {},
       (addr, pagedata) => {
@@ -920,6 +920,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // console.log(addr - MEMORY_OFFSET, pagedata);
       }
     );
+    // TODO convert version < 2 data
+    if (version<2) alert('Firmware 1.x date received. Needs conversion!');
     return result;
   }
 
