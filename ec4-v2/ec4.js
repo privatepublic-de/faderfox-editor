@@ -403,9 +403,11 @@ class InputHandler {
     let value = element.value;
     switch (what) {
       case P.channel:
+      case P.pb_channel:
         if (value < 1) value = 1;
         else if (value > 16) value = 16;
         break;
+
       case P.number:
         if (
           DOM.ancestorAttribute(element, 'data-type') == 4 /*CC14bit*/ &&
@@ -413,10 +415,17 @@ class InputHandler {
         ) {
           value = 31;
         }
+      // runs intentionally on
       case P.number_h:
       case P.lower:
       case P.upper:
-        if (DOM.ancestorAttribute(element, 'data-highres') == 1) {
+      case P.pb_number:
+      case P.pb_lower:
+      case P.pb_upper:
+        if (
+          DOM.ancestorAttribute(element, 'data-highres') == 1 &&
+          what.indexOf('pb_') == -1
+        ) {
           if (value < 0) {
             value = 0;
           } else if (value > 4095) {
@@ -801,6 +810,10 @@ document.addEventListener('DOMContentLoaded', function () {
       case P.lower:
       case P.upper:
       case P.channel:
+      case P.pb_channel:
+      case P.pb_number:
+      case P.pb_lower:
+      case P.pb_upper:
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
           const add = event.key === 'ArrowUp' ? 1 : -1;
           if (
@@ -883,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function () {
       0x13,
       0x43, // CMD_APP_ID_H
       0x20,
-      0x12, // TODO is this right?
+      0x12,
       0x44, // CMD_APP_ID_L
       0x20,
       0x14,
@@ -921,7 +934,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     );
     // TODO convert version < 2 data
-    if (version<2) alert('Firmware 1.x date received. Needs conversion!');
+    // beim import alter daten bitte eine konvertierung des encoder-modes vornehmen: alle werte + 3, da acc0...acc3 jetzt nicht mehr auf den werten 0...3 liegen sondern auf den werten 3...6, den defaultwert für upper bei den push buttons bitte auf 127 setzen
+    if (version < 2) alert('Firmware 1.x date received. Needs conversion!');
+
     return result;
   }
 
@@ -987,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', function () {
       confirmCallback: function () {
         MBox.hide();
         let data = generateSysexData();
-        midi.sendSysex(data, 50000);
+        midi.sendSysex(data, 90 * 1000);
       },
     });
   }
@@ -1147,17 +1162,22 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       // whole setup
       let addr = MEM.addrPresets + selection.setup * MEM.lengthSetup;
-      MEM.clipboardDataSetup.setupData = new Uint8Array(MEM.lengthSetup + MEM.lengthSetupKey1 + MEM.lengthSetupKey2);
+      MEM.clipboardDataSetup.setupData = new Uint8Array(
+        MEM.lengthSetup + MEM.lengthSetupKey1 + MEM.lengthSetupKey2
+      );
       for (let i = 0; i < MEM.lengthSetup; i++) {
         MEM.clipboardDataSetup.setupData[i] = MEM.data[addr + i];
       }
       addr = MEM.addrKey1 + selection.setup * MEM.lengthSetupKey1;
       for (let i = 0; i < MEM.lengthSetupKey1; i++) {
-        MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup] = MEM.data[addr + i];
+        MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup] =
+          MEM.data[addr + i];
       }
       addr = MEM.addrKey2 + selection.setup * MEM.lengthSetupKey2;
       for (let i = 0; i < MEM.lengthSetupKey2; i++) {
-        MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup + MEM.lengthSetupKey1] = MEM.data[addr + i];
+        MEM.clipboardDataSetup.setupData[
+          i + MEM.lengthSetup + MEM.lengthSetupKey1
+        ] = MEM.data[addr + i];
       }
       const addrGNames = MEM.addrGroupNames + selection.setup * 64;
       MEM.clipboardDataSetup.groupNames = new Uint8Array(64);
@@ -1204,13 +1224,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 MEM.addrKey1 +
                 (selection.setup * 16 + selection.group) * MEM.lengthGroupKey1;
               for (let i = 0; i < MEM.lengthGroupKey1; i++) {
-                MEM.data[addr + i] = MEM.clipboardDataGroup[i + MEM.lengthGroup];
+                MEM.data[addr + i] =
+                  MEM.clipboardDataGroup[i + MEM.lengthGroup];
               }
               addr =
                 MEM.addrKey2 +
                 (selection.setup * 16 + selection.group) * MEM.lengthGroupKey2;
               for (let i = 0; i < MEM.lengthGroupKey2; i++) {
-                MEM.data[addr + i]  = MEM.clipboardDataGroup[i + MEM.lengthGroup + MEM.lengthGroupKey1];
+                MEM.data[addr + i] =
+                  MEM.clipboardDataGroup[
+                    i + MEM.lengthGroup + MEM.lengthGroupKey1
+                  ];
               }
               updateDisplayValues();
               MBox.hide();
@@ -1246,11 +1270,15 @@ document.addEventListener('DOMContentLoaded', function () {
               }
               addr = MEM.addrKey1 + selection.setup * MEM.lengthSetupKey1;
               for (let i = 0; i < MEM.lengthSetupKey1; i++) {
-                MEM.data[addr + i] = MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup];
+                MEM.data[addr + i] =
+                  MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup];
               }
               addr = MEM.addrKey2 + selection.setup * MEM.lengthSetupKey2;
               for (let i = 0; i < MEM.lengthSetupKey2; i++) {
-                MEM.data[addr + i] = MEM.clipboardDataSetup.setupData[i + MEM.lengthSetup + MEM.lengthSetupKey1];
+                MEM.data[addr + i] =
+                  MEM.clipboardDataSetup.setupData[
+                    i + MEM.lengthSetup + MEM.lengthSetupKey1
+                  ];
               }
               const addrGNames = MEM.addrGroupNames + selection.setup * 64;
               for (let i = 0; i < 64; i++) {
