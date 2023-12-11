@@ -741,6 +741,17 @@ main section {
   color: #888;
 }
 
+.enc[data-pb_type='5'] .link.push,
+.enc[data-pb_type='6'] .link.push,
+.enc[data-pb_type='7'] .link.push,
+.enc[data-pb_type='8'] .link.push,
+.enc[data-pb_type='9'] .link.push,
+.enc[data-pb_type='10'] .link.push,
+.enc[data-pb_type='11'] .link.push,
+.enc[data-pb_type='12'] .link.push {
+  display: none;
+}
+
 /* #oled[data-type='4'] #turn .lower,
 #oled[data-type='4'] #turn .upper {
   visibility: hidden;

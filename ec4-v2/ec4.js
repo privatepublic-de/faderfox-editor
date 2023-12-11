@@ -508,13 +508,13 @@ class InputHandler {
         updateDisplayValues = true;
       }
       if (what === P.type) {
-        // if (
-        //   P.get(this.selection, encid, P.number) > 31 &&
-        //   P.get(this.selection, encid, P.type) == 4
-        // ) {
-        //   P.set(this.selection, encid, P.number, 31);
-        //   updateDisplayValues = true;
-        // }
+        if (
+          P.get(this.selection, encid, P.number) > 31 &&
+          P.get(this.selection, encid, P.type) == 4
+        ) {
+          P.set(this.selection, encid, P.number, 31);
+          updateDisplayValues = true;
+        }
         updateDisplayValues = true;
         if (encid === this.selection.encoder) {
           DOM.element('#oled').setAttribute('data-type', storeVal);
@@ -531,7 +531,7 @@ class InputHandler {
         }
         DOM.all('#ctrlcontainer .enc', (el) => {
           const eid = this.findReferencedEncoder(el);
-          const type = P.get(this.selection, eid, P.type);
+          const type = P.get(this.selection, eid, P.pb_type);
           el.setAttribute('data-pb_type', type);
         });
       }
@@ -935,7 +935,22 @@ document.addEventListener('DOMContentLoaded', function () {
     );
     // TODO convert version < 2 data
     // beim import alter daten bitte eine konvertierung des encoder-modes vornehmen: alle werte + 3, da acc0...acc3 jetzt nicht mehr auf den werten 0...3 liegen sondern auf den werten 3...6, den defaultwert für upper bei den push buttons bitte auf 127 setzen
-    if (version < 2) alert('Firmware 1.x date received. Needs conversion!');
+    if (version < 2) {
+      for (let s = 0; s < 16; s++) {
+        for (let g = 0; g < 16; g++) {
+          for (let e = 0; e < 16; e++) {
+            let addr =
+              P._getMemAddr(P._dataFormat[P.mode], { setup: s, group: g }) + e;
+            let converted = (((result[addr] & 0xc0) >> 6) + 3) << 4;
+            result[addr] = (result[addr] & 0x3f) + converted;
+            addr =
+              P._getMemAddr(P._dataFormat[P.pb_upper], { setup: s, group: g }) +
+              e;
+            result[addr] = result[addr] + 0x7f;
+          }
+        }
+      }
+    }
 
     return result;
   }
