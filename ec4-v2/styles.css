@@ -221,6 +221,21 @@ select[data-watch='select-encoder'] option {
   bottom: -8px;
   padding: 5px;
 }
+#fillpbnumbers {
+  display: none;
+  font-size: 10px;
+  color: #feff5f;
+  background-color: #000;
+  position: absolute;
+  width: 100%;
+  left: 40%;
+  margin-left: -30%;
+  bottom: -3px;
+}
+#fillpbnumbers .asbutton {
+  padding: 5px;
+}
+
 
 *[data-mode='number'] #fillnumbers {
   display: block;
