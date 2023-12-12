@@ -65,5 +65,29 @@ let SEC4 = {
   $msg_fillnumbers:
     'Fill all encoder\'s <b>{}</b> in this group in ascending order starting with &quot;{}&quot; (value of encoder #1)?',
   $msg_fillnumbers_bottom:
-    'Fill all encoder\'s <b>{}</b> in this group in ascending order from bottom left to top right starting with &quot;{}&quot; (value of encoder #13)?'
+    'Fill all encoder\'s <b>{}</b> in this group in ascending order from bottom left to top right starting with &quot;{}&quot; (value of encoder #13)?',
+
+  title_upgrade:
+    'Update firmware on EC4 to Version 2.0',
+  msg_upgrade:
+    `
+      <p>Before you start: <b>Make a backup of your current EC4 setup data!</b></p>
+      <ul>
+        <li>If your <b>EC4 is still running a firmware version 1.x</b>, please use the previous
+        editor version to make a backup. Click this link to open <a href="../ec4/index.html">EC4 Editor for Firmware 1.x</a>. You will be guided through the backup process there.
+        </li>
+        <li>If your EC4 is already running with a firmware version 2.x make a backup as recommended
+        when opening this page.
+        </li>
+      </ul>
+      <p>Start the update process:</p>
+      <ul>
+        <li>Disconnect your EC4 from the USB connection to this computer</li>
+        <li>Press the red &quot;Shift&quot; key while reconnecting the USB cable.</li>
+        <li>The display should read &quot;Ready to receive&quot;</li>
+        <li>Press the button &quot;Send update to EC4&quot; below</li>
+        <li>Wait until the device received 100% of the firmware data and reboots</li>
+        <li>Congratulations! Update was successful.</li>
+      </ul>     
+    `
 };

@@ -47,7 +47,7 @@ const MEM = {
   },
 };
 
-const FACTORY_PRESET_PATH = 'factory-preset.syx';
+const FACTORY_PRESET_PATH = 'EC4-setup-all-factory-V20.syx';
 
 class Selection {
   constructor(updatecallback) {
@@ -938,9 +938,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // console.log(addr - MEMORY_OFFSET, pagedata);
       }
     );
-    // TODO convert version < 2 data
-    // beim import alter daten bitte eine konvertierung des encoder-modes vornehmen: alle werte + 3, da acc0...acc3 jetzt nicht mehr auf den werten 0...3 liegen sondern auf den werten 3...6, den defaultwert für upper bei den push buttons bitte auf 127 setzen
     if (version < 2) {
+      // convert version 1.x data
       for (let s = 0; s < 16; s++) {
         for (let g = 0; g < 16; g++) {
           for (let e = 0; e < 16; e++) {
@@ -1382,7 +1381,36 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   selection.setAll(0, 0, 0);
+
+  DOM.on('#upgradeFirmware', 'click', ()=>{updateFirmware(midi);});
+
 });
+
+function updateFirmware(midi) {
+  const req = new XMLHttpRequest();
+  req.open('GET', 'EC4 V0200.syx', true);
+  req.responseType = 'arraybuffer';
+  req.onload = function (oEvent) {
+    const data = req.response;
+    if (data) {
+      try {
+        const fwdata = new Uint8Array(data); 
+        MBox.show(SEC4.title_upgrade, SEC4.msg_upgrade, {
+          buttonLabel: 'Send update to EC4',
+          confirmCallback: function () {
+            MBox.hide();
+            midi.sendSysex(fwdata, 60 * 1000);
+          },
+        });
+      } catch (e) {
+        console.log('Error handling firmware sysex data.', e);
+      }
+    } else {
+      console.log('No firmware data received.');
+    }
+  };
+  req.send();
+}
 
 function buildUI() {
   function createNameInput(id, type, number, value) {
