@@ -728,6 +728,7 @@ document.addEventListener('DOMContentLoaded', function () {
       fillLabel = name;
       switch (name) {
         case P.channel:
+          case P.pb_channel: 
           fillButtonLabel = 'Channels';
           fillLabel = 'channels';
           break;
@@ -780,6 +781,10 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'mode-push':
         DOM.element('#contentcontainer').setAttribute('data-mode', 'modepush');
         DOM.element('#editnothing').click();
+        break;
+      case 'filltopbottom':
+      case 'fillbottomtop':
+        fillNumbers(action);
         break;
     }
     e.stopPropagation();
@@ -995,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
     } else {
-      console.log('Ignoring sysexData due to length', data);
+      console.log('Ignoring sysex data due to length', data);
     }
   }
 
@@ -1102,34 +1107,80 @@ document.addEventListener('DOMContentLoaded', function () {
     );
   });
 
-  DOM.on('#fillnumbers', 'click', function (e) {
-    const what = DOM.ancestorAttribute(e.target, 'data-mode');
-    const startValue = P.get(selection, 0, what);
+  function fillNumbers(fillmode) {
+    const what = DOM.ancestorAttribute(DOM.element('#fillnumbers'), 'data-mode');
+    const fromTopLeft = (fillmode=='filltopbottom');
+    const startValue = fromTopLeft?P.get(selection, 0, what):P.get(selection, 12, what);
     MBox.show(
-      SEC4.title_fillnumbers,
-      STR.apply(SEC4.$msg_fillnumbers, fillLabel, startValue),
+      fromTopLeft?SEC4.title_fillnumbers:SEC4.title_fillnumbers_bottom,
+      STR.apply(fromTopLeft?SEC4.$msg_fillnumbers:SEC4.$msg_fillnumbers_bottom, fillLabel, startValue),
       {
-        buttonLabel: 'Fill numbers',
+        buttonLabel: 'OK',
         confirmCallback: function () {
-          for (let i = 1; i < 16; i++) {
-            let value = startValue + i;
-            switch (what) {
-              case P.number:
-                value = value & 0x7f;
-                if (P.get(selection, i, P.type) === 4 /*CC14bit*/) {
-                  if (value < 32) {
+          if (fromTopLeft) {
+            for (let i = 1; i < 16; i++) {
+              let value = startValue + i;
+              switch (what) {
+                case P.number:
+                  value = value & 0x7f;
+                  if (P.get(selection, i, P.type) === 4 /*CC14bit*/) {
+                    if (value < 32) {
+                      P.set(selection, i, P.number, value);
+                    }
+                  } else {
                     P.set(selection, i, P.number, value);
                   }
-                } else {
-                  P.set(selection, i, P.number, value);
+                  break;
+                case P.channel:
+                  while (value > 16) {
+                    value = value - 16;
+                  }
+                  P.set(selection, i, P.channel, value);
+                  break;
+                case P.pb_channel:
+                  while (value > 16) {
+                    value = value - 16;
+                  }
+                  P.set(selection, i, P.pb_channel, value);
+                  break;
+                case P.pb_number:
+                  value = value & 0x7f;
+                  if (P.get(selection, i, P.pb_type) === 1 || P.get(selection, i, P.pb_type) === 2) {
+                    P.set(selection, i, P.pb_number, value);
+                  }
+                  break;
+              }
+            }
+          } else {
+            for (let r=3; r>=0; r--) {
+              for (let i = 0; i<4; i++) {
+                let encId = r*4 + i;
+                let value = (startValue + (3-r)*4 + i)  & 0x7f;
+                switch (what) {
+                  case P.number:
+                    if (P.get(selection, encId, P.type) === 4 /*CC14bit*/) {
+                      if (value < 32) {
+                        P.set(selection, encId, P.number, value);
+                      }
+                    } else {
+                      P.set(selection, encId, P.number, value);
+                    }
+                    break;
+                  case P.channel:
+                    value = value & 0xf;
+                    P.set(selection, encId, P.channel, value);
+                    break;
+                  case P.pb_channel:
+                    value = value & 0xf;
+                    P.set(selection, encId, P.pb_channel, value);
+                    break;
+                  case P.pb_number:
+                    if (P.get(selection, encId, P.pb_type) === 1 || P.get(selection, encId, P.pb_type) === 2) {
+                      P.set(selection, encId, P.pb_number, value);
+                    }
+                    break;
                 }
-                break;
-              case P.channel:
-                while (value > 16) {
-                  value = value - 16;
-                }
-                P.set(selection, i, P.channel, value);
-                break;
+              }
             }
           }
           updateDisplayValues();
@@ -1137,7 +1188,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
       }
     );
-  });
+  };
 
   function copyToClipboard(what) {
     if (what === 'group') {

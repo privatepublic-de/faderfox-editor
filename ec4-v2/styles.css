@@ -9,6 +9,14 @@
   font-style: normal;
 }
 
+#midisettings {
+  width: 660px;
+}
+#midisettings a {
+  color: #ccc;
+  margin-left: 2em;
+}
+
 .content {
   position: relative;
 }
@@ -212,7 +220,7 @@ select[data-watch='select-encoder'] option {
   background-color: #770;
 }
 
-#fillnumbers {
+/* #fillnumbers {
   display: none;
   position: absolute;
   width: 60%;
@@ -220,27 +228,33 @@ select[data-watch='select-encoder'] option {
   margin-left: -30%;
   bottom: -8px;
   padding: 5px;
-}
-#fillpbnumbers {
+} */
+
+
+#fillnumbers {
   display: none;
-  font-size: 10px;
-  color: #feff5f;
-  background-color: #000;
+  font-size: 12px;
+  height: 16px;
+  border: 2px solid #bbb;
+  border-radius: 8px;
+  background-color: #666;
   position: absolute;
-  width: 100%;
-  left: 40%;
-  margin-left: -30%;
-  bottom: -3px;
+  right: -4px;
+  left: -4px;
+  bottom: -20px;
+  text-align: center;
+  padding: 8px 0;
 }
-#fillpbnumbers .asbutton {
+#fillnumbers .asbutton {
   padding: 5px;
+  margin-left: .5em;
 }
 
 
-*[data-mode='number'] #fillnumbers {
-  display: block;
-}
-*[data-mode='channel'] #fillnumbers {
+*[data-mode='number'] #fillnumbers,
+*[data-mode='channel'] #fillnumbers,
+*[data-mode='pb_channel'] #fillnumbers,
+*[data-mode='pb_number'] #fillnumbers {
   display: block;
 }
 

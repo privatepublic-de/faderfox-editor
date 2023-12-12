@@ -60,7 +60,10 @@ let SEC4 = {
   msg_pasted: 'Pasted clipboard data.',
   msg_clipboard_empty: 'Nothing to paste... clipboard is empty. ',
 
-  title_fillnumbers: 'Fill numbers',
+  title_fillnumbers: 'Fill from top left to bottom right',
+  title_fillnumbers_bottom: 'Fill from bottom left to top right',
   $msg_fillnumbers:
-    'Fill all encoder <b>{}</b> in this group in ascending order starting with &quot;{}&quot; (value of encoder #1)?'
+    'Fill all encoder\'s <b>{}</b> in this group in ascending order starting with &quot;{}&quot; (value of encoder #1)?',
+  $msg_fillnumbers_bottom:
+    'Fill all encoder\'s <b>{}</b> in this group in ascending order from bottom left to top right starting with &quot;{}&quot; (value of encoder #13)?'
 };
