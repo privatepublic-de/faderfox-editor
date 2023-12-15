@@ -11,7 +11,7 @@ let SEC4 = {
   title_data_received: 'Data received',
   title_send: 'Send data to EC4',
   warning_send:
-    '<p>Warning: Sending the editor data overwrites all setups on the EC4.</p><p>If you want to make a backup copy of your current EC4 setups simply start the &quot;Send all setups&quot; function on the device *now*. After receiving the data, it will be stored as Sysex file in your downloads folder.<p>Then you can continue to send your editor setups to the EC4.</p>',
+    '<p>Warning: Sending the editor data overwrites all setups on the EC4.</p><p>If you want to make a backup copy of your current EC4 setups simply start the &quot;<b><u>Send all setups</u></b>&quot; function on the device *now*. After receiving the data, it will be stored as Sysex file in your downloads folder.<p>Then you can continue to send your editor setups to the EC4.</p>',
   continue_without_backup: 'Continue without backup',
   msg_send:
     "To send the current editor settings to your EC4 device:\
@@ -88,6 +88,8 @@ let SEC4 = {
         <li>Press the button &quot;Send update to EC4&quot; below</li>
         <li>Wait until the device received 100% of the firmware data and reboots</li>
         <li>Congratulations! Update was successful.</li>
-      </ul>     
+      </ul>
+      <p>Now you can load your backup file and transmit it to the EC4
+        with this editor. The setup data will be automatically converted to Version 2.x.</p>
     `
 };
