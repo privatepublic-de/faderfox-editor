@@ -534,6 +534,11 @@ class InputHandler {
           const type = P.get(this.selection, eid, P.pb_type);
           el.setAttribute('data-pb_type', type);
         });
+        if (storeVal > 4) {
+          // disable link
+          P.set(this.selection, encid, P.pb_link, 0);
+          updateDisplayValues = true;
+        }
       }
     }
     return updateDisplayValues;
@@ -728,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function () {
       fillLabel = name;
       switch (name) {
         case P.channel:
-          case P.pb_channel: 
+        case P.pb_channel:
           fillButtonLabel = 'Channels';
           fillLabel = 'channels';
           break;
@@ -762,7 +767,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const value = P.get(selection, selection.encoder, target);
         for (let i = 0; i < 16; i++) {
-          const targetType = P.get(selection, i, 'type');
+          const targetType = P.get(selection, i, P.type);
+          const targetPbType = P.get(selection, i, P.pb_type);
           let setValue = value;
           if (targetType === 4 /* CC14bit */ && target === 'number') {
             if (setValue < 32) {
@@ -770,6 +776,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           } else {
             P.set(selection, i, target, setValue);
+          }
+          if (targetPbType > 4) {
+            P.set(selection, i, P.pb_link, 0); // clear all pb links if needed
           }
         }
         updateDisplayValues();
@@ -1107,12 +1116,21 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function fillNumbers(fillmode) {
-    const what = DOM.ancestorAttribute(DOM.element('#fillnumbers'), 'data-mode');
-    const fromTopLeft = (fillmode=='filltopbottom');
-    const startValue = fromTopLeft?P.get(selection, 0, what):P.get(selection, 12, what);
+    const what = DOM.ancestorAttribute(
+      DOM.element('#fillnumbers'),
+      'data-mode'
+    );
+    const fromTopLeft = fillmode == 'filltopbottom';
+    const startValue = fromTopLeft
+      ? P.get(selection, 0, what)
+      : P.get(selection, 12, what);
     MBox.show(
-      fromTopLeft?SEC4.title_fillnumbers:SEC4.title_fillnumbers_bottom,
-      STR.apply(fromTopLeft?SEC4.$msg_fillnumbers:SEC4.$msg_fillnumbers_bottom, fillLabel, startValue),
+      fromTopLeft ? SEC4.title_fillnumbers : SEC4.title_fillnumbers_bottom,
+      STR.apply(
+        fromTopLeft ? SEC4.$msg_fillnumbers : SEC4.$msg_fillnumbers_bottom,
+        fillLabel,
+        startValue
+      ),
       {
         buttonLabel: 'OK',
         confirmCallback: function () {
@@ -1144,17 +1162,20 @@ document.addEventListener('DOMContentLoaded', function () {
                   break;
                 case P.pb_number:
                   value = value & 0x7f;
-                  if (P.get(selection, i, P.pb_type) === 1 || P.get(selection, i, P.pb_type) === 2) {
+                  if (
+                    P.get(selection, i, P.pb_type) === 1 ||
+                    P.get(selection, i, P.pb_type) === 2
+                  ) {
                     P.set(selection, i, P.pb_number, value);
                   }
                   break;
               }
             }
           } else {
-            for (let r=3; r>=0; r--) {
-              for (let i = 0; i<4; i++) {
-                let encId = r*4 + i;
-                let value = (startValue + (3-r)*4 + i)  & 0x7f;
+            for (let r = 3; r >= 0; r--) {
+              for (let i = 0; i < 4; i++) {
+                let encId = r * 4 + i;
+                let value = (startValue + (3 - r) * 4 + i) & 0x7f;
                 switch (what) {
                   case P.number:
                     if (P.get(selection, encId, P.type) === 4 /*CC14bit*/) {
@@ -1174,7 +1195,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     P.set(selection, encId, P.pb_channel, value);
                     break;
                   case P.pb_number:
-                    if (P.get(selection, encId, P.pb_type) === 1 || P.get(selection, encId, P.pb_type) === 2) {
+                    if (
+                      P.get(selection, encId, P.pb_type) === 1 ||
+                      P.get(selection, encId, P.pb_type) === 2
+                    ) {
                       P.set(selection, encId, P.pb_number, value);
                     }
                     break;
@@ -1187,7 +1211,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
       }
     );
-  };
+  }
 
   function copyToClipboard(what) {
     if (what === 'group') {
@@ -1382,8 +1406,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   selection.setAll(0, 0, 0);
 
-  DOM.on('#upgradeFirmware', 'click', ()=>{updateFirmware(midi);});
-
+  DOM.on('#upgradeFirmware', 'click', () => {
+    updateFirmware(midi);
+  });
 });
 
 function updateFirmware(midi) {
@@ -1394,7 +1419,7 @@ function updateFirmware(midi) {
     const data = req.response;
     if (data) {
       try {
-        const fwdata = new Uint8Array(data); 
+        const fwdata = new Uint8Array(data);
         MBox.show(SEC4.title_upgrade, SEC4.msg_upgrade, {
           buttonLabel: 'Send update to EC4',
           confirmCallback: function () {
