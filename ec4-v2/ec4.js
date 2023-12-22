@@ -780,6 +780,9 @@ document.addEventListener('DOMContentLoaded', function () {
           if (targetPbType > 4) {
             P.set(selection, i, P.pb_link, 0); // clear all pb links if needed
           }
+          if (target == P.type && value==4 && P.get(selection, i, P.number) > 31) {
+            P.set(selection, i, P.number, 31);
+          }
         }
         updateDisplayValues();
         break;
