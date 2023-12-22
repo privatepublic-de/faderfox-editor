@@ -1655,6 +1655,12 @@ function memcpy(sourceData, addr, length) {
   }
 }
 
+function memfill(value, addr, length) {
+  for (let i = 0; i < length; i++) {
+    MEM.data[addr + i] = value;
+  }
+}
+
 function doMerge(sourceData, selectedElements) {
   selectedElements.forEach((element) => {
     const { group, setup } = element;
@@ -1662,8 +1668,10 @@ function doMerge(sourceData, selectedElements) {
       const addr = MEM.addrPresets + (setup * 16 + group) * MEM.lengthGroup;
       memcpy(sourceData, addr, MEM.lengthGroup);
       const addr1 = MEM.addrKey1 + (setup * 16 + group) * MEM.lengthGroupKey1;
+      memfill(0, addr1, MEM.lengthGroupKey1); // init with 0
       memcpy(sourceData, addr1, MEM.lengthGroupKey1);
       const addr2 = MEM.addrKey2 + (setup * 16 + group) * MEM.lengthGroupKey2;
+      memfill(0, addr2, MEM.lengthGroupKey2); // init with 0
       memcpy(sourceData, addr2, MEM.lengthGroupKey2);
       const nameAddr = MEM.addrGroupNames + setup * 64 + group * 4;
       memcpy(sourceData, nameAddr, 4);
