@@ -395,7 +395,7 @@ else number range = 0...127
 
 [x] if encoder type = NOTE then lower/upper/mode = disable
 
-if encoder (type = CCAh or PBnd or NRPN) and (display = OFF or 1000 or +-500 or 9999) then lower/upper range = 0...1683
+[x] if encoder (type = CCAh or PBnd or NRPN) and (display = OFF or 1000 or +-500 or 9999) then lower/upper range = 0...1683
 else lower/upper range = 0...127
 
 [x] if encoder type = PrgC or PBnd or AftT then command number = disable
