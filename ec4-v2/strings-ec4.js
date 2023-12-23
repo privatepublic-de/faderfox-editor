@@ -26,6 +26,7 @@ let SEC4 = {
   msg_apply: 'Received setup data from EC4. Apply to editor?',
   msg_data_applied: 'Setups from EC4 applied to editor!',
   $msg_invalid_data: 'Received invalid sysex data. {}',
+  msg_old_firmware_data: '<p><b>Your EC4 is running on an older firmware version (1.x).</b></p> <p>Please upgrade your device to the latest firmware version before using this editor.</p>  <p>You can use the link &quot;Upgrade EC4 to firmware 2.x&quot; in the top bar of this page.</p>',
 
   title_receive: 'Receive from EC4',
   msg_receive:

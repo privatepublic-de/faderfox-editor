@@ -780,7 +780,11 @@ document.addEventListener('DOMContentLoaded', function () {
           if (targetPbType > 4) {
             P.set(selection, i, P.pb_link, 0); // clear all pb links if needed
           }
-          if (target == P.type && value==4 && P.get(selection, i, P.number) > 31) {
+          if (
+            target == P.type &&
+            value == 4 &&
+            P.get(selection, i, P.number) > 31
+          ) {
             P.set(selection, i, P.number, 31);
           }
         }
@@ -986,28 +990,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function sysexHandler(data) {
     if (data.length > 100 /* arbitrary number */) {
-      if (SYSEX_BACKUP_MODE) {
-        const now = new Date();
-        function twoDigits(v) {
-          return v < 10 ? `0${v}` : String(v);
-        }
-        let filename = `EC4-backup-${now.getFullYear()}-${twoDigits(
-          now.getMonth() + 1
-        )}-${twoDigits(now.getDate())}-${twoDigits(now.getHours())}-${twoDigits(
-          now.getMinutes()
-        )}.syx`;
-        download(data, filename, 'application/octet-stream');
-        SYSEX_BACKUP_MODE = false;
-        sendData();
+      const version = sysex.parseSysexData(
+        data,
+        (c) => {},
+        (a, p) => {}
+      );
+      if (version < 2) {
+        MBox.show(
+          SEC4.title_data_received,
+          SEC4.msg_old_firmware_data,
+          { type: 'error' }
+        );
       } else {
-        try {
-          loadSysexData(data);
-        } catch (e) {
-          MBox.show(
-            SEC4.title_data_received,
-            STR.apply(SEC4.$msg_invalid_data, e.message),
-            { hideAfter: 10000, type: 'error' }
-          );
+        if (SYSEX_BACKUP_MODE) {
+          const now = new Date();
+          function twoDigits(v) {
+            return v < 10 ? `0${v}` : String(v);
+          }
+          let filename = `EC4-backup-${now.getFullYear()}-${twoDigits(
+            now.getMonth() + 1
+          )}-${twoDigits(now.getDate())}-${twoDigits(
+            now.getHours()
+          )}-${twoDigits(now.getMinutes())}.syx`;
+          download(data, filename, 'application/octet-stream');
+          SYSEX_BACKUP_MODE = false;
+          sendData();
+        } else {
+          try {
+            loadSysexData(data);
+          } catch (e) {
+            MBox.show(
+              SEC4.title_data_received,
+              STR.apply(SEC4.$msg_invalid_data, e.message),
+              { hideAfter: 10000, type: 'error' }
+            );
+          }
         }
       }
     } else {
