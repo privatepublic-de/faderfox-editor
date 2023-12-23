@@ -768,7 +768,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const value = P.get(selection, selection.encoder, target);
         for (let i = 0; i < 16; i++) {
           const targetType = P.get(selection, i, P.type);
-          const targetPbType = P.get(selection, i, P.pb_type);
           let setValue = value;
           if (targetType === 4 /* CC14bit */ && target === 'number') {
             if (setValue < 32) {
@@ -777,7 +776,7 @@ document.addEventListener('DOMContentLoaded', function () {
           } else {
             P.set(selection, i, target, setValue);
           }
-          if (targetPbType > 4) {
+          if (P.get(selection, i, P.pb_type) > 4) {
             P.set(selection, i, P.pb_link, 0); // clear all pb links if needed
           }
           if (
