@@ -91,6 +91,6 @@ let SEC4 = {
         <li>Congratulations! Update was successful.</li>
       </ul>
       <p>Now you can load your backup file and transmit it to the EC4
-        with this editor. The setup data will be automatically converted to Version 2.x.</p>
+        with this editor. The setup data will be automatically converted to Version 2.x. Otherwise you have to do a factory reset.</p>
     `
 };
